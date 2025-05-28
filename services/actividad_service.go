@@ -23,3 +23,18 @@ func GetActividadById(id int) (dto.ActividadDto, e.ApiError) {
 
 	return actividadDto, nil
 }
+
+
+func InsertActividad(actividadDto dto.ActividadDto)(dto.ActividadDto, e.ApiError){
+	var actividad model.Actividad
+	
+	actividad.Nombre = actividadDto.Nombre
+	actividad.Descripcion = actividadDto.Descripcion
+	actividad.Cupo = actividadDto.Cupo
+	actividad.Profesor = actividadDto.Profesor
+
+	actividad = actividadCliente.InsertActividad(actividad)
+	actividadDto.Id = actividad.Id
+
+	return actividadDto, nil
+}

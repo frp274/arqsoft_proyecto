@@ -9,6 +9,7 @@ import(
 
 func mapUrls(){
 	router.GET("/actividades/:id", actividadController.GetActividadById)
+	router.POST("/actividad", actividadController.InsertActividad)
 
 	log.Info("Finishing mappings configurations")
 }

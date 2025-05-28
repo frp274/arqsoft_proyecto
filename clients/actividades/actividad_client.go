@@ -17,3 +17,14 @@ func GetActividadById(id int) model.Actividad {
 
 	return actividad
 }
+
+func InsertActividad(actividad model.Actividad) model.Actividad{
+	result := Db.Create(&actividad)
+
+	if result.Error != nil {
+		//TODO Manage Errors
+		log.Error("")
+	}
+	log.Debug("Actividad Created: ", actividad.Id)
+	return actividad
+}
