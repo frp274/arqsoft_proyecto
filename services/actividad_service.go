@@ -24,6 +24,28 @@ func GetActividadById(id int) (dto.ActividadDto, e.ApiError) {
 	return actividadDto, nil
 }
 
+// func GetAllActividades() (dto.ActividadesDto, e.ApiError) {
+//     var actividades []model.Actividades
+//     var actividadesDto dto.ActividadesDto
+
+//     // Obtener actividades del "client" (repositorio)
+//     actividades = actividadCliente.GetAllActividades()
+
+//     // Mapear modelo → DTO
+//     for _, actividad := range actividades {
+//         actividadDto := dto.ActividadDto{
+//             Id:          actividad.Id,
+//             Nombre:      actividad.Nombre,
+//             Descripcion: actividad.Descripcion,
+//             Profesor:    actividad.Profesor,
+//             Cupo:        actividad.Cupo,
+//         }
+//         actividadesDto = append(actividadesDto, actividadDto)
+//     }
+
+//     return actividadesDto, e.ApiError{} // asumimos que no hay error por ahora
+// }
+
 
 func InsertActividad(actividadDto dto.ActividadDto)(dto.ActividadDto, e.ApiError){
 	var actividad model.Actividad

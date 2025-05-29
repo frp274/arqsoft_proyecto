@@ -18,6 +18,13 @@ func GetActividadById(id int) model.Actividad {
 	return actividad
 }
 
+// func GetAllActividades() []model.Actividades{
+// 	var actividades []model.Actividades
+// 	Db.Find(&actividades)
+
+// 	return actividades
+// }
+
 func InsertActividad(actividad model.Actividad) model.Actividad{
 	result := Db.Create(&actividad)
 
