@@ -3,8 +3,8 @@ package actividad
 import (
 	"arqsoft_proyecto/model"
 
-	"gorm.io/gorm"
 	log "github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 var Db *gorm.DB
@@ -21,14 +21,17 @@ func GetActividadById(id int) model.Actividad {
 	return actividad
 }
 
-// func GetAllActividades() []model.Actividades{
-// 	var actividades []model.Actividades
-// 	Db.Find(&actividades)
+func GetAllActividades() (model.Actividades, error) {
+	var actividades model.Actividades
+	result := Db.Find(&actividades)
+	if result.Error != nil {
+		return actividades, result.Error
+	}
 
-// 	return actividades
-// }
+	return actividades, nil
+}
 
-func InsertActividad(actividad model.Actividad) model.Actividad{
+func InsertActividad(actividad model.Actividad) model.Actividad {
 	result := Db.Create(&actividad)
 
 	if result.Error != nil {
