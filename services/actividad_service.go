@@ -46,10 +46,9 @@ func GetActividadById(id int) (dto.ActividadDto, e.ApiError) {
 //     return actividadesDto, e.ApiError{} // asumimos que no hay error por ahora
 // }
 
-
-func InsertActividad(actividadDto dto.ActividadDto)(dto.ActividadDto, e.ApiError){
+func InsertActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiError) {
 	var actividad model.Actividad
-	
+
 	actividad.Nombre = actividadDto.Nombre
 	actividad.Descripcion = actividadDto.Descripcion
 	actividad.Cupo = actividadDto.Cupo

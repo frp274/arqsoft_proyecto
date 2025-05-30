@@ -12,8 +12,11 @@ var Db *gorm.DB
 func GetActividadById(id int) model.Actividad {
 	var actividad model.Actividad
 
-	Db.Where("id = ?", id).First(&actividad)
-	log.Debug("Act: ", actividad)
+	result := Db.Where("id = ?", id).First(&actividad)
+	if result.Error != nil {
+
+	}
+	log.Debugf("Act: %v", actividad)
 
 	return actividad
 }
@@ -32,6 +35,6 @@ func InsertActividad(actividad model.Actividad) model.Actividad{
 		//TODO Manage Errors
 		log.Error("")
 	}
-	log.Debug("Actividad Created: ", actividad.Id)
+	log.Debugf("Actividad Created: %v", actividad.Id)
 	return actividad
 }
