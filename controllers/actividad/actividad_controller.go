@@ -26,15 +26,15 @@ func GetActividadById(c *gin.Context) {
 	c.JSON(http.StatusOK, actividadDto)
 }
 
-// func GetAllActividades(c *gin.Context) {
-// 	actividadesDto, err := service.GetAllActividades()
+func GetAllActividades(c *gin.Context) {
+	actividadesDto, err := service.GetAllActividades()
 
-// 	    if err != nil {
-//         c.JSON(http.StatusInternalServerError, err.Error())
-//         return
-//     }
-// 	c.JSON(http.StatusOK, actividadesDto)
-// }
+	    if err != nil {
+        c.JSON(http.StatusInternalServerError, err.Error())
+        return
+    }
+	c.JSON(http.StatusOK, actividadesDto)
+}
 
 func InsertActividad(c *gin.Context){
 	var actividadDto dto.ActividadDto

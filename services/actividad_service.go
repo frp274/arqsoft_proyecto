@@ -5,6 +5,7 @@ import (
 	"arqsoft_proyecto/dto"
 	"arqsoft_proyecto/model"
 	e "arqsoft_proyecto/utils/errors"
+	log "github.com/sirupsen/logrus"
 )
 
 func GetActividadById(id int) (dto.ActividadDto, e.ApiError) {
@@ -24,32 +25,35 @@ func GetActividadById(id int) (dto.ActividadDto, e.ApiError) {
 	return actividadDto, nil
 }
 
-// func GetAllActividades() (dto.ActividadesDto, e.ApiError) {
-//     var actividades []model.Actividades
-//     var actividadesDto dto.ActividadesDto
+func GetAllActividades() (dto.ActividadesDto, e.ApiError) {
+	var actividades model.Actividades
+	var actividadesDto dto.ActividadesDto
 
-//     // Obtener actividades del "client" (repositorio)
-//     actividades = actividadCliente.GetAllActividades()
+	// Obtener actividades del "client" (repositorio)
+	actividades, err := actividadCliente.GetAllActividades()
 
-//     // Mapear modelo → DTO
-//     for _, actividad := range actividades {
-//         actividadDto := dto.ActividadDto{
-//             Id:          actividad.Id,
-//             Nombre:      actividad.Nombre,
-//             Descripcion: actividad.Descripcion,
-//             Profesor:    actividad.Profesor,
-//             Cupo:        actividad.Cupo,
-//         }
-//         actividadesDto = append(actividadesDto, actividadDto)
-//     }
+	if err != nil {
+		log.Error(err.Error())
+		return actividadesDto, e.NewInternalServerApiError("Error", err)
+	}
+	// Mapear modelo → DTO
+	for _, actividad := range actividades {
+		actividadDto := dto.ActividadDto{
+			Id:          actividad.Id,
+			Nombre:      actividad.Nombre,
+			Descripcion: actividad.Descripcion,
+			Profesor:    actividad.Profesor,
+			Cupo:        actividad.Cupo,
+		}
+		actividadesDto = append(actividadesDto, actividadDto)
+	}
 
-//     return actividadesDto, e.ApiError{} // asumimos que no hay error por ahora
-// }
+	return actividadesDto, nil // asumimos que no hay error por ahora
+}
 
-
-func InsertActividad(actividadDto dto.ActividadDto)(dto.ActividadDto, e.ApiError){
+func InsertActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiError) {
 	var actividad model.Actividad
-	
+
 	actividad.Nombre = actividadDto.Nombre
 	actividad.Descripcion = actividadDto.Descripcion
 	actividad.Cupo = actividadDto.Cupo
