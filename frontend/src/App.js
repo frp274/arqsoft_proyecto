@@ -46,17 +46,14 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>PROYECTO FINAL</h1>
-        <ul>
-          {actividades.map(act => (
-            <li key={act.id}>{act.nombre} - {act.descripcion}</li>
-          ))}
-        </ul>
-        <footer>
-          <h2>hola mundo</h2>
-          <p>facu pete</p>
-          <p>este parrafo es de prueba para ver</p>
-        </footer>
+        <h1>BIENVENIDO</h1>
+        <h3>REGISTRATE</h3>
+        
+        <button>LOGIN</button>
+
+
+
+
       </header>
     </div>
   );
