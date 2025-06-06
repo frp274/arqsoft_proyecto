@@ -1,31 +1,4 @@
-
-/*import './App.css';
-import { componente1 } from './componets/componente1';
-
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <h1>PROYECTO FINAL</h1>
-    
-      <footer>
-        
-        <h2>hola mundo</h2>
-      <p>este parrafo es de prueba para ver</p>
-      </footer>
-      </header>
-      
-      
-      
-    </div>
-  );
-}
-
-export default App;*/
-
-
-// Ejemplo para obtener actividades y mostrarlas en tu App.js
-import React, { useEffect, useState } from 'react';
+/*import React, { useEffect, useState } from 'react';
 import './App.css';
 
 function App() {
@@ -61,6 +34,7 @@ function App() {
         
       </header>
       
+      
       <footer>
           
           
@@ -70,4 +44,26 @@ function App() {
   );
 }
 
-export default App;
+export default App;*/
+
+// src/components/Login.jsx
+import { useNavigate } from "react-router-dom";
+
+function Login() {
+  const navigate = useNavigate();
+
+  const irAHome = () => {
+    navigate("/Home");
+  };
+
+  return (
+    <div>
+      <h2>Login</h2>
+      <p>Bienvenido. Iniciá sesión para continuar.</p>
+      <button onClick={irAHome}>Ir a Home →</button>
+    </div>
+  );
+}
+
+export default Login;
+
