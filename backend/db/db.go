@@ -1,8 +1,10 @@
 package db
 
 import (
-	model "arqsoft_proyecto/model"
 	actividadClient "arqsoft_proyecto/clients/actividades"
+	model "arqsoft_proyecto/model"
+	"fmt"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -10,13 +12,14 @@ import (
 
 func InitConnection() *gorm.DB {
 	// refer https://github.com/go-sql-driver/mysql#dsn-data-source-name for details
-	dsn := "root:facurp274@tcp(127.0.0.1:3306)/arquisoftware?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "root:Santiago-321@tcp(127.0.0.1:3306)/arquisoftware?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
 		},
 	})
 	if err != nil {
+		fmt.Printf("failed to connect database %v", err)
 		panic("failed to connect database")
 	}
 

@@ -35,7 +35,7 @@ function App() {
   fetch('http://localhost:8080/actividad')
     .then(response => response.json())
     .then(data => {
-      console.log('Actividades:', data); // <-- Agrega este log
+      console.log('Actividades:', data); 
       setActividades(data);
     })
     .catch(error => console.error('Error:', error));
@@ -54,6 +54,7 @@ function App() {
         </ul>
         <footer>
           <h2>hola mundo</h2>
+          <p>facu pete</p>
           <p>este parrafo es de prueba para ver</p>
         </footer>
       </header>
