@@ -13,9 +13,12 @@ func InscripcionActividad(inscripcionDto dto.InscripcionDto)(dto.InscripcionDto,
 
 	inscripcion.UsuarioId = inscripcionDto.UsuarioId
 	inscripcion.ActividadId = inscripcionDto.ActividadId
-	inscripcion.Fecha = inscripcionDto.Fecha
+	inscripcion.HorarioInscripcion.Dia = inscripcionDto.HorarioInscripcion.Dia
+	inscripcion.HorarioInscripcion.HoraInicio = inscripcionDto.HorarioInscripcion.HoraInicio
+	inscripcion.HorarioInscripcion.HoraFin = inscripcionDto.HorarioInscripcion.HoraFin
 
 	inscripcion = inscripcionCliente.InscripcionActividad(inscripcion)
 	inscripcionDto.Id = inscripcion.Id
 	return inscripcionDto, nil
+
 }
