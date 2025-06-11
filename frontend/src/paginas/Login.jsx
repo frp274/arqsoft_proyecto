@@ -19,7 +19,6 @@ const Login = () => {
 
     // Si pasa la validación, hace la request al backend
     try {
-      console.log(usuario);
       const response = await fetch("http://localhost:8080/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
