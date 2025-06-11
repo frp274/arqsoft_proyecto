@@ -2,6 +2,9 @@ package db
 
 import (
 	actividadClient "arqsoft_proyecto/clients/actividades"
+	inscripcionClient "arqsoft_proyecto/clients/inscripciones"
+	usuarioClient "arqsoft_proyecto/clients/usuarios"
+
 	model "arqsoft_proyecto/model"
 	"fmt"
 
@@ -25,6 +28,9 @@ func InitConnection() *gorm.DB {
 
 	db.AutoMigrate(&model.Actividad{}, &model.Usuario{}, &model.Inscripcion{})
 	actividadClient.Db = db
+	inscripcionClient.Db = db
+	usuarioClient.Db = db
+
 	return db
 }
 

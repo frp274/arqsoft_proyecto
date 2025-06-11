@@ -3,7 +3,7 @@ package utils
 import (
 	"fmt"
 	"time"
-
+	"log"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -24,11 +24,12 @@ func GenerateJWT(userId int) (string, error) {
 		ID:        fmt.Sprintf("%d", userId),
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	tokenString, err := token.SignedString([]byte(jwtSecret))
 
 	if err != nil {
+		log.Printf("error al generar el token %v", err)
 		return "", fmt.Errorf("error generating token %w", err)
 	}
 
