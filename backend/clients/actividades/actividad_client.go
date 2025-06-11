@@ -12,7 +12,7 @@ var Db *gorm.DB
 func GetActividadById(id int) model.Actividad {
 	var actividad model.Actividad
 
-	result := Db.Where("id = ?", id).First(&actividad)
+	result := Db.Preload("Horarios").Where("id = ?", id).First(&actividad)
 	if result.Error != nil {
 
 	}
@@ -23,7 +23,7 @@ func GetActividadById(id int) model.Actividad {
 
 func GetAllActividades() (model.Actividades, error) {
 	var actividades model.Actividades
-	result := Db.Find(&actividades)
+	result := Db.Preload("Horarios").Find(&actividades)
 	if result.Error != nil {
 		return actividades, result.Error
 	}
@@ -40,4 +40,13 @@ func InsertActividad(actividad model.Actividad) model.Actividad {
 	}
 	log.Debugf("Actividad Created: %v", actividad.Id)
 	return actividad
+}
+
+
+func UpdateActividad(actividad model.Actividad) model.Actividad {
+    result := Db.Save(&actividad)
+    if result.Error != nil {
+		log.Error("")
+    }
+    return actividad
 }

@@ -23,7 +23,7 @@ func GetActividadById(id int) (dto.ActividadDto, e.ApiError) {
 	actividadDto.Profesor = actividad.Profesor
 	//actividadDto.HorarioInscripcion = actividad.Horario
 
-	for _, horario := range actividad.Horario {
+	for _, horario := range actividad.Horarios {
 		horarioDto := dto.HorarioDto{
 			Dia:        horario.Dia,
 			HoraInicio: horario.HoraInicio,
@@ -55,7 +55,7 @@ func GetAllActividades() (dto.ActividadesDto, e.ApiError) {
 			Profesor:    actividad.Profesor,
 			Cupo:        actividad.Cupo,
 		}
-		for _, horario := range actividad.Horario {
+		for _, horario := range actividad.Horarios {
 			horarioDto := dto.HorarioDto{
 				Dia:        horario.Dia,
 				HoraInicio: horario.HoraInicio,
@@ -85,7 +85,7 @@ func InsertActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 			HoraInicio: horarioDto.HoraInicio,
 			HoraFin:    horarioDto.HoraFin,
 		}
-		actividad.Horario = append(actividad.Horario, horario)
+		actividad.Horarios = append(actividad.Horarios, horario)
 	}
 
 	actividad = actividadCliente.InsertActividad(actividad)

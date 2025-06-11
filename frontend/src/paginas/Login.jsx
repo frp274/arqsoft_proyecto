@@ -1,80 +1,97 @@
-/*import React, { useEffect, useState } from 'react';
-import './App.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Si usás react-router
 
-function App() {
-  const [actividades, setActividades] = useState([]);
+const Login = () => {
+  const [usuario, setUsuario] = useState("");
+  const [contrasenia, setContrasenia] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate(); // para redireccionar
 
- useEffect(() => {
-  fetch('http://localhost:8080/actividad')
-    .then(response => response.json())
-    .then(data => {
-      console.log('Actividades:', data); 
-      setActividades(data);
-    })
-    .catch(error => console.error('Error:', error));
-}, []);
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError(""); // limpia error
 
-  
+    // Validación en el FRONT
+    if (!usuario || !contrasenia) {
+      setError("Debe completar los campos.");
+      return; // No hace la request
+    }
 
-  return (
-    <div className="App">
-      <header className="App-header">
-        <h1></h1>
-        <ul>
-          {actividades.map(act => (
-            <li key={act.id}>{act.nombre} - {act.descripcion}</li>
-          ))}
-        </ul>
+    // Si pasa la validación, hace la request al backend
+    try {
+      console.log(usuario);
+      const response = await fetch("http://localhost:8080/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ UserName: usuario, Password:contrasenia }),
+      });
 
-        <h1>hola mundo</h1>
-        <body>
-
-          <p>chuaaaa</p>
-      </body>
-        
-      </header>
-      
-      
-      <footer>
-          
-          
-          <p>este parrafo es de prueba para ver</p>
-        </footer>
-    </div>
-  );
-}
-
-export default App;*/
-
-// src/components/Login.jsx
-import { useNavigate } from "react-router-dom";
-import DosCampos from '../components/camposLogin';
-import './Login.css';
-
-function Login() {
-  const navigate = useNavigate();
-
-  const irAHome = () => {
-    navigate("/Home");
+      if (response.ok) {
+        // Puede que el backend te devuelva un token, podés guardarlo en localStorage/sessionStorage
+        // const data = await response.json();
+        navigate("/home"); // Redirige a Home si login OK
+      } else {
+        setError("Usuario o contraseña incorrectos."); // Error de backend
+      }
+    } catch (err) {
+      setError("Error de conexión al servidor.");
+    }
   };
 
   return (
-    <div className="login">
-      
-      <h2 className="titulo">GOOD GYM</h2>
-      <p>Bienvenido. Ingrese su usuario para acceder : </p>
-      
-
-      <hr/>
-      <p/>
-      <DosCampos></DosCampos>
-      <p/>
-      <div className="boton">
-      <button onClick={irAHome} className="ingresar" >  I N G R E S A R  </button>
-      </div>
+    <div className="login-container">
+      <form onSubmit={handleLogin}>
+        <input
+          type="text"
+          placeholder="Usuario"
+          value={usuario}
+          onChange={(e) => setUsuario(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Contraseña"
+          value={contrasenia}
+          onChange={(e) => setContrasenia(e.target.value)}
+        />
+        <button type="submit">Ingresar</button>
+        {error && <div className="error">{error}</div>}
+      </form>
     </div>
   );
-}
+};
 
 export default Login;
+
+
+
+// import { useNavigate } from "react-router-dom";
+// import DosCampos from '../components/camposLogin';
+// import './Login.css';
+
+// function Login() {
+//   const navigate = useNavigate();
+
+//   const irAHome = () => {
+//     navigate("/Home");
+//   };
+
+//   return (
+//     <div className="login">
+      
+//       <h2 className="titulo">GOOD GYM</h2>
+//       <p>Bienvenido. Ingrese su usuario para acceder : </p>
+      
+
+//       <hr/>
+//       <p/>
+//       <DosCampos></DosCampos>
+//       <p/>
+//       <div className="boton">
+//       <button onClick={irAHome} className="ingresar" >  I N G R E S A R  </button>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default Login;
 
