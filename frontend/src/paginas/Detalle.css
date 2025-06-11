@@ -1,0 +1,25 @@
+.detalle-card {
+  border: 1px solid #ccc;
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 10px;
+}
+
+.inscribirse-btn {
+  background-color: #28a745;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.inscribirse-btn:hover {
+  background-color: #218838;
+}
+
+.mensaje-exito {
+  color: green;
+  margin-top: 15px;
+  font-weight: bold;
+}
