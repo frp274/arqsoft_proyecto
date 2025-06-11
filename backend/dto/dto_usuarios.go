@@ -2,7 +2,7 @@ package dto
 
 type UsuarioDto struct {
 	Id       int    `json:"id"`
-	UserName string `json:"username"`
+	UserName string `json:"Username"`
 }
 
 type UsuariosDto []UsuarioDto
@@ -13,6 +13,6 @@ type LoginResponse struct {
 }
 
 type LoginRequest struct {
-	Username string `json:"UserName"`
+	Username string `json:"Username"`
 	Password string `json:"Password"`
 }

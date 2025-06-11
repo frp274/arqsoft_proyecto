@@ -13,7 +13,7 @@ function Home() {
     <div className="home">
       <top className="top">
 
-        <button onClick={() => navigate("/")} className="botonRedondoVolver">← Volver a Login</button>
+        <button onClick={() => navigate("/Login")} className="botonRedondoVolver">← Volver a Login</button>
         <button onClick={() => navigate("/Detalle")} className="botonRedondoAdelante">Ir a Detalle →</button>
         <p className="espacio"/>
         <h2>Home</h2>
