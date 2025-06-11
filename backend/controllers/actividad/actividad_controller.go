@@ -29,7 +29,7 @@ func GetActividadById(c *gin.Context) {
 func GetAllActividades(c *gin.Context) {
 	actividadesDto, err := service.GetAllActividades()
 
-	    if err != nil {
+	if err != nil {
         c.JSON(http.StatusInternalServerError, err.Error())
         return
     }
