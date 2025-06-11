@@ -61,12 +61,12 @@ function Login() {
   return (
     <div className="login">
       
-      <h2 className="titulo">GOOD GYM</h2>
-      <p>Bienvenido. Ingrese su usuario para acceder : </p>
+      <h2 className="titulo">💪🏼 GOOD GYM 🦵🏼</h2>
+      <div className="sb">
+      <p className="subtitulo">Bienvenido. Ingrese su usuario para acceder : </p>
+      </div>
       
-
-      <hr/>
-      <p/>
+      <p className="espacio"/>
       <DosCampos></DosCampos>
       <p/>
       <div className="boton">

@@ -13,13 +13,12 @@ function Home() {
       <button onClick={() => navigate("/")} className="botonRedondoVolver">← Volver a Login</button>
       <button onClick={() => navigate("/Detalle")} className="botonRedondoAdelante">Ir a Detalle →</button>
       <hr/>
-      <h1 className="Titulo">GIMNACIO HELL NAHHHHH 😩</h1>
+      <h1 className="Titulo">    G O O D  G Y M    </h1>
+      <div className="foto">
      <Foto/>
+     </div>
      <ListaDesplegable/>
      
-     
-
-      
     </div>
   );
 }
