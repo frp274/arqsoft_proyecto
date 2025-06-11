@@ -1,0 +1,31 @@
+.Login {
+
+    background-color: #282c34;
+   
+}
+
+.titulo{
+
+    text-align: center;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 100px;
+
+}
+
+.ingresar{
+
+    width: 150px;
+    height: 30px;
+    border-radius: 30px;
+    background-color: rgb(143, 143, 147);
+    
+}
+
+.boton{
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    
+}
