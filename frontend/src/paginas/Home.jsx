@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import './Home.css';
 import Foto from '../components/Foto';
 import ListaDesplegable from '../components/ListaDesplegable';
+import Buscador from "../components/buscador";
+import ListadoActividades from "../components/listadoActividades";
 
 
 function Home() {
@@ -9,15 +11,33 @@ function Home() {
 
   return (
     <div className="home">
-      <h2>Home</h2>
-      <button onClick={() => navigate("/")} className="botonRedondoVolver">← Volver a Login</button>
-      <button onClick={() => navigate("/Detalle")} className="botonRedondoAdelante">Ir a Detalle →</button>
+      <top className="top">
+
+        <button onClick={() => navigate("/")} className="botonRedondoVolver">← Volver a Login</button>
+        <button onClick={() => navigate("/Detalle")} className="botonRedondoAdelante">Ir a Detalle →</button>
+        <p className="espacio"/>
+        <h2>Home</h2>
+
+      </top>
       <hr/>
       <h1 className="Titulo">    G O O D  G Y M    </h1>
       <div className="foto">
-     <Foto/>
+
+      <Foto/>
+
+      <p className="espacio"/>
+      <h1 className='subtitulo'>ACTIVIDADES DISPONIBLES</h1>
+      <p className="espacio"/>
+
+      <Buscador/>
+
+      <p className="espacio"/>
+
+      <ListadoActividades/>
+
+
      </div>
-     <ListaDesplegable/>
+     
      
     </div>
   );
@@ -25,55 +45,4 @@ function Home() {
 
 export default Home;
 
-/*import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-
-function Home() {
-  const navigate = useNavigate();
-  const [actividades, setActividades] = useState([]);
-  const [seleccionada, setSeleccionada] = useState("");
-
-  useEffect(() => {
-    // Llamada al backend para traer las actividades
-    fetch("http://localhost:8080/actividades")
-      .then((res) => res.json())
-      .then((data) => setActividades(data))
-      .catch((error) => console.error("Error al obtener actividades:", error));
-  }, []);
-
-  return (
-    <div>
-      <h2>Home</h2>
-
-      <button onClick={() => navigate("/")}>← Volver a Login</button>
-      <button onClick={() => navigate("/Detalle")}>Ir a Detalle →</button>
-
-      <h3>Lista de actividades</h3>
-      <select
-        value={seleccionada}
-        onChange={(e) => setSeleccionada(e.target.value)}
-      >
-        <option value="">-- Seleccioná una actividad --</option>
-        {actividades.map((actividad, index) => (
-          <option key={index} value={actividad.id}>
-            {actividad.nombre}
-          </option>
-        ))}
-      </select>
-
-      {seleccionada && (
-        <p>
-          Actividad seleccionada:{" "}
-          {
-            actividades.find((a) => a.id.toString() === seleccionada)?.nombre
-          }
-        </p>
-      )}
-
-
-    </div>
-  );
-}
-
-export default Home;*/
 

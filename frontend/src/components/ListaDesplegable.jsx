@@ -25,15 +25,13 @@ function ListaDesplegable() {
 
   return (
     <div>
-      <label htmlFor="opciones">Seleccioná una opción:  </label>
+      <label htmlFor="opciones"></label>
       <select id="opciones" value={seleccion} onChange={manejarCambio} className='lista'>
-        <option value="">-- Elegir --</option>
+        <option value=""> Horarios </option>
         <option value="a">Opción A</option>
         <option value="b">Opción B</option>
         <option value="c">Opción C</option>
       </select>
-
-      <p>Seleccionaste: {seleccion}</p>
     </div>
   );
 }
