@@ -144,21 +144,28 @@ function Login() {
   return (
     <div className="login-container">
       <form className="login-form" onSubmit={handleLogin}>
-        <h2>Iniciar sesión</h2>
-        <input
-          type="text"
-          placeholder="Usuario"
-          value={usuario}
-          onChange={(e) => setUsuario(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={contrasenia}
-          onChange={(e) => setContrasenia(e.target.value)}
-        />
-        <button type="submit">Ingresar</button>
-        {error && <p className="login-error">{error}</p>}
+        <h1 className="titulo"> 💪🏼 GOOD GYM 🦵🏼 </h1>
+        <div className="boton">
+          <input
+            className="usuario"
+            type="text"
+            placeholder="Usuario"
+            value={usuario}
+            onChange={(e) => setUsuario(e.target.value)}
+          />
+          <p/>
+          <input
+            className="contra"
+            type="password"
+            placeholder="Contraseña"
+            value={contrasenia}
+            onChange={(e) => setContrasenia(e.target.value)}
+          />
+          <p/>
+        
+          <button className="ingresar" type="submit">Ingresar</button>
+          {error && <p className="login-error">{error}</p>}
+        </div>
       </form>
     </div>
   );

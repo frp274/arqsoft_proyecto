@@ -8,6 +8,7 @@
     text-align: center;
     margin: 50px 0;
     font-size: 100px;
+    text-shadow: 30svb;
 }
 
 .botonRedondoVolver{
@@ -38,7 +39,3 @@
     
 }
 
-.textohome{
-    text-align: center;
-    display: flex;
-}

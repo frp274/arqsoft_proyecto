@@ -21,15 +21,48 @@
 
 .texto{
 
-    font-size: larger;
+    font-size: 20px;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     height: fit-content;
     color: rgb(0, 0, 0);
-    background-color: antiquewhite;
+    
 }
 
 .li{
 
     list-style: none;
     padding: 0;
+}
+
+.actnp{
+
+    display: inline-block;
+}
+
+.boton-actividad {
+  background-color: #f2f2f2;
+  padding: 12px 20px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.boton-actividad:hover {
+  background-color: #e6e6e6;
+}
+
+.contenido-actividad {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Centra horizontalmente todo */
+  gap: 30px; /* Espacio entre nombre, profesor y horarios */
+  flex-wrap: wrap; /* Por si no entra todo en una sola línea */
+}
+
+.actividad-nombre,
+.actividad-profesor {
+  font-weight: bold;
+  font-size: 16px;
 }
