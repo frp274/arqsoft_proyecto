@@ -44,5 +44,8 @@
 .ul{
 
   list-style: none;
-    padding: 0;
+  padding: 0;
+  margin-right: 450px;
+  margin-left: 450px;
+
 }

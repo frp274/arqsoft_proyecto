@@ -147,8 +147,7 @@ function Detalle() {
 
   return (
     <div>
-      <h2>Detalles</h2>
-      <p>Listado o gestión de tareas.</p>
+      
       <button onClick={() => navigate("/Home")}>← Volver a Home</button>
       <div className="detalles">
         <h1>DETALLES DE LA ACTIVIDAD</h1>
