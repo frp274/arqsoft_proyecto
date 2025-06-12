@@ -1,21 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './buscador.css';
 
-
-
-function Buscador() {
-  const [actividad, setActividad] = useState('');
-  
-
-  const manejarCambioActividad = (e) => setActividad(e.target.value);
-  
+function Buscador({ setFiltro }) {
+  const manejarCambioActividad = (e) => setFiltro(e.target.value);
 
   return (
     <div className='campos'>
       <input 
         className='placeholder'
         type="text" 
-        value={actividad} 
         onChange={manejarCambioActividad} 
         placeholder="-- Buscar actividad 🔎 --"
       />
@@ -23,4 +16,4 @@ function Buscador() {
   );
 }
 
-export default Buscador;
+export default Buscador;

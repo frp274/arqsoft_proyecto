@@ -100,6 +100,13 @@ function Detalle() {
       setTimeout(() => navigate("/Login"), 2000);
       return;
     }
+
+    const cupo = actividad.cupo || actividad.Cupo;
+    if (cupo === 0) {
+      setMensaje("No hay cupos disponibles para esta actividad.");
+      return;
+    }
+
     axios.post('http://localhost:8080/inscripcion', {
       actividadId: id,
       horarioId: horarioId,
@@ -121,33 +128,62 @@ function Detalle() {
 
   const horarios = actividad.horarios || actividad.Horarios || [];
 
+    const obtenerImagenActividad = (nombre) => {
+    if (!nombre) return "/default.jpg";
+    const nombreNormalizado = nombre.toLowerCase();
+    switch (nombreNormalizado) {
+      case "pilates":
+        return "/pilates.png";
+      case "mma":
+        return "/mma.png";
+      case "funcional":
+        return "/funcional.jpg";
+      case "boxeo":
+        return "/boxeo.jpg";
+      default:
+        return "/default.jpg";
+    }
+  };
+
   return (
     <div>
       <h2>Detalles</h2>
       <p>Listado o gestión de tareas.</p>
       <button onClick={() => navigate("/Home")}>← Volver a Home</button>
-      <h1>DETALLES DE LA ACTIVIDAD</h1>
+      <div className="detalles">
+        <h1>DETALLES DE LA ACTIVIDAD</h1>
 
-      <div className="detalle-card">
-        <h3>{actividad.nombre || actividad.Nombre}</h3>
-        <p><strong>Descripción:</strong> {actividad.descripcion || actividad.Descripcion}</p>
-        <p><strong>Horarios:</strong></p>
-        <ul>
-          {horarios.length > 0 ? horarios.map((h, idx) => (
-            <li key={idx} style={{display:"flex", alignItems:"center", justifyContent:"space-between"}}>
-              <span>
-                {h.dia || h.Dia}: {h.horarioInicio || h.horarioinicio || h.HorarioInicio} - {h.horarioFinal || h.horariofinal || h.HorarioFinal}
-              </span>
-              <button className="inscribirse-btn" onClick={() => inscribirseHorario(h.id || h.Id)}>
-                Inscribirme a este horario
-              </button>
-            </li>
-          )) : <li>No hay horarios cargados.</li>}
-        </ul>
+        <div className="detalle-card">
+          <h3 className="nact">{actividad.nombre || actividad.Nombre}</h3>
+          <p className="desc"><strong>Descripción:</strong> {actividad.descripcion || actividad.Descripcion}</p>
+          <p className="desc"><strong>Profesor:</strong> {actividad.profesor || actividad.Profesor}</p>
+          <p className="desc"><strong>Cupo disponible:</strong> {actividad.cupo || actividad.Cupo}</p>
 
-        <p><strong>Profesor:</strong> {actividad.profesor || actividad.Profesor}</p>
+          <p><strong>Horarios:</strong></p>
+          <ul className="ul">
+            {horarios.length > 0 ? horarios.map((h, idx) => (
+              <li key={idx} style={{display:"flex", alignItems:"center", justifyContent:"space-between"}}>
+                <span>
+                  {h.dia || h.Dia}: {h.horarioInicio || h.horarioinicio || h.HorarioInicio} - {h.horarioFinal || h.horariofinal || h.HorarioFinal}
+                </span>
+                <button className="inscribirse-btn" onClick={() => inscribirseHorario(h.id || h.Id)}>
+                  Inscribirme a este horario
+                </button>
+              </li>
+            )) : <li>No hay horarios cargados.</li>}
+          </ul>
 
-        {mensaje && <p className="mensaje-exito">{mensaje}</p>}
+          
+
+          {mensaje && <p className="mensaje-exito">{mensaje}</p>}
+
+          <img 
+            src={obtenerImagenActividad(actividad.nombre || actividad.Nombre)} 
+            alt="Imagen de la actividad" 
+            style={{ width: "400px", marginTop: "20px", borderRadius: "8px" }}
+          />
+
+        </div>
       </div>
     </div>
   );
