@@ -132,7 +132,7 @@ function Login() {
         console.log("RESPUESTA DEL LOGIN:", data); // <-- AGREGÁ ESTA LÍNEA
         console.log(localStorage.getItem("token"))
         localStorage.setItem("token", data.token);
-        navigate("/home");
+        navigate("/Home");
       } else {
         setError("Usuario o contraseña incorrectos.");
       }
@@ -145,6 +145,7 @@ function Login() {
     <div className="login-container">
       <form className="login-form" onSubmit={handleLogin}>
         <h1 className="titulo"> 💪🏼 GOOD GYM 🦵🏼 </h1>
+        
         <div className="boton">
           <input
             className="usuario"

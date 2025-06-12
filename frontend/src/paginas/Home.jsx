@@ -12,12 +12,7 @@ function Home() {
 
   return (
     <div className="home">
-      <top className="top">
-        <button onClick={() => navigate("/Login")} className="botonRedondoVolver">← Volver a Login</button>
-        <button onClick={() => navigate("/Detalle")} className="botonRedondoAdelante">Ir a Detalle →</button>
-        <p className="espacio"/>
-        <h2>Home</h2>
-      </top>
+      
 
       <hr/>
       <h1 className="Titulo">    G O O D   G Y M    </h1>
