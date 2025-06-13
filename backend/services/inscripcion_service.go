@@ -16,7 +16,10 @@ func InscripcionActividad(inscripcionDto dto.InscripcionDto)(dto.InscripcionDto,
 	inscripcion.ActividadId = inscripcionDto.ActividadId
 	inscripcion.HorarioId = inscripcionDto.HorarioId
 
-	inscripcion = inscripcionCliente.InscripcionActividad(inscripcion)
+	inscripcion, err := inscripcionCliente.InscripcionActividad(inscripcion)
+	if err != nil {
+		return dto.InscripcionDto{}, e.NewBadRequestApiError("ya estas inscripto a la actividad")
+	}
 	inscripcionDto.Id = inscripcion.Id
     actividad := actividadCliente.GetActividadById(inscripcionDto.ActividadId)
     if actividad.Id == 0 {
