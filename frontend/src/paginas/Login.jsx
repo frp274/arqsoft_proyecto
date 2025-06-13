@@ -127,15 +127,23 @@ function Login() {
       // console.log("Respuesta del backend:", data); // <-- AGREGÁ ESTO
       // localStorage.setItem("token", data.token);
       
+// Después de recibir la respuesta del login
       if (response.ok) {
         const data = await response.json();
-        console.log("RESPUESTA DEL LOGIN:", data); // <-- AGREGÁ ESTA LÍNEA
-        console.log(localStorage.getItem("token"))
-        localStorage.setItem("token", data.token);
-        navigate("/Home");
+        console.log("RESPUESTA DEL LOGIN:", data); // Verifica la respuesta
+
+        // Guardar el token en la cookie
+        document.cookie = `token=${data.token}; path=/; SameSite=Strict`;
+
+        // Guardar el usuarioId en la cookie (opcional)
+        //document.cookie = `userId=${data.id}; path=/; secure; HttpOnly`;
+
+        // Redirigir al Home
+        navigate("/home");
       } else {
         setError("Usuario o contraseña incorrectos.");
       }
+
     } catch (error) {
       setError("Error al conectar con el servidor.");
     }
