@@ -1,66 +1,3 @@
-// import { useNavigate, useParams } from "react-router-dom";
-// import { useEffect, useState } from "react";
-// import axios from "axios";
-// import './Detalle.css';
-
-// function Detalle() {
-//   const { id } = useParams(); // Tomamos el ID de la URL
-//   const navigate = useNavigate();
-//   const [actividad, setActividad] = useState(null);
-//   const [mensaje, setMensaje] = useState('');
-
-//   // Cargar detalles de la actividad
-//   useEffect(() => {
-//     axios.get(`http://localhost:8080/actividad/${id}`)
-//       .then((res) => setActividad(res.data))
-//       .catch((err) => console.error(err));
-//   }, [id]);
-
-//   // Función para inscribirse
-//   const inscribirse = () => {
-//     axios.post('http://localhost:8080/inscripcion', { actividadId: id })
-//       .then(() => {
-//         setMensaje('¡Inscripción exitosa!');
-//         setTimeout(() => navigate('/Home'), 2000); // Vuelve a Home después de 2 segundos
-//       })
-//       .catch((err) => console.error(err));
-//   };
-
-//   if (!actividad) return <p>Cargando actividad...</p>;
-
-//   return (
-//     <div>
-//       <h2>Detalles</h2>
-//       <p>Listado o gestión de tareas.</p>
-//       <button onClick={() => navigate("/Home")}>← Volver a Home</button>
-//       <h1>DETALLES DE LA ACTIVIDAD</h1>
-
-//       <div className="detalle-card">
-//         <h3>{actividad.nombre}</h3>
-//         <p><strong>Descripción:</strong> {actividad.descripcion}</p>
-//         <p><strong>Horarios:</strong></p>
-//         <ul>
-//           {actividad.horarios && actividad.horarios.map((h, idx) => (
-//             <li key={idx}>
-//               {h.dia}: {h.horarioInicio} - {h.horarioFinal}
-//             </li>
-//           ))}
-//         </ul>
-
-//         <p><strong>Profesor:</strong> {actividad.profesor}</p>
-
-//         <button onClick={inscribirse} className="inscribirse-btn">
-//           Inscribirme
-//         </button>
-
-//         {mensaje && <p className="mensaje-exito">{mensaje}</p>}
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default Detalle;
-
 
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -68,23 +5,9 @@ import axios from "axios";
 import './Detalle.css';
 
 
-// function getUserIdFromToken() {
-//   const token = getCookie("token");
-//   if (!token) return null;
-
-//   try {
-//     const payload = JSON.parse(atob(token.split('.')[1]));  // Decodificar el payload del token
-//     return payload.ID || null;
-//     //return payload.id || payload.userId || payload.UserId || null;  // Retornar el ID del usuario
-//   } catch (e) {
-//     console.error("Error al decodificar el token:", e);
-//     return null;
-//   }
-// }
 
 function getUserIdFromToken() {
-  // const token = getCookie("token");
-  // if (!token) return null;
+  
   const token = getCookie("token");
   if (token) {
     console.log("Token obtenido desde la cookie:", token);
@@ -191,19 +114,21 @@ function Detalle() {
         return "/pilates.png";
       case "mma":
         return "/mma.png";
-      case "funcional":
-        return "/funcional.jpg";
-      case "boxeo":
-        return "/boxeo.jpg";
+      case "musculacion":
+        return "/musculacion.png";
+      case "zumba":
+        return "/zumba.png";
+      case "spinning":
+        return "/spining.png";
       default:
-        return "/default.jpg";
+        return "/logo192.png";
     }
   };
 
   return (
     <div>
       
-      <button onClick={() => navigate("/Home")}>← Volver a Home</button>
+      <button className="boton-home" onClick={() => navigate("/Home")}>← Volver a Home</button>
       <div className="detalles">
         <h1>DETALLES DE LA ACTIVIDAD</h1>
 
