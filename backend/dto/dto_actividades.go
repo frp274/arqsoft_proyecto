@@ -12,6 +12,7 @@ type ActividadDto struct {
 type ActividadesDto []ActividadDto	
 
 type HorarioDto struct{
+	Id			int		`json:"id"`
 	Dia        string	`json:"dia"`
 	HoraInicio string	`json:"horarioInicio"`
 	HoraFin    string	`json:"horarioFinal"`
