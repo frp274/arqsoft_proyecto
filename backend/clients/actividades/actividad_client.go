@@ -14,7 +14,7 @@ func GetActividadById(id int) model.Actividad {
 
 	result := Db.Preload("Horarios").Where("id = ?", id).First(&actividad)
 	if result.Error != nil {
-
+		//return actividad, result.Error
 	}
 	log.Debugf("Act: %v", actividad)
 

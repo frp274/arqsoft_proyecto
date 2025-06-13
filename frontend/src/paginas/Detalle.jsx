@@ -67,18 +67,69 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import './Detalle.css';
 
-// Función para extraer el userId del token
+
+// function getUserIdFromToken() {
+//   const token = getCookie("token");
+//   if (!token) return null;
+
+//   try {
+//     const payload = JSON.parse(atob(token.split('.')[1]));  // Decodificar el payload del token
+//     return payload.ID || null;
+//     //return payload.id || payload.userId || payload.UserId || null;  // Retornar el ID del usuario
+//   } catch (e) {
+//     console.error("Error al decodificar el token:", e);
+//     return null;
+//   }
+// }
+
 function getUserIdFromToken() {
-  const token = localStorage.getItem("token");
-  if (!token) return null;
+  // const token = getCookie("token");
+  // if (!token) return null;
+  const token = getCookie("token");
+  if (token) {
+    console.log("Token obtenido desde la cookie:", token);
+  } else {
+    console.log("No se encontró el token en las cookies");
+  }
+
+  // Verifica si el token tiene tres partes (header, payload, signature)
+  const parts = token.split('.');
+  if (parts.length !== 3) {
+    console.error("Token JWT inválido");
+    return null;
+  }
+
   try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    // Usá el nombre correcto del campo según cómo guardás el id en el token
-    return payload.id || payload.userId || payload.UserId || null;
+    const payload = JSON.parse(atob(parts[1]));  // Decodificar el payload del token
+    console.log(payload); // Verifica si contiene el 'id' que buscas
+    return payload.jti || null;  // Retorna el ID del usuario
   } catch (e) {
+    console.error("Error al decodificar el token:", e);
     return null;
   }
 }
+
+// function getCookie(name) {
+//   const value = `; ${document.cookie}`;
+//   const parts = value.split(`; ${name}=`);
+//   if (parts.length === 2) return parts.pop().split(';').shift();
+// }
+
+function getCookie(name) {
+  const nameEQ = `${name}=`;
+  const ca = document.cookie.split(';');
+  
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i].trim();
+    if (c.indexOf(nameEQ) === 0) {
+      return c.substring(nameEQ.length, c.length);
+    }
+  }
+  return null; // Si no se encuentra la cookie, devuelve null
+}
+
+
+
 
 function Detalle() {
   const { id } = useParams();
@@ -112,11 +163,11 @@ function Detalle() {
       horarioId: horarioId,
       usuarioId: usuarioId
     }, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      headers: { Authorization: `Bearer ${getCookie("token")}` }
     })
       .then(() => {
         setMensaje('¡Inscripción exitosa!');
-        setTimeout(() => navigate('/Home'), 2000);
+        setTimeout(() => window.location.reload(), 2000);  // Recarga la página después de 2 segundos
       })
       .catch((err) => {
         setMensaje("Error al inscribirse.");
