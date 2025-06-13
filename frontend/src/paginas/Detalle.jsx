@@ -157,13 +157,17 @@ function Detalle() {
       setMensaje("No hay cupos disponibles para esta actividad.");
       return;
     }
-
+    const Id = parseInt(id, 10);
+    const horarioidint = parseInt(horarioId, 10);
+    const usuarioidint = parseInt(usuarioId, 10);
     axios.post('http://localhost:8080/inscripcion', {
-      actividadId: id,
-      horarioId: horarioId,
-      usuarioId: usuarioId
+      actividad_id: Id,
+      horario_id: horarioidint,
+      usuario_id: usuarioidint
     }, {
-      headers: { Authorization: `Bearer ${getCookie("token")}` }
+      headers: { Authorization: `Bearer ${getCookie("token")}`, "Content-Type": "application/json"
+                  
+    }
     })
       .then(() => {
         setMensaje('¡Inscripción exitosa!');

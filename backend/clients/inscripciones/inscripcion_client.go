@@ -13,8 +13,8 @@ func InscripcionActividad(inscripcion model.Inscripcion) model.Inscripcion {
 	result := Db.Create(&inscripcion)
 
 	if result.Error != nil {
-		log.Error("")
+		log.Info(result.Error.Error())
 	}
-	log.Debug("Inscripcion realizada", inscripcion.Id)
+	log.Info("Inscripcion realizada", inscripcion.Id)
 	return inscripcion
 }
