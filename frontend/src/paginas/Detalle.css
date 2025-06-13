@@ -49,3 +49,10 @@
   margin-left: 450px;
 
 }
+
+.boton-home{
+  width: 150px;
+  height: 30px;
+  border-radius: 30px;
+  background-color: rgb(143, 143, 147);
+}
