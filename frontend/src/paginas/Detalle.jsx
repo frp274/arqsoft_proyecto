@@ -97,7 +97,7 @@ function Detalle() {
         setTimeout(() => window.location.reload(), 2000);  // Recarga la página después de 2 segundos
       })
       .catch((err) => {
-        setMensaje("Error al inscribirse.");
+        setMensaje("Ya estas incripto a esta actividad.");
         console.error(err);
       });
   };
