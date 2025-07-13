@@ -56,3 +56,17 @@ func InsertActividad(c *gin.Context){
 
 	c.JSON(http.StatusCreated, actividadDto)
 }
+
+
+func DeleteActividad(c *gin.Context) {
+	log.Debug("Actividad id to delete: " + c.Param("id"))
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	err := service.DeleteActividad(id)
+	if err != nil {
+		c.JSON(err.Status(), err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"mensaje": "Actividad eliminada correctamente"})
+}

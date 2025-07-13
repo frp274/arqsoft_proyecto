@@ -2,6 +2,7 @@ package actividad
 
 import (
 	"arqsoft_proyecto/model"
+	"fmt"
 
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -42,11 +43,32 @@ func InsertActividad(actividad model.Actividad) model.Actividad {
 	return actividad
 }
 
-
 func UpdateActividad(actividad model.Actividad) model.Actividad {
-    result := Db.Save(&actividad)
-    if result.Error != nil {
+	result := Db.Save(&actividad)
+	if result.Error != nil {
 		log.Error("")
-    }
-    return actividad
+	}
+	return actividad
+}
+
+func DeleteActividad(id int) error {
+	// 1. Borrar los horarios asociados a la actividad
+	err := Db.Where("actividad_id = ?", id).Delete(&model.Horario{}).Error
+	if err != nil {
+		return fmt.Errorf("error al eliminar los horarios asociados: %w", err)
+	}
+
+	// 2. Borrar la actividad en sí
+	actividad := model.Actividad{}
+	result := Db.Delete(&actividad, id)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("no se encontró actividad con ID %d", id)
+	}
+
+	return nil
 }
