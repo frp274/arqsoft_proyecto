@@ -4,7 +4,7 @@ import (
 	"arqsoft_proyecto/dto"
 	service "arqsoft_proyecto/services"
 	"net/http"
-	_"strconv"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -30,4 +30,19 @@ func InscripcionActividad(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, inscripcionDto)
+}
+
+func GetInscripcionesByUsuarioId(c *gin.Context) {
+	log.Debug("Usuario id to load: " + c.Param("id"))
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	inscripcionesDto, err := service.GetInscripcionesByUsuarioId(id)
+
+	if err != nil {
+		log.Error(err.Error())
+		c.JSON(err.Status(), err)
+		return
+	}
+
+	c.JSON(http.StatusOK, inscripcionesDto)
 }

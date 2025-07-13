@@ -5,7 +5,6 @@ type Actividad struct {
 	Nombre      string    `gorm:"not null"`
 	Descripcion string    `gorm:"type:varchar(250);not null"`
 	Profesor    string    `gorm:"not null"`
-	Cupo        int       `gorm:"not null"`
 	Horarios    []Horario `gorm:"foreignKey:ActividadID"`
 }
 
@@ -15,6 +14,7 @@ type Horario struct {
 	Dia         string `gorm:"not null"`
 	HoraInicio  string `gorm:"not null"`
 	HoraFin     string `gorm:"not null"`
+	Cupo        int    `gorm:"not null"`
 }
 
 
