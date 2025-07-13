@@ -1,0 +1,58 @@
+.detalle-card {
+  border: 1px solid #ccc;
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 10px;
+}
+
+.inscribirse-btn {
+  background-color: #28a745;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.inscribirse-btn:hover {
+  background-color: #218838;
+}
+
+.mensaje-exito {
+  color: green;
+  margin-top: 15px;
+  font-weight: bold;
+}
+
+.detalles{
+
+  text-align: center;
+}
+
+.nact{
+  
+  font-size: 70px;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+
+}
+
+.desc{
+
+
+}
+
+.ul{
+
+  list-style: none;
+  padding: 0;
+  margin-right: 450px;
+  margin-left: 450px;
+
+}
+
+.boton-home{
+  width: 150px;
+  height: 30px;
+  border-radius: 30px;
+  background-color: rgb(143, 143, 147);
+}

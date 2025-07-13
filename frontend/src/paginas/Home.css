@@ -1,0 +1,41 @@
+.home{
+
+    
+}
+
+.Titulo{
+
+    text-align: center;
+    margin: 50px 0;
+    font-size: 100px;
+    text-shadow: 30svb;
+}
+
+.botonRedondoVolver{
+
+    border-radius: 10px;
+    
+}
+
+.botonRedondoAdelante{
+
+    border-radius: 10px;
+    
+}
+
+.espacio{
+
+    height: 30px;
+}
+
+.top{
+
+    
+    display: flex;
+    justify-content: left;
+    align-content: center;
+    padding: 12px;
+    
+    
+}
+
