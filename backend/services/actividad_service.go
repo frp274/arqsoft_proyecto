@@ -98,7 +98,6 @@ func InsertActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 	return actividadDto, nil
 }
 
-<<<<<<< HEAD
 func GetActividadesByNombre(nombre string) (dto.ActividadesDto, e.ApiError) {
 	actividades, err := actividadCliente.GetActividadesFiltradas(nombre)
 	if err != nil {
@@ -112,7 +111,6 @@ func GetActividadesByNombre(nombre string) (dto.ActividadesDto, e.ApiError) {
 			Id:          actividad.Id,
 			Nombre:      actividad.Nombre,
 			Descripcion: actividad.Descripcion,
-			Cupo:        actividad.Cupo,
 			Profesor:    actividad.Profesor,
 		}
 
@@ -122,6 +120,7 @@ func GetActividadesByNombre(nombre string) (dto.ActividadesDto, e.ApiError) {
 				Dia:        horario.Dia,
 				HoraInicio: horario.HoraInicio,
 				HoraFin:    horario.HoraFin,
+				Cupo:       horario.Cupo,
 			}
 			actividadDto.Horario = append(actividadDto.Horario, horarioDto)
 		}
@@ -130,12 +129,12 @@ func GetActividadesByNombre(nombre string) (dto.ActividadesDto, e.ApiError) {
 	}
 
 	return actividadesDto, nil
-=======
+}
+
 func DeleteActividad(id int) e.ApiError {
 	err := actividadCliente.DeleteActividad(id)
 	if err != nil {
 		return e.NewInternalServerApiError("No se pudo eliminar la actividad", err)
 	}
 	return nil
->>>>>>> 90ae604429bddb5228f31c65f671a43a7906a29b
 }
