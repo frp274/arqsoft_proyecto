@@ -106,7 +106,7 @@ func UpdateActividad(c *gin.Context) {
 	}
 
 	var actividadDto dto.ActividadDto
-	if err := c.ShouldBindJSON(&actividadDto); err != nil {
+	if err := c.BindJSON(&actividadDto); err != nil {
 		log.Error("Error al parsear JSON: ", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido"})
 		return

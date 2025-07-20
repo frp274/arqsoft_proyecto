@@ -130,9 +130,10 @@ func InsertActividad(actividad model.Actividad) model.Actividad {
 }
 
 func UpdateActividad(actividad model.Actividad) model.Actividad {
-	result := Db.Save(&actividad)
+	result := Db.Model(&model.Actividad{}).Where("id = ?", actividad.Id).Updates(actividad) //Db.Save(&actividad)
 	if result.Error != nil {
 		log.Error("")
+		return model.Actividad{}
 	}
 	return actividad
 }
