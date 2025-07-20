@@ -83,11 +83,12 @@ func InsertActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 
 	for _, horarioDto := range actividadDto.Horario {
 		horario := model.Horario{
-			Id:         horarioDto.Id,
-			Dia:        horarioDto.Dia,
-			HoraInicio: horarioDto.HoraInicio,
-			HoraFin:    horarioDto.HoraFin,
-			Cupo:       horarioDto.Cupo,
+			Id:          horarioDto.Id,
+			ActividadID: actividad.Id,
+			Dia:         horarioDto.Dia,
+			HoraInicio:  horarioDto.HoraInicio,
+			HoraFin:     horarioDto.HoraFin,
+			Cupo:        horarioDto.Cupo,
 		}
 		actividad.Horarios = append(actividad.Horarios, horario)
 	}
@@ -137,4 +138,59 @@ func DeleteActividad(id int) e.ApiError {
 		return e.NewInternalServerApiError("No se pudo eliminar la actividad", err)
 	}
 	return nil
+<<<<<<< HEAD
+=======
+}
+
+func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiError) {
+
+	// Traemos la actividad actual para asegurarnos de que existe
+	actividadActual := actividadCliente.GetActividadById(actividadDto.Id)
+	if actividadActual.Id == 0 {
+		return dto.ActividadDto{}, e.NewNotFoundApiError("No se encontró la actividad con ese ID")
+	}
+
+	// Actualizamos los campos base
+	actividadActual.Nombre = actividadDto.Nombre
+	actividadActual.Descripcion = actividadDto.Descripcion
+	actividadActual.Profesor = actividadDto.Profesor
+
+	// Si vienen horarios nuevos, reemplazamos los anteriores
+	var nuevosHorarios []model.Horario
+	for _, horarioDto := range actividadDto.Horario {
+		horario := model.Horario{
+			Id:          horarioDto.Id,
+			ActividadID: actividadDto.Id,
+			Dia:         horarioDto.Dia,
+			HoraInicio:  horarioDto.HoraInicio,
+			HoraFin:     horarioDto.HoraFin,
+			Cupo:        horarioDto.Cupo,
+		}
+		nuevosHorarios = append(nuevosHorarios, horario)
+	}
+	actividadActual.Horarios = nuevosHorarios
+
+	// Guardamos la actividad actualizada en la base de datos
+	actividadActual = actividadCliente.UpdateActividad(actividadActual)
+
+	// Armamos el DTO de respuesta
+	var actividadActualizada dto.ActividadDto
+	actividadActualizada.Id = actividadActual.Id
+	actividadActualizada.Nombre = actividadActual.Nombre
+	actividadActualizada.Descripcion = actividadActual.Descripcion
+	actividadActualizada.Profesor = actividadActual.Profesor
+
+	for _, horario := range actividadActual.Horarios {
+		horarioDto := dto.HorarioDto{
+			Id:         horario.Id,
+			Dia:        horario.Dia,
+			HoraInicio: horario.HoraInicio,
+			HoraFin:    horario.HoraFin,
+			Cupo:       horario.Cupo,
+		}
+		actividadActualizada.Horario = append(actividadActualizada.Horario, horarioDto)
+	}
+
+	return actividadActualizada, nil
+>>>>>>> ce5d7f10aa64da7cd419aa8e9c3298b50fe88028
 }
