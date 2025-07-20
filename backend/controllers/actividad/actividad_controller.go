@@ -17,7 +17,7 @@ func GetActividadById(c *gin.Context) {
 	var actividadDto dto.ActividadDto
 
 	actividadDto, err := service.GetActividadById(id)
-	
+
 	if err != nil {
 		c.JSON(err.Status(), err)
 		return
@@ -82,7 +82,6 @@ func InsertActividad(c *gin.Context) {
 	c.JSON(http.StatusCreated, actividadDto)
 }
 
-
 func DeleteActividad(c *gin.Context) {
 	log.Debug("Actividad id to delete: " + c.Param("id"))
 	id, _ := strconv.Atoi(c.Param("id"))
@@ -94,4 +93,33 @@ func DeleteActividad(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"mensaje": "Actividad eliminada correctamente"})
+}
+
+func UpdateActividad(c *gin.Context) {
+	log.Debug("Id de la actividad a modificar: " + c.Param("id"))
+	id, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		log.Error("ID inválido: ", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+		return
+	}
+
+	var actividadDto dto.ActividadDto
+	if err := c.BindJSON(&actividadDto); err != nil {
+		log.Error("Error al parsear JSON: ", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido"})
+		return
+	}
+
+	// Aseguramos que el ID del DTO sea el mismo que el del path
+	actividadDto.Id = id
+
+	updatedActividad, serviceErr := service.UpdateActividad(actividadDto)
+	if serviceErr != nil {
+		c.JSON(serviceErr.Status(), serviceErr)
+		return
+	}
+
+	c.JSON(http.StatusOK, updatedActividad)
 }
