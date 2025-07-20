@@ -27,3 +27,33 @@ func InscripcionActividad(inscripcion model.Inscripcion) (model.Inscripcion, err
 	log.Info("Inscripcion realizada", inscripcion.Id)
 	return inscripcion, nil
 }
+
+
+func GetCupoByHorarioId(horarioId int) (model.Horario, error){
+	var horario model.Horario
+	Db.Where("Id = ?", horarioId).First(&horario)
+	if horario.Id != 0{
+		return horario, nil
+	}
+
+	return horario, e.NewNotFoundApiError("no se encontro el horario")
+}
+
+func UpdateInscripcion(horario model.Horario) model.Horario {
+    result := Db.Save(&horario)
+    if result.Error != nil {
+		log.Error("")
+    }
+    return horario
+}
+
+func GetInscripcionesByUsuarioId(usuarioId int) (model.Inscripciones, error) {
+	var inscripciones model.Inscripciones
+	result := Db.Where("Id = ?", usuarioId).Find(&inscripciones)
+	if result.Error != nil {
+		return inscripciones, result.Error
+	}
+	log.Debugf("Ins: %v", inscripciones)
+
+	return inscripciones, nil
+}
