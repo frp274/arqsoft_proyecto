@@ -15,11 +15,9 @@ import (
 
 func InitConnection() *gorm.DB {
 	// refer https://github.com/go-sql-driver/mysql#dsn-data-source-name for details
-<<<<<<< HEAD
+
 	dsn := "root:Santiago-321@tcp(127.0.0.1:3306)/arquisoftware?charset=utf8mb4&parseTime=True&loc=Local"
-=======
-	dsn := "root:facurp274@tcp(127.0.0.1:3306)/arquisoftware?charset=utf8mb4&parseTime=True&loc=Local"
->>>>>>> 90ae604429bddb5228f31c65f671a43a7906a29b
+
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,

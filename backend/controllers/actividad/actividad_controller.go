@@ -17,7 +17,7 @@ func GetActividadById(c *gin.Context) {
 	var actividadDto dto.ActividadDto
 
 	actividadDto, err := service.GetActividadById(id)
-
+	
 	if err != nil {
 		c.JSON(err.Status(), err)
 		return
@@ -81,8 +81,6 @@ func InsertActividad(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, actividadDto)
 }
-<<<<<<< HEAD
-=======
 
 
 func DeleteActividad(c *gin.Context) {
@@ -97,4 +95,3 @@ func DeleteActividad(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"mensaje": "Actividad eliminada correctamente"})
 }
->>>>>>> 90ae604429bddb5228f31c65f671a43a7906a29b
