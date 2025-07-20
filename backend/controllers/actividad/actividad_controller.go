@@ -13,11 +13,10 @@ import (
 func GetActividadById(c *gin.Context) {
 	log.Debug("Actividad id to load: " + c.Param("id"))
 	id, _ := strconv.Atoi(c.Param("id"))
-	
+
 	var actividadDto dto.ActividadDto
 
 	actividadDto, err := service.GetActividadById(id)
-
 
 	if err != nil {
 		c.JSON(err.Status(), err)
@@ -26,7 +25,7 @@ func GetActividadById(c *gin.Context) {
 	c.JSON(http.StatusOK, actividadDto)
 }
 
-func GetAllActividades(c *gin.Context) {
+/*func GetAllActividades(c *gin.Context) {
 	actividadesDto, err := service.GetAllActividades()
 
 	if err != nil {
@@ -34,9 +33,35 @@ func GetAllActividades(c *gin.Context) {
         return
     }
 	c.JSON(http.StatusOK, actividadesDto)
+}*/
+
+/*func GetAllActividades(c *gin.Context) {
+	nombre := c.Query("nombre")
+	actividadesDto, err := service.GetActividadesByNombre(nombre)
+
+	if err != nil {
+		c.JSON(err.Status(), err)
+		return
+	}
+
+	c.JSON(http.StatusOK, actividadesDto)
+}*/
+
+func GetAllActividades(c *gin.Context) {
+	nombre := c.Query("nombre")
+	log.Infof(">> Filtro recibido en el controller: '%s'", nombre)
+
+	actividadesDto, err := service.GetActividadesByNombre(nombre)
+
+	if err != nil {
+		c.JSON(err.Status(), err)
+		return
+	}
+
+	c.JSON(http.StatusOK, actividadesDto)
 }
 
-func InsertActividad(c *gin.Context){
+func InsertActividad(c *gin.Context) {
 	var actividadDto dto.ActividadDto
 	err := c.BindJSON(&actividadDto)
 
