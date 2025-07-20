@@ -19,7 +19,7 @@ func InitConnection() *gorm.DB {
 	dsn := "root:Santiago-321@tcp(127.0.0.1:3306)/arquisoftware?charset=utf8mb4&parseTime=True&loc=Local"
 =======
 
-	dsn := "root:Santiago-321@tcp(127.0.0.1:3306)/arquisoftware?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "root:facurp274@tcp(127.0.0.1:3306)/arquisoftware?charset=utf8mb4&parseTime=True&loc=Local"
 
 >>>>>>> ce5d7f10aa64da7cd419aa8e9c3298b50fe88028
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{

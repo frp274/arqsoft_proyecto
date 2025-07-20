@@ -172,7 +172,10 @@ func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 
 	// Guardamos la actividad actualizada en la base de datos
 	actividadActual = actividadCliente.UpdateActividad(actividadActual)
-
+	if actividadActual.Id == 0{
+		log.Print("no existe el id a actualizar")
+		return dto.ActividadDto{}, e.NewBadRequestApiError("error, el id de la actividad no existe")
+	}
 	// Armamos el DTO de respuesta
 	var actividadActualizada dto.ActividadDto
 	actividadActualizada.Id = actividadActual.Id
