@@ -13,7 +13,7 @@ type Horario struct {
     ActividadID  int
     Actividad    Actividad `gorm:"foreignKey:ActividadID"`
     Dia          string    `gorm:"not null"`
-    HoraInicio   string
+    HoraInicio   string    `gorm:"not null"`
     HoraFin      string    `gorm:"not null"`
     Cupo         int       `gorm:"not null"`
 }
