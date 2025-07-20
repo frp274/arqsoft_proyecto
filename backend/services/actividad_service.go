@@ -5,6 +5,7 @@ import (
 	"arqsoft_proyecto/dto"
 	"arqsoft_proyecto/model"
 	e "arqsoft_proyecto/utils/errors"
+
 	log "github.com/sirupsen/logrus"
 )
 
@@ -25,17 +26,17 @@ func GetActividadById(id int) (dto.ActividadDto, e.ApiError) {
 
 	for _, horario := range actividad.Horarios {
 		horarioDto := dto.HorarioDto{
-			Id:			horario.Id,
+			Id:         horario.Id,
 			Dia:        horario.Dia,
 			HoraInicio: horario.HoraInicio,
 			HoraFin:    horario.HoraFin,
-			Cupo: 		horario.Cupo,
+			Cupo:       horario.Cupo,
 		}
 		actividadDto.Horario = append(actividadDto.Horario, horarioDto)
 	}
 
 	return actividadDto, nil
-	}
+}
 
 func GetAllActividades() (dto.ActividadesDto, e.ApiError) {
 	var actividades model.Actividades
@@ -58,14 +59,14 @@ func GetAllActividades() (dto.ActividadesDto, e.ApiError) {
 		}
 		for _, horario := range actividad.Horarios {
 			horarioDto := dto.HorarioDto{
-				Id:			horario.Id,
+				Id:         horario.Id,
 				Dia:        horario.Dia,
 				HoraInicio: horario.HoraInicio,
 				HoraFin:    horario.HoraFin,
 				Cupo:       horario.Cupo,
 			}
 			actividadDto.Horario = append(actividadDto.Horario, horarioDto)
-		}	
+		}
 		actividadesDto = append(actividadesDto, actividadDto)
 	}
 
@@ -80,15 +81,13 @@ func InsertActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 	//actividad.Cupo = actividadDto.Cupo
 	actividad.Profesor = actividadDto.Profesor
 
-
-
 	for _, horarioDto := range actividadDto.Horario {
 		horario := model.Horario{
-			Id:			horarioDto.Id,
+			Id:         horarioDto.Id,
 			Dia:        horarioDto.Dia,
 			HoraInicio: horarioDto.HoraInicio,
 			HoraFin:    horarioDto.HoraFin,
-			Cupo: 		horarioDto.Cupo,
+			Cupo:       horarioDto.Cupo,
 		}
 		actividad.Horarios = append(actividad.Horarios, horario)
 	}
@@ -99,5 +98,43 @@ func InsertActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 	return actividadDto, nil
 }
 
+func GetActividadesByNombre(nombre string) (dto.ActividadesDto, e.ApiError) {
+	actividades, err := actividadCliente.GetActividadesFiltradas(nombre)
+	if err != nil {
+		log.Error(err.Error())
+		return nil, e.NewInternalServerApiError("Error al obtener actividades", err)
+	}
 
+	var actividadesDto dto.ActividadesDto
+	for _, actividad := range actividades {
+		actividadDto := dto.ActividadDto{
+			Id:          actividad.Id,
+			Nombre:      actividad.Nombre,
+			Descripcion: actividad.Descripcion,
+			Profesor:    actividad.Profesor,
+		}
 
+		for _, horario := range actividad.Horarios {
+			horarioDto := dto.HorarioDto{
+				Id:         horario.Id,
+				Dia:        horario.Dia,
+				HoraInicio: horario.HoraInicio,
+				HoraFin:    horario.HoraFin,
+				Cupo:       horario.Cupo,
+			}
+			actividadDto.Horario = append(actividadDto.Horario, horarioDto)
+		}
+
+		actividadesDto = append(actividadesDto, actividadDto)
+	}
+
+	return actividadesDto, nil
+}
+
+func DeleteActividad(id int) e.ApiError {
+	err := actividadCliente.DeleteActividad(id)
+	if err != nil {
+		return e.NewInternalServerApiError("No se pudo eliminar la actividad", err)
+	}
+	return nil
+}
