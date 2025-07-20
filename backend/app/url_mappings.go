@@ -13,6 +13,7 @@ func mapUrls() {
 	router.POST("/actividad", actividadController.InsertActividad)
 	router.GET("/actividad", actividadController.GetAllActividades)
 	router.DELETE("/actividad/:id", actividadController.DeleteActividad)
+	router.PUT("/actividad/:id", actividadController.UpdateActividad)
 
 	router.POST("/inscripcion", inscripcionController.InscripcionActividad)
 	router.GET("/inscripcion/:id", inscripcionController.GetInscripcionesByUsuarioId)
@@ -20,5 +21,4 @@ func mapUrls() {
 	router.POST("/login", usuarioController.Login)
 	log.Info("Finishing mappings configurations")
 
-	
 }
