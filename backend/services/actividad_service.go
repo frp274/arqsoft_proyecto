@@ -84,6 +84,7 @@ func InsertActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 	for _, horarioDto := range actividadDto.Horario {
 		horario := model.Horario{
 			Id:         horarioDto.Id,
+			ActividadID: actividad.Id,
 			Dia:        horarioDto.Dia,
 			HoraInicio: horarioDto.HoraInicio,
 			HoraFin:    horarioDto.HoraFin,

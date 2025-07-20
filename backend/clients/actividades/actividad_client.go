@@ -96,8 +96,8 @@ if nombre != "" {
 	return actividades, nil
 }*/
 
-func GetActividadesFiltradas(nombre string) ([]model.Actividad, error) {
-	var actividades []model.Actividad
+func GetActividadesFiltradas(nombre string) (model.Actividades, error) {
+	var actividades model.Actividades
 
 	log.Infof(">> Filtro recibido: '%s'", nombre)
 

@@ -9,12 +9,13 @@ type Actividad struct {
 }
 
 type Horario struct {
-	Id          int    `gorm:"primaryKey"`
-	ActividadID int    // Foreign Key que referencia a Actividad
-	Dia         string `gorm:"not null"`
-	HoraInicio  string 
-	HoraFin     string `gorm:"not null"`
-	Cupo        int    `gorm:"not null"`
+    Id           int		`gorm:"primaryKey"`
+    ActividadID  int
+    Actividad    Actividad `gorm:"foreignKey:ActividadID"`
+    Dia          string    `gorm:"not null"`
+    HoraInicio   string
+    HoraFin      string    `gorm:"not null"`
+    Cupo         int       `gorm:"not null"`
 }
 
 
