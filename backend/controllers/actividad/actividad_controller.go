@@ -94,8 +94,6 @@ func DeleteActividad(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"mensaje": "Actividad eliminada correctamente"})
 }
-<<<<<<< HEAD
-=======
 
 func UpdateActividad(c *gin.Context) {
 	log.Debug("Id de la actividad a modificar: " + c.Param("id"))
@@ -125,4 +123,3 @@ func UpdateActividad(c *gin.Context) {
 
 	c.JSON(http.StatusOK, updatedActividad)
 }
->>>>>>> ce5d7f10aa64da7cd419aa8e9c3298b50fe88028
