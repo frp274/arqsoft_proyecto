@@ -49,7 +49,7 @@ func UpdateInscripcion(horario model.Horario) model.Horario {
 
 func GetInscripcionesByUsuarioId(usuarioId int) (model.Inscripciones, error) {
 	var inscripciones model.Inscripciones
-	result := Db.Where("Id = ?", usuarioId).Find(&inscripciones)
+	result := Db.Where("usuario_id = ?", usuarioId).Find(&inscripciones)
 	if result.Error != nil {
 		return inscripciones, result.Error
 	}

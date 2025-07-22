@@ -138,8 +138,6 @@ func DeleteActividad(id int) e.ApiError {
 		return e.NewInternalServerApiError("No se pudo eliminar la actividad", err)
 	}
 	return nil
-<<<<<<< HEAD
-=======
 }
 
 func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiError) {
@@ -195,5 +193,4 @@ func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 	}
 
 	return actividadActualizada, nil
->>>>>>> ce5d7f10aa64da7cd419aa8e9c3298b50fe88028
 }
