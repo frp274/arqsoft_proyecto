@@ -27,4 +27,7 @@ func Login(c *gin.Context) {
 		Token: token,
 		Es_admin: es_admin,
 	})
+	log.Printf("id: %d", usuarioId)
+	log.Printf("id: %s", token)
+	log.Printf("id: %t", es_admin)
 }
