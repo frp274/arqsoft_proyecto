@@ -127,7 +127,7 @@ function Login() {
       // console.log("Respuesta del backend:", data); // <-- AGREGÁ ESTO
       // localStorage.setItem("token", data.token);
       
-// Después de recibir la respuesta del login
+      // Después de recibir la respuesta del login
       if (response.ok) {
         const data = await response.json();
         console.log("RESPUESTA DEL LOGIN:", data); // Verifica la respuesta
@@ -139,7 +139,7 @@ function Login() {
         //document.cookie = `userId=${data.id}; path=/; secure; HttpOnly`;
 
         // Redirigir al Home
-        if (data.Es_admin){
+        if (data.Es_admin === true){
           navigate("/Admin");
         }
         else{

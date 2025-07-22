@@ -19,11 +19,7 @@ function Home() {
       <div className="foto">
         <Foto/>
 
-        <div style={{ textAlign: 'right', margin: '10px' }}> 
-          <button onClick={() => navigate('/admin')}>
-            Panel Administrador
-          </button>
-        </div>
+       
 
        
 
