@@ -139,7 +139,12 @@ function Login() {
         //document.cookie = `userId=${data.id}; path=/; secure; HttpOnly`;
 
         // Redirigir al Home
+        if (data.Es_admin){
+          navigate("/Admin");
+        }
+        else{
         navigate("/home");
+        }
       } else {
         setError("Usuario o contraseña incorrectos.");
       }
