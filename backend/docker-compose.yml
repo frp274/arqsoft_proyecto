@@ -6,7 +6,7 @@ services:
     container_name: mysql_arqsoft
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: facurp274
+      MYSQL_ROOT_PASSWORD: basededatos_nicolas123
       MYSQL_DATABASE: arquisoftware
     ports:
       - "3307:3306"
@@ -31,7 +31,7 @@ services:
       DB_HOST: mysql
       DB_PORT: 3306
       DB_USER: root
-      DB_PASSWORD: facurp274
+      DB_PASSWORD: basededatos_nicolas123
       DB_NAME: arquisoftware
     restart: on-failure
 
