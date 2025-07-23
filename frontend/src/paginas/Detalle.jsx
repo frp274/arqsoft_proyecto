@@ -32,6 +32,20 @@ function getUserIdFromToken() {
   }
 }
 
+
+function getIsAdminFromToken() {
+  const token = getCookie("token");
+  const parts = token.split('.');
+  if (parts.length !== 3) return false;
+
+  try {
+    const payload = JSON.parse(atob(parts[1]));
+    return payload.es_admin || false;
+  } catch (e) {
+    return false;
+  }
+}
+
 // function getCookie(name) {
 //   const value = `; ${document.cookie}`;
 //   const parts = value.split(`; ${name}=`);
@@ -125,10 +139,28 @@ function Detalle() {
     }
   };
 
+
+
+
+
   return (
     <div>
-      
-      <button className="boton-home" onClick={() => navigate("/Home")}>← Volver a Home</button>
+
+      <button
+        className="boton-home"
+        onClick={() => {
+          const isAdmin = getIsAdminFromToken();
+          if (isAdmin) {
+          navigate("/Admin");
+          }else {
+            navigate("/Home");
+          }
+        }   }
+      >← Volver al Inicio 
+      </button>
+
+
+
       <div className="detalles">
         <h1>DETALLES DE LA ACTIVIDAD</h1>
 

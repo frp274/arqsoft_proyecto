@@ -3,6 +3,7 @@ package actividadController
 import (
 	"arqsoft_proyecto/dto"
 	service "arqsoft_proyecto/services"
+
 	"net/http"
 	"strconv"
 
@@ -63,7 +64,7 @@ func GetAllActividades(c *gin.Context) {
 
 func InsertActividad(c *gin.Context) {
 	var actividadDto dto.ActividadDto
-	
+
 	err := c.BindJSON(&actividadDto)
 
 	// Error Parsing json param
