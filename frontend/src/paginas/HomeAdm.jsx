@@ -8,6 +8,62 @@ import ListadoActividades from "../components/listadoActividades";
 import InscripcionesUsuario from '../components/InscripcionesUsuario';
 
 
+// function getUserIdFromToken() {
+  
+//   const token = getCookie("token");
+//   if (token) {
+//     console.log("Token obtenido desde la cookie:", token);
+//   } else {
+//     console.log("No se encontró el token en las cookies");
+//   }
+
+//   // Verifica si el token tiene tres partes (header, payload, signature)
+//   const parts = token.split('.');
+//   if (parts.length !== 3) {
+//     console.error("Token JWT inválido");
+//     return null;
+//   }
+
+//   try {
+//     const payload = JSON.parse(atob(parts[1]));  // Decodificar el payload del token
+//     console.log(payload); // Verifica si contiene el 'id' que buscas
+//     return payload.jti || null;  // Retorna el ID del usuario
+//   } catch (e) {
+//     console.error("Error al decodificar el token:", e);
+//     return null;
+//   }
+// }
+function getUserInfoFromToken() {
+  const token = getCookie("token");
+  if (!token) {
+    console.log("No se encontró el token en las cookies");
+    return null;
+  }
+
+  const parts = token.split('.');
+  if (parts.length !== 3) {
+    console.error("Token JWT inválido");
+    return null;
+  }
+
+  try {
+    const payload = JSON.parse(atob(parts[1]));
+    console.log("Payload del token:", payload);
+
+    return {
+      id: payload.jti || null,
+      es_admin: payload.es_admin || false  // o 'Es_admin' si tu backend lo envía así
+    };
+  } catch (e) {
+    console.error("Error al decodificar el token:", e);
+    return null;
+  }
+}
+const json_info  = getUserInfoFromToken();
+const usuario_id = json_info.id;
+const usuario_es_admin = json_info.es_admin;
+
+if (usuario_es_admin === true){
 function HomeAdm() {
   const navigate = useNavigate();
   const [filtro, setFiltro] = useState('');
@@ -17,6 +73,7 @@ function HomeAdm() {
   const [profesor, setProfesor] = useState('');
   const [horarios, setHorarios] = useState([{ dia: '', horarioInicio: '', horarioFinal: '', cupo: 0 }]);
   const [refrescar, setRefrescar] = useState(false);
+<<<<<<< HEAD
   const [errorText, setErrorText] = useState('');
   const usuarioData = localStorage.getItem("usuario");
   const usuario = usuarioData ? JSON.parse(usuarioData) : null;
@@ -25,6 +82,9 @@ function HomeAdm() {
 
 
 
+=======
+  const [errorText, setErrorText] = useState('');  
+>>>>>>> e43fbceea6b284179ea7a0af3f9f64d24a2875ac
   const handleAgregarHorario = () => {
     setHorarios([...horarios, { dia: '', horarioInicio: '', horarioFinal: '', cupo: 0 }]);
   };
@@ -319,7 +379,7 @@ function HomeAdm() {
     </div>
   );
 }
-
+}
 export default HomeAdm;
 
 

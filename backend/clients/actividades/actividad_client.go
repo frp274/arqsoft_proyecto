@@ -131,6 +131,16 @@ func InsertActividad(actividad model.Actividad) model.Actividad {
 
 func UpdateActividad(actividad model.Actividad) model.Actividad {
 	result := Db.Model(&model.Actividad{}).Where("id = ?", actividad.Id).Updates(actividad) //Db.Save(&actividad)
+	for _, horario := range actividad.Horarios{ 
+		result2 := Db.Model(&model.Horario{}).Where("id = ?", horario.Id).Updates(horario)
+		fmt.Println("HORARIO:", horario)
+		if result2.Error != nil {
+			fmt.Println("Error al actualizar:", result2.Error)
+			log.Printf("error al actualizar el horario:\n %+v", horario)
+			return model.Actividad{}
+		}
+	}
+
 	if result.Error != nil {
 		log.Error("")
 		return model.Actividad{}

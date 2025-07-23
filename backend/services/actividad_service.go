@@ -149,12 +149,13 @@ func DeleteActividad(id int) e.ApiError {
 	}
 
 	// Actualizamos los campos base
+	//actividadActual.Id = actividadDto.Id
 	actividadActual.Nombre = actividadDto.Nombre
 	actividadActual.Descripcion = actividadDto.Descripcion
 	actividadActual.Profesor = actividadDto.Profesor
 
 	// Si vienen horarios nuevos, reemplazamos los anteriores
-	var nuevosHorarios []model.Horario
+	// var nuevosHorarios []model.Horario
 	for _, horarioDto := range actividadDto.Horario {
 		horario := model.Horario{
 			Id:          horarioDto.Id,
@@ -164,9 +165,10 @@ func DeleteActividad(id int) e.ApiError {
 			HoraFin:     horarioDto.HoraFin,
 			Cupo:        horarioDto.Cupo,
 		}
-		nuevosHorarios = append(nuevosHorarios, horario)
+	// 	// nuevosHorarios = append(nuevosHorarios, horario)
+		actividadActual.Horarios = append(actividadActual.Horarios, horario)
 	}
-	actividadActual.Horarios = nuevosHorarios
+	// actividadActual.Horarios = nuevosHorarios
 
 	// Guardamos la actividad actualizada en la base de datos
 	actividadActual = actividadCliente.UpdateActividad(actividadActual)
