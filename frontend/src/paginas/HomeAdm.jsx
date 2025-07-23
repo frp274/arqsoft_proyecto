@@ -31,6 +31,20 @@ import ListadoActividades from "../components/listadoActividades";
 //     return null;
 //   }
 // }
+  
+function getCookie(name) {
+  const nameEQ = `${name}=`;
+  const ca = document.cookie.split(';');
+  
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i].trim();
+    if (c.indexOf(nameEQ) === 0) {
+      return c.substring(nameEQ.length, c.length);
+    }
+  }
+  return null; // Si no se encuentra la cookie, devuelve null
+}
+
 function getUserInfoFromToken() {
   const token = getCookie("token");
   if (!token) {
@@ -57,13 +71,17 @@ function getUserInfoFromToken() {
     return null;
   }
 }
-const json_info  = getUserInfoFromToken();
-const usuario_id = json_info.id;
-const usuario_es_admin = json_info.es_admin;
+// const json_info  = getUserInfoFromToken();
+// const usuario_id = json_info.id;
+// const usuario_es_admin = json_info.es_admin;
 
-if (usuario_es_admin === true){
+
+  
 function HomeAdm() {
   const navigate = useNavigate();
+  if (getUserInfoFromToken().es_admin === false){
+    navigate("/Home");
+  }
   const [filtro, setFiltro] = useState('');
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [nombre, setNombre] = useState('');
@@ -174,6 +192,7 @@ function HomeAdm() {
       </div>
     </div>
   );
-}
-}
+  }
+
+
 export default HomeAdm;
