@@ -63,6 +63,7 @@ func GetAllActividades(c *gin.Context) {
 
 func InsertActividad(c *gin.Context) {
 	var actividadDto dto.ActividadDto
+	
 	err := c.BindJSON(&actividadDto)
 
 	// Error Parsing json param
