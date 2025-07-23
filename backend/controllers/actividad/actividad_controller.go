@@ -95,7 +95,7 @@ func DeleteActividad(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"mensaje": "Actividad eliminada correctamente"})
 }
 
-func UpdateActividad(c *gin.Context) {
+/*func UpdateActividad(c *gin.Context) {
 	log.Debug("Id de la actividad a modificar: " + c.Param("id"))
 	id, err := strconv.Atoi(c.Param("id"))
 
@@ -122,4 +122,33 @@ func UpdateActividad(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, updatedActividad)
+}*/
+
+func UpdateActividad(c *gin.Context) {
+	log.Debug("Actividad id to update: " + c.Param("id"))
+	id, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		log.Error("ID inválido: ", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+		return
+	}
+
+	var actividadDto dto.ActividadDto
+	err = c.BindJSON(&actividadDto)
+	if err != nil {
+		log.Error("Error al parsear el cuerpo JSON: ", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido"})
+		return
+	}
+
+	actividadDto.Id = id
+
+	actividadActualizada, updateErr := service.UpdateActividad(actividadDto)
+	if updateErr != nil {
+		c.JSON(updateErr.Status(), updateErr)
+		return
+	}
+
+	c.JSON(http.StatusOK, actividadActualizada)
 }

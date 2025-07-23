@@ -114,7 +114,8 @@ function HomeAdm() {
         <Buscador setFiltro={setFiltro} />
         <p className="espacio" />
 
-        <ListadoActividades filtro={filtro} refrescar={refrescar} />
+        <ListadoActividades filtro={filtro} esAdmin={true} />
+
       </div>
     </div>
   );

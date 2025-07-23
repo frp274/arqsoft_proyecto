@@ -9,6 +9,8 @@ import { useState } from "react";
 function Home() {
   const navigate = useNavigate();
   const [filtro, setFiltro] = useState('');
+  const [refrescar, setRefrescar] = useState(false);
+
 
   return (
     <div className="home">
@@ -19,11 +21,6 @@ function Home() {
       <div className="foto">
         <Foto/>
 
-        <div style={{ textAlign: 'right', margin: '10px' }}> 
-          <button onClick={() => navigate('/admin')}>
-            Panel Administrador
-          </button>
-        </div>
 
        
 
@@ -35,7 +32,8 @@ function Home() {
 
         <p className="espacio"/>
 
-        <ListadoActividades filtro={filtro} />
+        <ListadoActividades filtro={filtro} refrescar={refrescar} />
+
       </div>
     </div>
   );
