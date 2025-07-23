@@ -602,11 +602,12 @@ function ListadoActividades({ filtro, refrescar, esAdmin }) {
           descripcion: formData.descripcion,
           profesor: formData.profesor,
           horarios: formData.horarios.map(h => ({
-            id: h.id,
-            dia: h.dia,
-            horaInicio: h.horaInicio, // CORREGIDO
-            horaFin: h.horaFin,       // CORREGIDO
-            cupo: Number(h.cupo)
+          id: h.id,
+          dia: h.dia,
+          horarioInicio: h.horaInicio,  // 👈 correcto
+          horarioFinal: h.horaFin,      // 👈 correcto
+          cupo: Number(h.cupo)
+
           }))
         })
       });

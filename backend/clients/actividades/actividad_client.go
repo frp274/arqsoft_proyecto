@@ -159,3 +159,11 @@ func DeleteActividad(id int) error {
 
 	return nil
 }
+
+func DeleteHorariosByActividadID(actividadID int) error {
+	err := Db.Where("actividad_id = ?", actividadID).Delete(&model.Horario{}).Error
+	if err != nil {
+		return fmt.Errorf("error al eliminar los horarios de la actividad %d: %w", actividadID, err)
+	}
+	return nil
+}
