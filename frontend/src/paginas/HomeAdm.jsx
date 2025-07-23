@@ -91,7 +91,6 @@ function HomeAdm() {
   const [profesor, setProfesor] = useState('');
   const [horarios, setHorarios] = useState([{ dia: '', horarioInicio: '', horarioFinal: '', cupo: 0 }]);
   const [refrescar, setRefrescar] = useState(false);
-<<<<<<< HEAD
   const [errorText, setErrorText] = useState('');
   const usuarioData = localStorage.getItem("usuario");
   const usuario = usuarioData ? JSON.parse(usuarioData) : null;
@@ -100,9 +99,6 @@ function HomeAdm() {
 
 
 
-=======
-  const [errorText, setErrorText] = useState('');  
->>>>>>> e43fbceea6b284179ea7a0af3f9f64d24a2875ac
   const handleAgregarHorario = () => {
     setHorarios([...horarios, { dia: '', horarioInicio: '', horarioFinal: '', cupo: 0 }]);
   };
