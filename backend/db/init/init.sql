@@ -39,7 +39,7 @@ CREATE TABLE `actividad` (
 
 LOCK TABLES `actividad` WRITE;
 /*!40000 ALTER TABLE `actividad` DISABLE KEYS */;
-INSERT INTO `actividad` VALUES (2,'Pilates','Actividad enfocada en fortalecer el core, mejorar la postura y la flexibilidad.','Laura Fernández'),(3,'Spinning','Clase aeróbica sobre bicicleta fija ideal para quemar calorías y mejorar la capacidad cardiovascular.','Martín Pérez'),(4,'Musculacion','Entrenamiento con pesas y máquinas para aumentar la fuerza y la masa muscular.','Ana Torres');
+INSERT INTO `actividad` VALUES (1, 'MMA', 'Entrenamiento de artes marciales mixtas que combina técnicas de boxeo, kickboxing, jiu-jitsu y lucha.', 'Carlos Gómez'),(2,'Pilates','Actividad enfocada en fortalecer el core, mejorar la postura y la flexibilidad.','Laura Fernández'),(3,'Spinning','Clase aeróbica sobre bicicleta fija ideal para quemar calorías y mejorar la capacidad cardiovascular.','Martín Pérez'),(4,'Musculacion','Entrenamiento con pesas y máquinas para aumentar la fuerza y la masa muscular.','Ana Torres');
 /*!40000 ALTER TABLE `actividad` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -69,7 +69,7 @@ CREATE TABLE `horario` (
 
 LOCK TABLES `horario` WRITE;
 /*!40000 ALTER TABLE `horario` DISABLE KEYS */;
-INSERT INTO `horario` VALUES (4,2,'Martes','09:00','10:00',20),(5,2,'Jueves','09:00','10:00',20),(6,2,'Sábado','10:00','11:00',20),(7,3,'Lunes','19:00','20:00',20),(8,3,'Miércoles','19:00','20:00',20),(9,4,'Lunes','08:00','09:00',20),(10,4,'Martes','08:00','09:00',20),(11,4,'Miércoles','08:00','09:00',20),(12,4,'Jueves','08:00','09:00',20),(13,4,'Viernes','08:00','09:00',20);
+INSERT INTO `horario` VALUES (1, 'Lunes', '18:00', '19:00', 20),(1, 'Miércoles', '18:00', '19:00', 20),(1, 'Viernes', '18:00', '19:00', 20),(4,2,'Martes','09:00','10:00',20),(5,2,'Jueves','09:00','10:00',20),(6,2,'Sábado','10:00','11:00',20),(7,3,'Lunes','19:00','20:00',20),(8,3,'Miércoles','19:00','20:00',20),(9,4,'Lunes','08:00','09:00',20),(10,4,'Martes','08:00','09:00',20),(11,4,'Miércoles','08:00','09:00',20),(12,4,'Jueves','08:00','09:00',20),(13,4,'Viernes','08:00','09:00',20);
 /*!40000 ALTER TABLE `horario` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -127,7 +127,7 @@ CREATE TABLE `usuario` (
 
 LOCK TABLES `usuario` WRITE;
 /*!40000 ALTER TABLE `usuario` DISABLE KEYS */;
-INSERT INTO `usuario` VALUES (1,'Genaro','genacanas',1,'66e49ff234ab9d28adf8662bc56bf31c0e5fec55f0ff2212731b094a1586e961');
+INSERT INTO `usuario` VALUES (1,'Genaro','genacanas',1,'66e49ff234ab9d28adf8662bc56bf31c0e5fec55f0ff2212731b094a1586e961'),("Facundo Buffaz", "facubuffaz", false, "55acd9cfcd1c218410d04b8d6c53e9d77e09d0f2ffbacfacec6ba9bb799b2a89");
 /*!40000 ALTER TABLE `usuario` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

@@ -4,6 +4,7 @@ import (
 	actividadClient "arqsoft_proyecto/clients/actividades"
 	inscripcionClient "arqsoft_proyecto/clients/inscripciones"
 	usuarioClient "arqsoft_proyecto/clients/usuarios"
+	_"os"
 
 	model "arqsoft_proyecto/model"
 	"fmt"
@@ -11,20 +12,19 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
-	"os"
 )
 
 func InitConnection() *gorm.DB {
 	// refer https://github.com/go-sql-driver/mysql#dsn-data-source-name for details
-
-	dsn := fmt.Sprintf(
-		"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_NAME"),
-	)
+	dsn := "root:genagena1@tcp(mysql:3306)/arquisoftware?charset=utf8mb4&parseTime=True&loc=Local"
+	// dsn := fmt.Sprintf(
+	// 	"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+	// 	os.Getenv("DB_USER"),
+	// 	os.Getenv("DB_PASSWORD"),
+	// 	os.Getenv("DB_HOST"),
+	// 	os.Getenv("DB_PORT"),
+	// 	os.Getenv("DB_NAME"),
+	// )
 
 	fmt.Println("DSN generado:", dsn)
 
