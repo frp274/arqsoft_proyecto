@@ -36,7 +36,7 @@ func GetInscripcionesByUsuarioId(c *gin.Context) {
 	log.Debug("Usuario id to load: " + c.Param("id"))
 	id, _ := strconv.Atoi(c.Param("id"))
 
-	inscripcionesDto, err := service.GetInscripcionesByUsuarioId(id)
+	actividadesDto, err := service.GetInscripcionesByUsuarioId(id)
 
 	if err != nil {
 		log.Error(err.Error())
@@ -44,5 +44,5 @@ func GetInscripcionesByUsuarioId(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, inscripcionesDto)
+	c.JSON(http.StatusOK, actividadesDto)
 }

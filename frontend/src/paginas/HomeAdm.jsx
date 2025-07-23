@@ -203,12 +203,7 @@ function HomeAdm() {
         <p className="espacio" />
 
         <div style={{ marginTop: '5rem', marginLeft: '5rem' }}>
-          {usuario ? (
-            <InscripcionesUsuario usuarioId={usuario.id} />
-          ) : (
-            <p>No se pudo obtener el usuario</p>
-          )}
-
+          <InscripcionesUsuario usuarioId={getUserInfoFromToken().id} />
         </div>
 
       </div>

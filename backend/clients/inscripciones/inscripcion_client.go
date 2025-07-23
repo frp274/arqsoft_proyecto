@@ -47,13 +47,14 @@ func UpdateInscripcion(horario model.Horario) model.Horario {
     return horario
 }
 
-func GetInscripcionesByUsuarioId(usuarioId int) (model.Inscripciones, error) {
-	var inscripciones model.Inscripciones
-	result := Db.Where("usuario_id = ?", usuarioId).Find(&inscripciones)
+func GetInscripcionesByUsuarioId(usuarioId int) (model.Actividades, error) {
+	var actividades model.Actividades
+	result := Db.Preload("Horarios").Where("id = ?", usuarioId).Find(&actividades)
+	//result := Db.Where("usuario_id = ?", usuarioId).Find(&inscripciones)
 	if result.Error != nil {
-		return inscripciones, result.Error
+		return model.Actividades{}, result.Error
 	}
-	log.Debugf("Ins: %v", inscripciones)
+	log.Debugf("Ins: %v", actividades)
 
-	return inscripciones, nil
+	return actividades, nil
 }

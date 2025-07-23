@@ -38,25 +38,25 @@ func InscripcionActividad(inscripcionDto dto.InscripcionDto) (dto.InscripcionDto
 
 }
 
-func GetInscripcionesByUsuarioId(usuarioId int) (dto.InscripcionesDto, e.ApiError) {
-	var inscripcionesDto dto.InscripcionesDto
+func GetInscripcionesByUsuarioId(usuarioId int) (dto.ActividadesDto, e.ApiError) {
+	var actividadesDto dto.ActividadesDto
 
-	inscripciones, er := inscripcionCliente.GetInscripcionesByUsuarioId(usuarioId)
+	actividades, er := inscripcionCliente.GetInscripcionesByUsuarioId(usuarioId)
 
 	if er != nil {
 		log.Error(er.Error())
-		return dto.InscripcionesDto{}, e.NewBadRequestApiError("no se encontro el usuario id")
+		return dto.ActividadesDto{}, e.NewBadRequestApiError("no se encontro el usuario id")
 	}
 
-	for _, inscripcion := range inscripciones {
-		inscripcionDto := dto.InscripcionDto{
-			Id:          inscripcion.Id,
-			UsuarioId:   inscripcion.UsuarioId,
-			ActividadId: inscripcion.ActividadId,
-			HorarioId:   inscripcion.HorarioId,
+	for _, actividad := range actividades {
+		actividadDto := dto.ActividadDto{
+			Id:          actividad.Id,
+			Nombre:   actividad.Nombre,
+			Descripcion: actividad.Descripcion,
+			Profesor:   actividad.Profesor,
 		}
-		inscripcionesDto = append(inscripcionesDto, inscripcionDto)
+		actividadesDto = append(actividadesDto, actividadDto)
 	}
 
-	return inscripcionesDto, nil
+	return actividadesDto, nil
 }
