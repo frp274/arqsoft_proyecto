@@ -140,7 +140,7 @@ func DeleteActividad(id int) e.ApiError {
 	return nil
 }
 
-func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiError) {
+/*func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiError) {
 
 	// Traemos la actividad actual para asegurarnos de que existe
 	actividadActual := actividadCliente.GetActividadById(actividadDto.Id)
@@ -192,6 +192,66 @@ func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 			Cupo:       horario.Cupo,
 		}
 		actividadActualizada.Horario = append(actividadActualizada.Horario, horarioDto)
+	}
+
+	return actividadActualizada, nil
+}*/
+
+func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiError) {
+	// 1. Validar existencia de la actividad
+	actividadActual := actividadCliente.GetActividadById(actividadDto.Id)
+	if actividadActual.Id == 0 {
+		return dto.ActividadDto{}, e.NewNotFoundApiError("No se encontró la actividad con ese ID")
+	}
+
+	// 2. Actualizar campos básicos
+	actividadActual.Nombre = actividadDto.Nombre
+	actividadActual.Descripcion = actividadDto.Descripcion
+	actividadActual.Profesor = actividadDto.Profesor
+
+	// 3. Eliminar horarios anteriores asociados a la actividad
+	err := actividadCliente.DeleteHorariosByActividadID(actividadDto.Id)
+	if err != nil {
+		log.Print("Error al eliminar horarios anteriores: ", err)
+		return dto.ActividadDto{}, e.NewInternalServerApiError("Error al eliminar horarios anteriores", err)
+	}
+
+	// 4. Crear nuevos horarios desde el DTO
+	var nuevosHorarios []model.Horario
+	for _, horarioDto := range actividadDto.Horario {
+		nuevoHorario := model.Horario{
+			ActividadID: actividadDto.Id,
+			Dia:         horarioDto.Dia,
+			HoraInicio:  horarioDto.HoraInicio,
+			HoraFin:     horarioDto.HoraFin,
+			Cupo:        horarioDto.Cupo,
+		}
+		nuevosHorarios = append(nuevosHorarios, nuevoHorario)
+	}
+
+	// 5. Guardar actividad actualizada
+	actividadActual.Horarios = nuevosHorarios
+	actividadActual = actividadCliente.UpdateActividad(actividadActual)
+	if actividadActual.Id == 0 {
+		log.Print("No se pudo actualizar la actividad")
+		return dto.ActividadDto{}, e.NewBadRequestApiError("Error al actualizar la actividad")
+	}
+
+	// 6. Armar respuesta DTO
+	var actividadActualizada dto.ActividadDto
+	actividadActualizada.Id = actividadActual.Id
+	actividadActualizada.Nombre = actividadActual.Nombre
+	actividadActualizada.Descripcion = actividadActual.Descripcion
+	actividadActualizada.Profesor = actividadActual.Profesor
+
+	for _, h := range actividadActual.Horarios {
+		actividadActualizada.Horario = append(actividadActualizada.Horario, dto.HorarioDto{
+			Id:         h.Id,
+			Dia:        h.Dia,
+			HoraInicio: h.HoraInicio,
+			HoraFin:    h.HoraFin,
+			Cupo:       h.Cupo,
+		})
 	}
 
 	return actividadActualizada, nil

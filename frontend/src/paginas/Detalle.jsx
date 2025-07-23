@@ -168,7 +168,6 @@ function Detalle() {
           <h3 className="nact">{actividad.nombre || actividad.Nombre}</h3>
           <p className="desc"><strong>Descripción:</strong> {actividad.descripcion || actividad.Descripcion}</p>
           <p className="desc"><strong>Profesor:</strong> {actividad.profesor || actividad.Profesor}</p>
-          <p className="desc"><strong>Cupo disponible:</strong> {actividad.cupo || actividad.Cupo}</p>
 
           <p><strong>Horarios:</strong></p>
           <ul className="ul">
@@ -177,6 +176,7 @@ function Detalle() {
                 <span>
                   {h.dia || h.Dia}: {h.horarioInicio || h.horarioinicio || h.HorarioInicio} - {h.horarioFinal || h.horariofinal || h.HorarioFinal}
                 </span>
+                <p className="desc">Cupo disponible: {h.cupo || h.Cupo}</p>
                 <button className="inscribirse-btn" onClick={() => inscribirseHorario(h.id || h.Id)}>
                   Inscribirme a este horario
                 </button>
