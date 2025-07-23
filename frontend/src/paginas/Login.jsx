@@ -133,13 +133,20 @@ function Login() {
         console.log("RESPUESTA DEL LOGIN:", data); // Verifica la respuesta
 
         // Guardar el token en la cookie
-        document.cookie = `token=${data.token}; path=/; SameSite=Strict`;
+        // document.cookie = `token=${data.token}; path=/; SameSite=Strict`;
+        document.cookie = `token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
+        document.cookie = `token=${data.token}; path=/; SameSite=Strict; Secure`;
 
         // Guardar el usuarioId en la cookie (opcional)
-        //document.cookie = `userId=${data.id}; path=/; secure; HttpOnly`;
+        //document.cookie = `userId=${data.id}; path=/; Secure; HttpOnly`;
 
         // Redirigir al Home
-        navigate("/home");
+        if (data.es_admin === true){
+          navigate("/Admin");
+        }
+        else{
+          navigate("/home");
+        }
       } else {
         setError("Usuario o contraseña incorrectos.");
       }

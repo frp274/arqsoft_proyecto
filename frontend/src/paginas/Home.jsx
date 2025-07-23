@@ -9,6 +9,8 @@ import { useState } from "react";
 function Home() {
   const navigate = useNavigate();
   const [filtro, setFiltro] = useState('');
+  const [refrescar, setRefrescar] = useState(false);
+
 
   return (
     <div className="home">
@@ -19,6 +21,9 @@ function Home() {
       <div className="foto">
         <Foto/>
 
+
+       
+
         <p className="espacio"/>
         <h1 className='subtitulo'>ACTIVIDADES DISPONIBLES</h1>
         <p className="espacio"/>
@@ -27,7 +32,8 @@ function Home() {
 
         <p className="espacio"/>
 
-        <ListadoActividades filtro={filtro} />
+        <ListadoActividades filtro={filtro} refrescar={refrescar} />
+
       </div>
     </div>
   );

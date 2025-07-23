@@ -8,8 +8,9 @@ type UsuarioDto struct {
 type UsuariosDto []UsuarioDto
 
 type LoginResponse struct {
-	Id    int    `json:"id"`
-	Token string `json:"token"`
+	Id    int    	`json:"id"`
+	Token string 	`json:"token"`
+	Es_admin bool	`json:"es_admin"`
 }
 
 type LoginRequest struct {

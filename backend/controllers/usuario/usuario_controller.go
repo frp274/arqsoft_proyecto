@@ -16,7 +16,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	usuarioId, token, err := usuariosService.Login(request.Username, request.Password)
+	usuarioId, token, es_admin, err := usuariosService.Login(request.Username, request.Password)
 	if err != nil {
 		log.Printf("el error esta aca")
 		c.JSON(http.StatusUnauthorized, gin.H{"Error": err.Error()})
@@ -25,5 +25,9 @@ func Login(c *gin.Context) {
 	c.JSON(http.StatusOK, dto.LoginResponse{
 		Id:    usuarioId,
 		Token: token,
+		Es_admin: es_admin,
 	})
+	log.Printf("id: %d", usuarioId)
+	log.Printf("id: %s", token)
+	log.Printf("id: %t", es_admin)
 }
