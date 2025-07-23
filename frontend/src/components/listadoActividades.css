@@ -53,14 +53,14 @@
   padding: 16px;
   text-align: left;
   border-radius: 12px;
-  background-color: #f8f8f8;
+  background-color: #7e7e7e;
   border: 1px solid #ccc;
   cursor: pointer;
   transition: background 0.2s ease;
 }
 
 .boton-actividad:hover {
-  background-color: #e6e6e6;
+  background-color: #353535;
 }
 
 .contenido-actividad {
