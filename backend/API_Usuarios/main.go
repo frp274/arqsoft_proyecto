@@ -1,10 +1,11 @@
-package main_gateway
+package main_usuarios
 
 import (
 	"arqsoft_proyecto/app"
 	actividad "arqsoft_proyecto/clients/actividades"
 	"arqsoft_proyecto/db"
 )
+
 
 func main() {
 	// Initialize the database connection
