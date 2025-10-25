@@ -84,6 +84,7 @@ function HomeAdm() {
   if (getUserInfoFromToken().es_admin === false){
     navigate("/Home");
   }
+  const [actividades, setActividades] = useState([]);
   const [filtro, setFiltro] = useState('');
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [nombre, setNombre] = useState('');
@@ -94,8 +95,7 @@ function HomeAdm() {
   const [errorText, setErrorText] = useState('');
   const usuarioData = localStorage.getItem("usuario");
   const usuario = usuarioData ? JSON.parse(usuarioData) : null;
-
-  
+ 
 
 
 
@@ -202,9 +202,8 @@ function HomeAdm() {
 
         <p className="espacio" />
 
-        <div style={{ marginTop: '5rem', marginLeft: '5rem' }}>
-          <InscripcionesUsuario usuarioId={getUserInfoFromToken().id} />
-        </div>
+      
+        
 
       </div>
     </div>

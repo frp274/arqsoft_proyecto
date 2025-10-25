@@ -1,10 +1,51 @@
 import React, { useEffect, useState } from 'react';
 
-function InscripcionesUsuario({ usuarioId }) {
+function getCookie(name) {
+  const nameEQ = `${name}=`;
+  const ca = document.cookie.split(';');
+  
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i].trim();
+    if (c.indexOf(nameEQ) === 0) {
+      return c.substring(nameEQ.length, c.length);
+    }
+  }
+  return null; // Si no se encuentra la cookie, devuelve null
+}
+
+function getUserInfoFromToken() {
+  const token = getCookie("token");
+  if (!token) {
+    console.log("No se encontró el token en las cookies");
+    return null;
+  }
+
+  const parts = token.split('.');
+  if (parts.length !== 3) {
+    console.error("Token JWT inválido");
+    return null;
+  }
+
+  try {
+    const payload = JSON.parse(atob(parts[1]));
+    console.log("Payload del token:", payload);
+
+    return {
+      id: payload.jti || null,
+      es_admin: payload.es_admin || false  // o 'Es_admin' si tu backend lo envía así
+    };
+  } catch (e) {
+    console.error("Error al decodificar el token:", e);
+    return null;
+  }
+}
+
+
+function InscripcionesUsuario() {
   const [inscripciones, setInscripciones] = useState([]);
   const [actividades, setActividades] = useState({});
   const [loading, setLoading] = useState(true);
-
+  const usuario_id = getUserInfoFromToken().Id;
   useEffect(() => {
     const fetchInscripciones = async () => {
       try {
