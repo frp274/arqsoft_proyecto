@@ -8,10 +8,10 @@ import (
 
 func mapUrls() {
 	router.GET("/actividad/:id", actividadController.GetActividadById)
-	router.POST("/actividad", actividadController.InsertActividad)
-	router.GET("/actividad", actividadController.GetAllActividades)
-	router.DELETE("/actividad/:id", actividadController.DeleteActividad)
-	router.PUT("/actividad/:id", actividadController.UpdateActividad)
+	//router.POST("/actividad", actividadController.InsertActividad)
+	//router.GET("/actividad", actividadController.GetAllActividades)
+	//router.DELETE("/actividad/:id", actividadController.DeleteActividad)
+	//router.PUT("/actividad/:id", actividadController.UpdateActividad)
 
 	//router.POST("/inscripcion", inscripcionController.InscripcionActividad)
 	//router.GET("/inscripcion/:id", inscripcionController.GetInscripcionesByUsuarioId)

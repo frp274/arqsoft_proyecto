@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongouser
+      - MONGO_INITDB_ROOT_PASSWORD=mongopass
+    
+    # ⚠️ AÑADE ESTO: Health Check para esperar a que Mongo esté listo ⚠️
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.runCommand({ping: 1})", "--quiet"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api_actividades:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api_actividades_go
+    ports:
+      - "8080:8080"
+    environment:
+      - MONGO_URI=mongodb://mongouser:mongopass@mongodb:27017
+      - MONGO_DB_NAME=actividades_db
+    restart: on-failure
+    
+    # ⚠️ MODIFICA ESTO: Espera a que el health check sea exitoso ⚠️
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+volumes:
+  mongo_data:

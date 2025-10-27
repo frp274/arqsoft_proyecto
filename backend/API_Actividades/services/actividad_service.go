@@ -1,32 +1,54 @@
 package services
 
 import (
-	actividadCliente "api_actividades/clients/actividades"
 	"api_actividades/dto"
-	"api_actividades/model"
+	actividadRepositories "api_actividades/repositories/actividades"
+
+	//"api_actividades/model"
 	e "api_actividades/utils/errors"
+	"errors"
 
 	log "github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func GetActividadById(id int) (dto.ActividadDto, e.ApiError) {
-	var actividad model.Actividad = actividadCliente.GetActividadById(id)
+func GetActividadById(id string) (dto.ActividadDto, e.ApiError) {
+
+	actividad, err := actividadRepositories.GetActividadById(id)
+
 	var actividadDto dto.ActividadDto
 
-	if actividad.Id == 0 {
-		return actividadDto, e.NewBadRequestApiError("actividad not found")
+	// 1. Validar si hubo un error general en la DB
+	if err != nil {
+		// 2. Validar si el error fue específicamente 'documento no encontrado'
+		log.Errorf("Error retrieving actividad: %v", err)
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			// Documento no encontrado
+			return actividadDto, e.NewNotFoundApiError("actividad not found")
+		}
+		// Otro error de la DB
+		return actividadDto, e.NewInternalServerApiError("Error retrieving actividad", err)
 	}
 
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Errorf("Error converting id to mongo ID: %v", err)
+		return dto.ActividadDto{}, e.NewBadRequestApiError("Invalid ID format")
+	}
+
+	actividadDto.Id = objectID.Hex()
 	actividadDto.Nombre = actividad.Nombre
-	actividadDto.Id = actividad.Id
 	actividadDto.Descripcion = actividad.Descripcion
-	//actividadDto.Cupo = actividad.Cupo
 	actividadDto.Profesor = actividad.Profesor
+	//actividadDto.Cupo = actividad.Cupo
+	//if actividad.tags != nil {
+	//	actividadDto.Tags = actividad.tags
+	//}
 	//actividadDto.HorarioInscripcion = actividad.Horario
 
 	for _, horario := range actividad.Horarios {
 		horarioDto := dto.HorarioDto{
-			Id:         horario.Id,
 			Dia:        horario.Dia,
 			HoraInicio: horario.HoraInicio,
 			HoraFin:    horario.HoraFin,
@@ -35,15 +57,17 @@ func GetActividadById(id int) (dto.ActividadDto, e.ApiError) {
 		actividadDto.Horario = append(actividadDto.Horario, horarioDto)
 	}
 
+	log.Infof("Actividad DTO to return: %+v", actividadDto)
 	return actividadDto, nil
 }
 
+/*
 func GetAllActividades() (dto.ActividadesDto, e.ApiError) {
 	var actividades model.Actividades
 	var actividadesDto dto.ActividadesDto
 
 	// Obtener actividades del "client" (repositorio)
-	actividades, err := actividadCliente.GetAllActividades()
+	actividades, err := actividadRepositories.GetAllActividades()
 
 	if err != nil {
 		log.Error(err.Error())
@@ -93,14 +117,14 @@ func InsertActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 		actividad.Horarios = append(actividad.Horarios, horario)
 	}
 
-	actividad = actividadCliente.InsertActividad(actividad)
+	actividad = actividadRepositories.InsertActividad(actividad)
 	actividadDto.Id = actividad.Id
 
 	return actividadDto, nil
 }
 
 func GetActividadesByNombre(nombre string) (dto.ActividadesDto, e.ApiError) {
-	actividades, err := actividadCliente.GetActividadesFiltradas(nombre)
+	actividades, err := actividadRepositories.GetActividadesFiltradas(nombre)
 	if err != nil {
 		log.Error(err.Error())
 		return nil, e.NewInternalServerApiError("Error al obtener actividades", err)
@@ -133,73 +157,17 @@ func GetActividadesByNombre(nombre string) (dto.ActividadesDto, e.ApiError) {
 }
 
 func DeleteActividad(id int) e.ApiError {
-	err := actividadCliente.DeleteActividad(id)
+	err := actividadRepositories.DeleteActividad(id)
 	if err != nil {
 		return e.NewInternalServerApiError("No se pudo eliminar la actividad", err)
 	}
 	return nil
 }
 
-/*func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiError) {
-
-	// Traemos la actividad actual para asegurarnos de que existe
-	actividadActual := actividadCliente.GetActividadById(actividadDto.Id)
-	if actividadActual.Id == 0 {
-		return dto.ActividadDto{}, e.NewNotFoundApiError("No se encontró la actividad con ese ID")
-	}
-
-	// Actualizamos los campos base
-	//actividadActual.Id = actividadDto.Id
-	actividadActual.Nombre = actividadDto.Nombre
-	actividadActual.Descripcion = actividadDto.Descripcion
-	actividadActual.Profesor = actividadDto.Profesor
-
-	// Si vienen horarios nuevos, reemplazamos los anteriores
-	// var nuevosHorarios []model.Horario
-	for _, horarioDto := range actividadDto.Horario {
-		horario := model.Horario{
-			Id:          horarioDto.Id,
-			ActividadID: actividadDto.Id,
-			Dia:         horarioDto.Dia,
-			HoraInicio:  horarioDto.HoraInicio,
-			HoraFin:     horarioDto.HoraFin,
-			Cupo:        horarioDto.Cupo,
-		}
-	// 	// nuevosHorarios = append(nuevosHorarios, horario)
-		actividadActual.Horarios = append(actividadActual.Horarios, horario)
-	}
-	// actividadActual.Horarios = nuevosHorarios
-
-	// Guardamos la actividad actualizada en la base de datos
-	actividadActual = actividadCliente.UpdateActividad(actividadActual)
-	if actividadActual.Id == 0{
-		log.Print("no existe el id a actualizar")
-		return dto.ActividadDto{}, e.NewBadRequestApiError("error, el id de la actividad no existe")
-	}
-	// Armamos el DTO de respuesta
-	var actividadActualizada dto.ActividadDto
-	actividadActualizada.Id = actividadActual.Id
-	actividadActualizada.Nombre = actividadActual.Nombre
-	actividadActualizada.Descripcion = actividadActual.Descripcion
-	actividadActualizada.Profesor = actividadActual.Profesor
-
-	for _, horario := range actividadActual.Horarios {
-		horarioDto := dto.HorarioDto{
-			Id:         horario.Id,
-			Dia:        horario.Dia,
-			HoraInicio: horario.HoraInicio,
-			HoraFin:    horario.HoraFin,
-			Cupo:       horario.Cupo,
-		}
-		actividadActualizada.Horario = append(actividadActualizada.Horario, horarioDto)
-	}
-
-	return actividadActualizada, nil
-}*/
 
 func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiError) {
 	// 1. Validar existencia de la actividad
-	actividadActual := actividadCliente.GetActividadById(actividadDto.Id)
+	actividadActual := actividadRepositories.GetActividadById(actividadDto.Id)
 	if actividadActual.Id == 0 {
 		return dto.ActividadDto{}, e.NewNotFoundApiError("No se encontró la actividad con ese ID")
 	}
@@ -210,7 +178,7 @@ func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 	actividadActual.Profesor = actividadDto.Profesor
 
 	// 3. Eliminar horarios anteriores asociados a la actividad
-	err := actividadCliente.DeleteHorariosByActividadID(actividadDto.Id)
+	err := actividadRepositories.DeleteHorariosByActividadID(actividadDto.Id)
 	if err != nil {
 		log.Print("Error al eliminar horarios anteriores: ", err)
 		return dto.ActividadDto{}, e.NewInternalServerApiError("Error al eliminar horarios anteriores", err)
@@ -231,7 +199,7 @@ func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 
 	// 5. Guardar actividad actualizada
 	actividadActual.Horarios = nuevosHorarios
-	actividadActual = actividadCliente.UpdateActividad(actividadActual)
+	actividadActual = actividadRepositories.UpdateActividad(actividadActual)
 	if actividadActual.Id == 0 {
 		log.Print("No se pudo actualizar la actividad")
 		return dto.ActividadDto{}, e.NewBadRequestApiError("Error al actualizar la actividad")
@@ -256,3 +224,5 @@ func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 
 	return actividadActualizada, nil
 }
+
+*/

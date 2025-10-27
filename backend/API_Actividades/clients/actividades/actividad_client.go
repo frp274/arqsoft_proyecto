@@ -2,8 +2,8 @@ package actividad
 
 import (
 	"api_actividades/model"
-	"fmt"
-	"strings"
+	//"fmt"
+	//"strings"
 
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -23,6 +23,7 @@ func GetActividadById(id int) model.Actividad {
 	return actividad
 }
 
+/*
 func GetAllActividades() (model.Actividades, error) {
 	var actividades model.Actividades
 	result := Db.Preload("Horarios").Find(&actividades)
@@ -33,68 +34,6 @@ func GetAllActividades() (model.Actividades, error) {
 	return actividades, nil
 }
 
-/*func GetActividadesFiltradas(nombre string) ([]model.Actividad, error) {
-	var actividades []model.Actividad
-	query := Db
-
-	if nombre != "" {
-		query = query.Where("LOWER(nombre) LIKE ?", "%"+strings.ToLower(nombre)+"%")
-	}
-
-	if err := query.Find(&actividades).Error; err != nil {
-		return nil, err
-	}
-	return actividades, nil
-}*/
-
-/*func GetActividadesFiltradas(nombre string) ([]model.Actividad, error) {
-var actividades []model.Actividad
-
-log.Infof(">> Filtrando actividades con: '%s'", nombre)
-
-query := Db
-
-if nombre != "" {
-	// Mostramos cómo se arma la consulta
-	/*like := "%" + strings.ToLower(nombre) + "%"
-	log.Infof(">> Query LIKE: %s", like)
-	query = query.Where("LOWER(nombre) LIKE ?", like)*/
-
-/*query = query.Where("LOWER(nombre) LIKE ?", fmt.Sprintf("%%%s%%", strings.ToLower(nombre)))*/
-/*query = query.Where("nombre LIKE ?", "%"+nombre+"%")
-
-	}
-
-	if err := query.Preload("Horarios").Find(&actividades).Error; err != nil {
-		log.Errorf("Error en consulta: %v", err)
-		return nil, err
-	}
-
-	log.Infof(">> Actividades encontradas: %d", len(actividades))
-
-	return actividades, nil
-}*/
-
-/*func GetActividadesFiltradas(nombre string) ([]model.Actividad, error) {
-	var actividades []model.Actividad
-
-	log.Infof(">> Filtrando actividades con: '%s'", nombre)
-
-	query := Db
-
-	if nombre != "" {
-		// ✅ Esta forma es segura y funciona siempre
-		query = query.Where("LOWER(nombre) LIKE LOWER(?)", "%"+nombre+"%")
-	}
-
-	if err := query.Preload("Horarios").Find(&actividades).Error; err != nil {
-		log.Errorf("Error en consulta: %v", err)
-		return nil, err
-	}
-
-	log.Infof(">> Actividades encontradas: %d", len(actividades))
-	return actividades, nil
-}*/
 
 func GetActividadesFiltradas(nombre string) (model.Actividades, error) {
 	var actividades model.Actividades
@@ -177,3 +116,6 @@ func DeleteHorariosByActividadID(actividadID int) error {
 	}
 	return nil
 }
+
+
+*/
