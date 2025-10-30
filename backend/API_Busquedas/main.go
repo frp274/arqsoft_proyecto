@@ -1,4 +1,4 @@
-package main_busquedas
+package main
 
 import (
 	"arqsoft_proyecto/app"

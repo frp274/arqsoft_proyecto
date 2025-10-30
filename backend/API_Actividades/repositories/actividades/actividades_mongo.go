@@ -15,15 +15,7 @@ import (
 
 var Db *mongo.Database
 
-func GetActividadById(id string) (model.Actividad, error) {
-
-	objectID, err := primitive.ObjectIDFromHex(id)
-
-	if err != nil {
-		//logeamos la info
-		log.Errorf("Error converting id to mongo ID: %v", err)
-		return model.Actividad{}, fmt.Errorf("error converting id to mongo ID: %w", err)
-	}
+func GetActividadById(objectID primitive.ObjectID) (model.Actividad, error) {
 
 	result := Db.Collection("actividades").FindOne(context.TODO(), bson.M{"_id": objectID})
 
@@ -40,12 +32,47 @@ func GetActividadById(id string) (model.Actividad, error) {
 	}
 
 	log.Infof("Actividad encontrada en BD: %v", actividad)
+	
 	return actividad, nil
-	//result := Db.Preload("Horarios").Where("id = ?", id).First(&actividad)
-	//if result.Error != nil {
-	//	//return actividad, result.Error
-	//}
-	//log.Debugf("Act: %v", actividad)
-//
-	//return actividad
+}
+/*
+func GetActividadesByNombre(nombre string) (model.Actividades, error) {
+
+
+}
+*/
+
+
+func InsertActividad(actividad model.Actividad) (model.Actividad, error) {
+	result := Db.Collection("actividades").FindOne(context.TODO(), bson.M{"nombre": actividad.Nombre})
+	if result.Err() == nil {
+		log.Errorf("Actividad con nombre '%s' ya existe", actividad.Nombre)
+		return model.Actividad{}, fmt.Errorf("actividad con nombre '%s' ya existe", actividad.Nombre)
+	}
+
+	_, err := Db.Collection("actividades").InsertOne(context.TODO(), actividad)
+	if err != nil {
+		log.Errorf("Error insertando actividad: %v", err)
+		return model.Actividad{}, err
+	}
+	return actividad, nil
+}
+
+
+func DeleteActividad(id primitive.ObjectID) error {
+	result, err := Db.Collection("actividades").DeleteOne(context.TODO(), bson.M{"_id": id})
+	if err != nil {
+		log.Errorf("Error deleting actividad: %v", err)
+		return err
+	}
+
+	if result.DeletedCount == 0 {
+		return fmt.Errorf("actividad not found")
+	}
+
+	log.Infof("Actividad with id %s deleted", id.Hex())
+	return nil
+}
+
+func UpdateActividad(actividadActualizada model.Actividad) (model.Actividad, error) {	
 }

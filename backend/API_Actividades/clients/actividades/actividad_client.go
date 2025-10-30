@@ -2,8 +2,8 @@ package actividad
 
 import (
 	"api_actividades/model"
-	//"fmt"
-	//"strings"
+	"fmt"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -23,7 +23,7 @@ func GetActividadById(id int) model.Actividad {
 	return actividad
 }
 
-/*
+
 func GetAllActividades() (model.Actividades, error) {
 	var actividades model.Actividades
 	result := Db.Preload("Horarios").Find(&actividades)
@@ -35,7 +35,7 @@ func GetAllActividades() (model.Actividades, error) {
 }
 
 
-func GetActividadesFiltradas(nombre string) (model.Actividades, error) {
+func GetActividadesByNombre(nombre string) (model.Actividades, error) {
 	var actividades model.Actividades
 
 	log.Infof(">> Filtro recibido: '%s'", nombre)
@@ -56,7 +56,7 @@ func GetActividadesFiltradas(nombre string) (model.Actividades, error) {
 	log.Infof(">> Actividades encontradas: %d", len(actividades))
 	return actividades, nil
 }
-
+/*
 func InsertActividad(actividad model.Actividad) model.Actividad {
 	result := Db.Create(&actividad)
 
