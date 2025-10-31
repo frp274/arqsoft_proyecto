@@ -180,6 +180,7 @@ func InsertActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 
 
 func DeleteActividad(id string) e.ApiError {
+	//Falta eliminar en Solr y en la cache local===============================================================================================================================
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		log.Errorf("Error converting id to mongo ID: %v", err)
@@ -195,6 +196,7 @@ func DeleteActividad(id string) e.ApiError {
 
 
 func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiError) {
+	//Falta actualizar en Solr y en la cache local===============================================================================================================================
 	objetID, err := primitive.ObjectIDFromHex(actividadDto.Id)
 	if err != nil {
 		log.Errorf("Error converting id to mongo ID: %v", err)

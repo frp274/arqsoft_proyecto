@@ -74,5 +74,17 @@ func DeleteActividad(id primitive.ObjectID) error {
 	return nil
 }
 
-func UpdateActividad(actividadActualizada model.Actividad) (model.Actividad, error) {	
+func UpdateActividad(actividadActualizada model.Actividad) (model.Actividad, error) {
+	result, err :=Db.Collection("actividades").UpdateByID(context.TODO(), actividadActualizada.Id, actividadActualizada)
+	if err != nil {
+		log.Errorf("Error updating actividad: %v", err)
+		return model.Actividad{}, err
+	}
+
+	if result.MatchedCount == 0 {
+		return model.Actividad{}, fmt.Errorf("actividad not found")
+	}
+
+	log.Infof("Actividad with id %s updated", actividadActualizada.Id.Hex())
+	return actividadActualizada, nil
 }

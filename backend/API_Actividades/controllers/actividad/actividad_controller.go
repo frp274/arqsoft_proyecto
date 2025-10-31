@@ -5,7 +5,6 @@ import (
 	service "api_actividades/services"
 
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
