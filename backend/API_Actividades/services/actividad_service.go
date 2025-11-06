@@ -14,32 +14,38 @@ import (
 )
 
 func GetActividadById(id string) (dto.ActividadDto, e.ApiError) {
-	//Aplicar Busqueda en la cache =====================================================================================================================================
-	objectID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		log.Errorf("Error converting id to mongo ID: %v", err)
-		return dto.ActividadDto{}, e.NewBadRequestApiError("Invalid ID format")
-	}
-
-	actividad, err := actividadRepositories.GetActividadById(objectID)
-
 	var actividadDto dto.ActividadDto
+	//Aplicar Busqueda en la cache =====================================================================================================================================
+	actividad, er := actividadRepositories.GetActividadByIdCache(id)
+	if er != nil {
+		log.Errorf("Error retrieving actividad from cache: %v", er)
+	}
+	if actividad.Id.IsZero() {
 
-	// 1. Validar si hubo un error general en la DB
-	if err != nil {
-		// 2. Validar si el error fue específicamente 'documento no encontrado'
-		log.Errorf("Error retrieving actividad: %v", err)
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			// Documento no encontrado
-			return actividadDto, e.NewNotFoundApiError("actividad not found")
+		objectID, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			log.Errorf("Error converting id to mongo ID: %v", err)
+			return dto.ActividadDto{}, e.NewBadRequestApiError("Invalid ID format")
 		}
-		// Otro error de la DB
-		return actividadDto, e.NewInternalServerApiError("Error retrieving actividad", err)
+
+		actividad, err := actividadRepositories.GetActividadById(objectID)
+
+		// 1. Validar si hubo un error general en la DB
+		if err != nil {
+			// 2. Validar si el error fue específicamente 'documento no encontrado'
+			log.Errorf("Error retrieving actividad: %v", err)
+			if errors.Is(err, mongo.ErrNoDocuments) {
+				// Documento no encontrado
+				return actividadDto, e.NewNotFoundApiError("actividad not found")
+			}
+			// Otro error de la DB
+			return actividadDto, e.NewInternalServerApiError("Error retrieving actividad", err)
+		}
+		log.Infof("Actividad encontrada en la BD: %v", actividad)
 	}
 
 	
-	
-	actividadDto.Id = objectID.Hex()
+	actividadDto.Id = id //objectID.Hex()
 	actividadDto.Nombre = actividad.Nombre
 	actividadDto.Descripcion = actividad.Descripcion
 	actividadDto.Profesor = actividad.Profesor
@@ -172,10 +178,18 @@ func InsertActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 		log.Errorf("Error al insertar actividad: %v", err)
 		return dto.ActividadDto{}, e.NewInternalServerApiError("Error al insertar actividad", err)
 	}
+
 	//Luego de insertar y que haya salido todo bien, falta insertarla en localcache e indexarla en soler (para busquedas)================================================================
+	actividadCache := actividadRepositories.InsertActividadCache(actividad)
+	// Preguntar al profe si conviene en vez de retornar,			==================================================================================================
+	// simplemente cuando devuelva el error en la funcion general, 	==================================================================================================
+	// mostrar el error que hubo									==================================================================================================
+	
+	log.Infof("Actividad insertada en la cache local: %v", actividadCache)
+
 	actividadDto.Id = actividad.Id.Hex()
 
-	return actividadDto, nil
+	return actividadDto, nil  // Mandar aca el error de la cache en caso de que haya?? ==============================^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 }
 
 
@@ -191,12 +205,17 @@ func DeleteActividad(id string) e.ApiError {
 	if err != nil {
 		return e.NewInternalServerApiError("No se pudo eliminar la actividad", err)
 	}
+	//Eliminar de la cache local
+	er := actividadRepositories.DeleteActividadCache(id)
+	if er != nil {
+		return e.NewInternalServerApiError("No se pudo eliminar la actividad de la cache local", er)
+	}
 	return nil
 }
 
 
 func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiError) {
-	//Falta actualizar en Solr y en la cache local===============================================================================================================================
+	//Falta actualizar en Solr ===============================================================================================================================
 	objetID, err := primitive.ObjectIDFromHex(actividadDto.Id)
 	if err != nil {
 		log.Errorf("Error converting id to mongo ID: %v", err)
@@ -239,6 +258,15 @@ func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 		log.Print("Error al actualizar la actividad: ", err)
 		return dto.ActividadDto{}, e.NewInternalServerApiError("Error al actualizar la actividad", err)
 	}
+
+	//Actualizar en la cache local 
+	actividadCache, er := actividadRepositories.UpdateActividadCache(actividadActual)
+	if er != nil {
+		log.Print("Error al actualizar la actividad en la cache local: ", er)
+		// Preguntar al profe si conviene poner un actividadRepositories.DeleteActividadCache(actividadDto.Id) acá =========================================================
+		return dto.ActividadDto{}, e.NewInternalServerApiError("Error al actualizar la actividad en la cache local", er)
+	}
+	log.Infof("Actividad actualizada en la cache local: %v", actividadCache)
 
 	// 6. Armar respuesta DTO
 	var actividadActualizada dto.ActividadDto

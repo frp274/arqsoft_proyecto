@@ -1,6 +1,7 @@
 package main
 
 import (
+	"api_actividades/repositories/actividades"
 	"context"
 	log "github.com/sirupsen/logrus"
 	"os"
@@ -30,7 +31,14 @@ func main() {
 	if err != nil {
 		log.Fatalf("FATAL: Failed to connect to MongoDB: %v", err)
 	}
-	
+	// Inicializar la cache local
+	repository.NewCache(repository.CacheConfig{
+		MaxSize:      100000,
+		ItemsToPrune: 100,
+		Duration:     30 * time.Minute,
+	})
+	log.Info("INFO: Successfully connected to Local Cache.")
+
 	// --- 3. CIERRE DE LA CONEXIÓN ---
 	// Usar defer para asegurar que la conexión se cierre al finalizar main()
 	defer func() {
