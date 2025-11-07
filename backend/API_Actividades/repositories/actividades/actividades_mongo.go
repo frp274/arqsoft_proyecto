@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	//"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var Db *mongo.Database
@@ -50,11 +50,12 @@ func InsertActividad(actividad model.Actividad) (model.Actividad, error) {
 		return model.Actividad{}, fmt.Errorf("actividad con nombre '%s' ya existe", actividad.Nombre)
 	}
 
-	_, err := Db.Collection("actividades").InsertOne(context.TODO(), actividad)
+	_id, err := Db.Collection("actividades").InsertOne(context.TODO(), actividad)
 	if err != nil {
 		log.Errorf("Error insertando actividad: %v", err)
 		return model.Actividad{}, err
 	}
+	actividad.Id = _id.InsertedID.(primitive.ObjectID)
 	return actividad, nil
 }
 
@@ -74,17 +75,16 @@ func DeleteActividad(id primitive.ObjectID) error {
 	return nil
 }
 
-func UpdateActividad(actividadActualizada model.Actividad) (model.Actividad, error) {
-	result, err :=Db.Collection("actividades").UpdateByID(context.TODO(), actividadActualizada.Id, actividadActualizada)
-	if err != nil {
-		log.Errorf("Error updating actividad: %v", err)
-		return model.Actividad{}, err
-	}
+func UpdateActividad(a model.Actividad) (model.Actividad, error) {
+    filter := bson.M{"_id": a.Id}
+    opts := options.Replace().SetUpsert(false)
 
-	if result.MatchedCount == 0 {
-		return model.Actividad{}, fmt.Errorf("actividad not found")
-	}
-
-	log.Infof("Actividad with id %s updated", actividadActualizada.Id.Hex())
-	return actividadActualizada, nil
+    res, err := Db.Collection("actividades").ReplaceOne(context.TODO(), filter, a, opts)
+    if err != nil {
+        return model.Actividad{}, err
+    }
+    if res.MatchedCount == 0 {
+        return model.Actividad{}, fmt.Errorf("actividad not found")
+    }
+    return a, nil
 }

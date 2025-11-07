@@ -28,8 +28,8 @@ func GetActividadById(id string) (dto.ActividadDto, e.ApiError) {
 			return dto.ActividadDto{}, e.NewBadRequestApiError("Invalid ID format")
 		}
 
-		actividad, err := actividadRepositories.GetActividadById(objectID)
-
+		actividad, err = actividadRepositories.GetActividadById(objectID)
+		
 		// 1. Validar si hubo un error general en la DB
 		if err != nil {
 			// 2. Validar si el error fue específicamente 'documento no encontrado'
@@ -41,11 +41,14 @@ func GetActividadById(id string) (dto.ActividadDto, e.ApiError) {
 			// Otro error de la DB
 			return actividadDto, e.NewInternalServerApiError("Error retrieving actividad", err)
 		}
-		log.Infof("Actividad encontrada en la BD: %v", actividad)
+		// Insertar en la cache local
+		actividadCache := actividadRepositories.InsertActividadCache(actividad)
+		log.Infof("Actividad insertada en la cache local: %v", actividadCache)
 	}
 
-	
+
 	actividadDto.Id = id //objectID.Hex()
+	log.Debugf("Nombre de la actividad: %v", actividad.Nombre)
 	actividadDto.Nombre = actividad.Nombre
 	actividadDto.Descripcion = actividad.Descripcion
 	actividadDto.Profesor = actividad.Profesor
@@ -173,21 +176,21 @@ func InsertActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 		actividad.Horarios = append(actividad.Horarios, horario)
 	}
 
-	actividad, err := actividadRepositories.InsertActividad(actividad)
+	actividadInsertada, err := actividadRepositories.InsertActividad(actividad)
 	if err != nil {
 		log.Errorf("Error al insertar actividad: %v", err)
 		return dto.ActividadDto{}, e.NewInternalServerApiError("Error al insertar actividad", err)
 	}
 
 	//Luego de insertar y que haya salido todo bien, falta insertarla en localcache e indexarla en soler (para busquedas)================================================================
-	actividadCache := actividadRepositories.InsertActividadCache(actividad)
+	actividadCache := actividadRepositories.InsertActividadCache(actividadInsertada)
 	// Preguntar al profe si conviene en vez de retornar,			==================================================================================================
 	// simplemente cuando devuelva el error en la funcion general, 	==================================================================================================
 	// mostrar el error que hubo									==================================================================================================
 	
 	log.Infof("Actividad insertada en la cache local: %v", actividadCache)
 
-	actividadDto.Id = actividad.Id.Hex()
+	actividadDto.Id = actividadInsertada.Id.Hex()
 
 	return actividadDto, nil  // Mandar aca el error de la cache en caso de que haya?? ==============================^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 }
@@ -260,12 +263,8 @@ func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 	}
 
 	//Actualizar en la cache local 
-	actividadCache, er := actividadRepositories.UpdateActividadCache(actividadActual)
-	if er != nil {
-		log.Print("Error al actualizar la actividad en la cache local: ", er)
-		// Preguntar al profe si conviene poner un actividadRepositories.DeleteActividadCache(actividadDto.Id) acá =========================================================
-		return dto.ActividadDto{}, e.NewInternalServerApiError("Error al actualizar la actividad en la cache local", er)
-	}
+	actividadCache := actividadRepositories.InsertActividadCache(actividadActual)
+	
 	log.Infof("Actividad actualizada en la cache local: %v", actividadCache)
 
 	// 6. Armar respuesta DTO

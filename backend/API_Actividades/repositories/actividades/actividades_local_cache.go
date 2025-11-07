@@ -19,9 +19,10 @@ type CacheConfig struct {
 }
 
 func NewCache(config CacheConfig) {
-	ccache.New(ccache.Configure().
+	client =ccache.New(ccache.Configure().
 		MaxSize(config.MaxSize).
 		ItemsToPrune(config.ItemsToPrune))
+	duration = config.Duration
 	//return Cache{
 	//	client:   client,
 	//	duration: config.Duration,
@@ -67,18 +68,4 @@ func DeleteActividadCache(id string) error {
 		return err
 	}
 	return nil
-}
-
-// Update recibe la actividad ya modificada
-func UpdateActividadCache(actividad model.Actividad) (model.Actividad, error) {
-	log.Infof("Actualizando actividad en local cache. Actividad: %v", actividad)
-
-	item := client.Get(actividad.Id.Hex())
-	if item == nil || item.Expired() {
-		err := fmt.Errorf("actividad con ID %s no encontrada o expirada en local cache", actividad.Id.Hex())
-		return model.Actividad{}, err
-	}
-
-	client.Set(actividad.Id.Hex(), actividad, duration)
-	return actividad, nil
 }

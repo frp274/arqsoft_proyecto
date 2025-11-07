@@ -9,7 +9,6 @@ import (
 
 	"api_actividades/app"
 	db "api_actividades/db" // Importar como 'db' para facilitar el uso
-	actividadesRepo "api_actividades/repositories/actividades"
 )
 
 func main() {
@@ -63,7 +62,7 @@ func main() {
 	// --- 5. INICIAR EL ROUTER Y LA API ---
 	// Aquí debes pasar la instancia 'database' al resto de tu aplicación
 	// (clients/repositories) para que puedan usarla.
-	actividadesRepo.Db = database
+	repository.Db = database
 	
     // **PENDIENTE**: Necesitas una forma de inyectar 'database' al resto de la aplicación.
 	// Por ahora, solo iniciamos las rutas.
