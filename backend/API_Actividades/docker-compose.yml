@@ -46,6 +46,7 @@ services:
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
       - RABBITMQ_QUEUE=actividades_events
       - RABBITMQ_EXCHANGE=actividades_exchange
+      - USUARIOS_API_URL=http://host.docker.internal:8082
     restart: on-failure
     
     depends_on:

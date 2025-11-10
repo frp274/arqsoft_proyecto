@@ -58,6 +58,7 @@ type Actividad struct {
 	Id primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
 	Nombre string `bson:"nombre" json:"nombre"`// 'nombre' está requerido y es un string.
 	Profesor string `bson:"profesor" json:"profesor"`// 'profesor' está requerido y es un string.
+	OwnerId int `bson:"owner_id" json:"owner_id"` // ID del usuario creador/dueño (validado contra API_Usuarios)
 	Horarios []Horario `bson:"horarios" json:"horarios"`// 'horarios' está requerido y es un array de objetos 'Horario'.
 	Descripcion string `bson:"descripcion,omitempty" json:"descripcion,omitempty"`// 'descripcion' es un array de strings o null, lo más simple es usar []string o un puntero. El schema dice: bson.A{"string", "null"} Si solo quieres strings, usa []string. Si necesitas el manejo de nulos:
 	Tags []string `bson:"tags,omitempty" json:"tags,omitempty"`// 'tags' es un array de strings opcional.

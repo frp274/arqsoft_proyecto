@@ -101,3 +101,17 @@ func UpdateActividad(c *gin.Context) {
 	c.JSON(http.StatusOK, actividadActualizada)
 }
 
+// CalcularDisponibilidad endpoint de acción que calcula disponibilidad con concurrencia
+func CalcularDisponibilidad(c *gin.Context) {
+	log.Debug("Calculando disponibilidad para actividad: " + c.Param("id"))
+	id := c.Param("id")
+
+	resultado, err := service.CalcularDisponibilidad(id)
+	if err != nil {
+		c.JSON(err.Status(), err)
+		return
+	}
+
+	c.JSON(http.StatusOK, resultado)
+}
+

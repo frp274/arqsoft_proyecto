@@ -1,13 +1,18 @@
 package services
 
 import (
+	"api_actividades/clients/usuarios"
 	"api_actividades/dto"
 	"api_actividades/queue"
 	actividadRepositories "api_actividades/repositories/actividades"
+	"errors"
+	"fmt"
+	"math/rand"
+	"sync"
+	"time"
 
 	"api_actividades/model"
 	e "api_actividades/utils/errors"
-	"errors"
 
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -52,6 +57,7 @@ func GetActividadById(id string) (dto.ActividadDto, e.ApiError) {
 	actividadDto.Nombre = actividad.Nombre
 	actividadDto.Descripcion = actividad.Descripcion
 	actividadDto.Profesor = actividad.Profesor
+	actividadDto.OwnerId = actividad.OwnerId
 	//actividadDto.Cupo = actividad.Cupo
 	//if actividad.tags != nil {
 	//	actividadDto.Tags = actividad.tags
@@ -162,10 +168,22 @@ func InsertActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 		log.Error("El nombre del profesor no puede estar vacío")
 		return dto.ActividadDto{}, e.NewBadRequestApiError("El nombre del profesor no puede estar vacío")
 	}
+	if actividadDto.OwnerId == 0 {
+		log.Error("El owner_id es requerido")
+		return dto.ActividadDto{}, e.NewBadRequestApiError("owner_id is required")
+	}
+
+	// VALIDAR EXISTENCIA DEL OWNER CONTRA API_USUARIOS
+	log.Infof("Validating owner user %d against API_Usuarios", actividadDto.OwnerId)
+	if err := usuarios.ValidateUser(actividadDto.OwnerId); err != nil {
+		log.Errorf("Owner validation failed for user %d: %v", actividadDto.OwnerId, err)
+		return dto.ActividadDto{}, e.NewBadRequestApiError(fmt.Sprintf("Invalid owner_id: %v", err))
+	}
+
 	actividad.Nombre = actividadDto.Nombre
 	actividad.Descripcion = actividadDto.Descripcion
-	//actividad.Cupo = actividadDto.Cupo
 	actividad.Profesor = actividadDto.Profesor
+	actividad.OwnerId = actividadDto.OwnerId
 
 	for _, horarioDto := range actividadDto.Horario {
 		horario := model.Horario{
@@ -244,6 +262,16 @@ func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 		return dto.ActividadDto{}, e.NewNotFoundApiError("Actividad no encontrada")
 	}
 
+	// 1.5 VALIDAR OWNER SI SE PROPORCIONA (para cambio de propietario)
+	if actividadDto.OwnerId != 0 && actividadDto.OwnerId != actividadActual.OwnerId {
+		log.Infof("Validating new owner user %d against API_Usuarios", actividadDto.OwnerId)
+		if err := usuarios.ValidateUser(actividadDto.OwnerId); err != nil {
+			log.Errorf("Owner validation failed for user %d: %v", actividadDto.OwnerId, err)
+			return dto.ActividadDto{}, e.NewBadRequestApiError(fmt.Sprintf("Invalid owner_id: %v", err))
+		}
+		actividadActual.OwnerId = actividadDto.OwnerId
+	}
+
 	// 2. Actualizar campos básicos
 	if actividadDto.Nombre != "" {
 		actividadActual.Nombre = actividadDto.Nombre
@@ -285,6 +313,7 @@ func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 	actividadActualizada.Nombre = actividadActual.Nombre
 	actividadActualizada.Descripcion = actividadActual.Descripcion
 	actividadActualizada.Profesor = actividadActual.Profesor
+	actividadActualizada.OwnerId = actividadActual.OwnerId
 
 	for _, h := range actividadActual.Horarios {
 		actividadActualizada.Horario = append(actividadActualizada.Horario, dto.HorarioDto{
@@ -302,4 +331,109 @@ func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 	}
 
 	return actividadActualizada, nil
+}
+
+// CalcularDisponibilidad calcula la disponibilidad de horarios de forma concurrente
+// Utiliza GoRoutines, Channels y WaitGroups según enunciado
+func CalcularDisponibilidad(id string) (dto.DisponibilidadResponse, e.ApiError) {
+	startTime := time.Now()
+	
+	// 1. Obtener la actividad
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Errorf("Error converting id to mongo ID: %v", err)
+		return dto.DisponibilidadResponse{}, e.NewBadRequestApiError("Invalid ID format")
+	}
+
+	actividad, err := actividadRepositories.GetActividadById(objectID)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return dto.DisponibilidadResponse{}, e.NewNotFoundApiError("actividad not found")
+		}
+		return dto.DisponibilidadResponse{}, e.NewInternalServerApiError("Error retrieving actividad", err)
+	}
+
+	// 2. Configurar procesamiento concurrente
+	numHorarios := len(actividad.Horarios)
+	if numHorarios == 0 {
+		return dto.DisponibilidadResponse{}, e.NewBadRequestApiError("La actividad no tiene horarios")
+	}
+
+	// Channel para recibir resultados de las GoRoutines
+	resultsChan := make(chan dto.DisponibilidadResult, numHorarios)
+	
+	// WaitGroup para sincronizar las GoRoutines
+	var wg sync.WaitGroup
+
+	log.Infof("Iniciando cálculo concurrente de disponibilidad para %d horarios", numHorarios)
+
+	// 3. Lanzar una GoRoutine por cada horario
+	for i, horario := range actividad.Horarios {
+		wg.Add(1)
+		go calcularDisponibilidadHorario(i, horario, resultsChan, &wg)
+	}
+
+	// 4. GoRoutine para cerrar el channel cuando todas las goroutines terminen
+	go func() {
+		wg.Wait()
+		close(resultsChan)
+		log.Info("Todas las GoRoutines completadas, channel cerrado")
+	}()
+
+	// 5. Recolectar resultados del channel
+	var resultados []dto.DisponibilidadResult
+	totalCupo := 0
+	totalOcupado := 0
+
+	for result := range resultsChan {
+		resultados = append(resultados, result)
+		totalCupo += result.Cupo
+		totalOcupado += (result.Cupo - result.Disponibles)
+	}
+
+	elapsed := time.Since(startTime)
+
+	response := dto.DisponibilidadResponse{
+		ActividadId:  id,
+		Nombre:       actividad.Nombre,
+		Horarios:     resultados,
+		TotalCupo:    totalCupo,
+		TotalOcupado: totalOcupado,
+		Tiempo:       elapsed.String(),
+	}
+
+	log.Infof("Cálculo completado en %s: %d horarios procesados", elapsed, numHorarios)
+	return response, nil
+}
+
+// calcularDisponibilidadHorario es ejecutada como GoRoutine para procesar cada horario
+func calcularDisponibilidadHorario(index int, horario model.Horario, resultsChan chan<- dto.DisponibilidadResult, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	log.Debugf("GoRoutine %d: Procesando horario %s", index, horario.Dia)
+
+	// Simular cálculo complejo (en producción aquí consultarías inscripciones, etc.)
+	time.Sleep(time.Millisecond * time.Duration(50+rand.Intn(100)))
+
+	// Simular ocupación aleatoria para demostración
+	// En producción, esto vendría de consultar inscripciones reales
+	ocupados := rand.Intn(horario.Cupo + 1)
+	disponibles := horario.Cupo - ocupados
+	porcentajeOcupado := 0.0
+	if horario.Cupo > 0 {
+		porcentajeOcupado = float64(ocupados) / float64(horario.Cupo) * 100
+	}
+
+	result := dto.DisponibilidadResult{
+		Dia:               horario.Dia,
+		Cupo:              horario.Cupo,
+		Disponibles:       disponibles,
+		PorcentajeOcupado: porcentajeOcupado,
+	}
+
+	log.Debugf("GoRoutine %d: Completado - %s: %d/%d disponibles (%.1f%% ocupado)", 
+		index, horario.Dia, disponibles, horario.Cupo, porcentajeOcupado)
+
+	// Enviar resultado por el channel
+	resultsChan <- result
 }
