@@ -45,24 +45,24 @@ function InscripcionesUsuario() {
   const [inscripciones, setInscripciones] = useState([]);
   const [actividades, setActividades] = useState({});
   const [loading, setLoading] = useState(true);
-  const usuario_id = getUserInfoFromToken().Id;
+  const usuarioInfo = getUserInfoFromToken();
+  const usuarioId = usuarioInfo?.id;
+
   useEffect(() => {
     const fetchInscripciones = async () => {
-      try {
-        const res = await fetch('http://localhost:8080/inscripciones/usuario/${usuarioId}');
-        const data = await res.json();
-        setInscripciones(data);
+      if (!usuarioId) {
+        setLoading(false);
+        return;
+      }
 
-        // Obtener detalles de actividades
-        const actividadesMap = {};
-        for (const insc of data) {
-          if (!actividadesMap[insc.actividadId]) {
-            const actRes = await fetch('http://localhost:8080/actividad/${insc.actividadId}');
-            const actData = await actRes.json();
-            actividadesMap[insc.actividadId] = actData;
-          }
-        }
-        setActividades(actividadesMap);
+      try {
+        // Comentado: endpoint de inscripciones no existe en microservicios
+        // const res = await fetch(`${process.env.REACT_APP_API_BUSQUEDAS_URL}/inscripciones/usuario/${usuarioId}`);
+        // const data = await res.json();
+        // setInscripciones(data);
+
+        // Por ahora, dejamos vacío hasta implementar endpoint
+        setInscripciones([]);
       } catch (err) {
         console.error("Error al obtener inscripciones:", err);
       } finally {
@@ -70,9 +70,7 @@ function InscripcionesUsuario() {
       }
     };
 
-    if (usuarioId) {
-      fetchInscripciones();
-    }
+    fetchInscripciones();
   }, [usuarioId]);
 
   if (loading) return <p>Cargando inscripciones...</p>;
