@@ -1,24 +1,24 @@
 package app
 
 import (
-	actividadController "arqsoft_proyecto/controllers/actividad"
-	inscripcionController "arqsoft_proyecto/controllers/inscripcion"
-	usuarioController "arqsoft_proyecto/controllers/usuario"
+	searchController "api_busquedas/controllers/search"
 
 	log "github.com/sirupsen/logrus"
 )
 
 func mapUrls() {
-	router.GET("/actividad/:id", actividadController.GetActividadById)
-	router.POST("/actividad", actividadController.InsertActividad)
-	router.GET("/actividad", actividadController.GetAllActividades)
-	router.DELETE("/actividad/:id", actividadController.DeleteActividad)
-	router.PUT("/actividad/:id", actividadController.UpdateActividad)
+	// Endpoint principal de búsqueda paginada con filtros y ordenamiento
+	// Query params: q (query), page, size, sort, order, filters
+	router.GET("/search/actividades", searchController.SearchActividades)
+	
+	// Endpoint para obtener actividad específica (con cache)
+	router.GET("/actividad/:id", searchController.GetActividadById)
+	
+	// Health check endpoint
+	router.GET("/health", searchController.HealthCheck)
+	
+	// Stats endpoint para monitoreo de cache
+	router.GET("/stats", searchController.GetCacheStats)
 
-	router.POST("/inscripcion", inscripcionController.InscripcionActividad)
-	router.GET("/inscripcion/:id", inscripcionController.GetInscripcionesByUsuarioId)
-
-	router.POST("/login", usuarioController.Login)
-	log.Info("Finishing mappings configurations")
-
+	log.Info("API_Busquedas: Finishing mappings configurations")
 }

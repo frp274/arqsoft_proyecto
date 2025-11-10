@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema name="actividades" version="1.6">
+  
+  <!-- Campo ID único (requerido) -->
+  <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+  
+  <!-- Campos de actividad -->
+  <field name="nombre" type="text_general" indexed="true" stored="true" />
+  <field name="descripcion" type="text_general" indexed="true" stored="true" />
+  <field name="profesor" type="text_general" indexed="true" stored="true" />
+  <field name="tags" type="string" indexed="true" stored="true" multiValued="true" />
+  <field name="horarios" type="string" indexed="false" stored="true" />
+  
+  <!-- Campos de auditoría -->
+  <field name="created_at" type="pdate" indexed="true" stored="true" />
+  <field name="updated_at" type="pdate" indexed="true" stored="true" />
+  
+  <!-- Campo especial para búsqueda en todos los campos de texto -->
+  <field name="_text_" type="text_general" indexed="true" stored="false" multiValued="true" />
+  
+  <!-- Campo de versión (requerido por Solr) -->
+  <field name="_version_" type="plong" indexed="false" stored="false" />
+  
+  <!-- Campo único para documentos -->
+  <uniqueKey>id</uniqueKey>
+  
+  <!-- Copy fields para búsqueda general -->
+  <copyField source="nombre" dest="_text_" />
+  <copyField source="descripcion" dest="_text_" />
+  <copyField source="profesor" dest="_text_" />
+  <copyField source="tags" dest="_text_" />
+  
+  <!-- Tipos de campos -->
+  <fieldType name="string" class="solr.StrField" sortMissingLast="true" />
+  <fieldType name="plong" class="solr.LongPointField" docValues="true" />
+  <fieldType name="pdate" class="solr.DatePointField" docValues="true" />
+  
+  <fieldType name="text_general" class="solr.TextField" positionIncrementGap="100">
+    <analyzer type="index">
+      <tokenizer class="solr.StandardTokenizerFactory"/>
+      <filter class="solr.LowerCaseFilterFactory"/>
+    </analyzer>
+    <analyzer type="query">
+      <tokenizer class="solr.StandardTokenizerFactory"/>
+      <filter class="solr.LowerCaseFilterFactory"/>
+    </analyzer>
+  </fieldType>
+  
+</schema>

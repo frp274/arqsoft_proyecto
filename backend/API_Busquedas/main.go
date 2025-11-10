@@ -1,20 +1,35 @@
 package main
 
 import (
-	"arqsoft_proyecto/app"
-	actividad "arqsoft_proyecto/clients/actividades"
-	"arqsoft_proyecto/db"
+	"api_busquedas/app"
+	"api_busquedas/cache"
+	"api_busquedas/queue"
+	"api_busquedas/search"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
-	// Initialize the database connection
-	database := db.InitConnection()
-	actividad.Db = database
+	log.Info("Starting API_Busquedas microservice...")
+
+	// Initialize Solr connection
+	if err := search.InitSolr(); err != nil {
+		log.Fatalf("Failed to initialize Solr: %v", err)
+	}
+	log.Info("Solr connection initialized")
+
+	// Initialize cache layers (local + distributed)
+	cache.InitCache()
+	log.Info("Cache layers initialized")
+
+	// Start RabbitMQ consumer in background
+	go func() {
+		if err := queue.StartConsumer(); err != nil {
+			log.Errorf("RabbitMQ consumer error: %v", err)
+		}
+	}()
+	log.Info("RabbitMQ consumer started")
+
+	// Start HTTP server
 	app.StartRoute()
-
-	// Perform any necessary operations with the database
-	// For example, you can create a new user or perform queries
-
-	// dbClose the database connection when done
-	defer db.Close(database)
 }

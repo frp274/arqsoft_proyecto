@@ -1,0 +1,95 @@
+services:
+  # Solr - Motor de búsqueda
+  solr:
+    image: solr:9.3
+    container_name: solr_busquedas
+    ports:
+      - "8983:8983"
+    volumes:
+      - solr_data:/var/solr
+      - ./solr/conf:/opt/solr/server/solr/configsets/actividades_config
+    command:
+      - solr-precreate
+      - actividades
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8983/solr/actividades/admin/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - busquedas_network
+
+  # RabbitMQ - Message Broker
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: rabbitmq_busquedas
+    ports:
+      - "5672:5672"   # AMQP
+      - "15672:15672" # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - busquedas_network
+
+  # Memcached - Cache distribuída
+  memcached:
+    image: memcached:1.6-alpine
+    container_name: memcached_busquedas
+    ports:
+      - "11211:11211"
+    command: ["-m", "64"]  # 64MB de memoria
+    networks:
+      - busquedas_network
+
+  # API_Busquedas - Servicio de búsqueda
+  api_busquedas:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api_busquedas_go
+    depends_on:
+      solr:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      memcached:
+        condition: service_started
+    ports:
+      - "8083:8083"
+    environment:
+      # Solr configuration
+      SOLR_HOST: solr
+      SOLR_PORT: 8983
+      
+      # RabbitMQ configuration
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      QUEUE_NAME: actividades_events
+      
+      # Memcached configuration
+      MEMCACHED_HOST: memcached
+      MEMCACHED_PORT: 11211
+      
+      # API_Actividades configuration
+      API_ACTIVIDADES_HOST: host.docker.internal
+      API_ACTIVIDADES_PORT: 8081
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: on-failure
+    networks:
+      - busquedas_network
+
+volumes:
+  solr_data:
+  rabbitmq_data:
+
+networks:
+  busquedas_network:
+    driver: bridge

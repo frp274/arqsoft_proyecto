@@ -19,8 +19,8 @@ func init() {
 func StartRoute() {
 	mapUrls()
 
-	log.Info("Starting server")
-	router.Run(":8080")
+	log.Info("Starting API_Busquedas server on port 8083")
+	router.Run(":8083")
 }
 
 func AllowCORS(ctx *gin.Context) {
