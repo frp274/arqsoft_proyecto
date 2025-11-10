@@ -1,7 +1,7 @@
 package usuarios
 
 import (
-	"arqsoft_proyecto/model"
+	"api_busquedas/model"
 	"fmt"
 
 	"gorm.io/gorm"

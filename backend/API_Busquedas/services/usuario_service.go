@@ -1,8 +1,8 @@
 package services
 
 import (
-	usuarioClient "arqsoft_proyecto/clients/usuarios"
-	"arqsoft_proyecto/utils"
+	usuarioClient "api_busquedas/clients/usuarios"
+	"api_busquedas/utils"
 	"fmt"
 	"log"
 )

@@ -1,8 +1,8 @@
 package inscripcion
 
 import (
-	"arqsoft_proyecto/dto"
-	service "arqsoft_proyecto/services"
+	"api_busquedas/dto"
+	service "api_busquedas/services"
 	"net/http"
 	"strconv"
 

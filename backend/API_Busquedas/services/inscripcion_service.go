@@ -1,11 +1,11 @@
 package services
 
 import (
-	actividadCliente "arqsoft_proyecto/clients/actividades"
-	inscripcionCliente "arqsoft_proyecto/clients/inscripciones"
-	"arqsoft_proyecto/dto"
-	"arqsoft_proyecto/model"
-	e "arqsoft_proyecto/utils/errors"
+	actividadCliente "api_busquedas/clients/actividades"
+	inscripcionCliente "api_busquedas/clients/inscripciones"
+	"api_busquedas/dto"
+	"api_busquedas/model"
+	e "api_busquedas/utils/errors"
 
 	log "github.com/sirupsen/logrus"
 )

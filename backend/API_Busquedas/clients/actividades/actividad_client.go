@@ -1,7 +1,7 @@
 package actividad
 
 import (
-	"arqsoft_proyecto/model"
+	"api_busquedas/model"
 	"fmt"
 	"strings"
 

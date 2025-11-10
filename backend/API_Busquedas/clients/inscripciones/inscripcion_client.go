@@ -1,11 +1,11 @@
 package inscripcion
 
 import (
-	"arqsoft_proyecto/model"
+	"api_busquedas/model"
 	"gorm.io/gorm"
 	log "github.com/sirupsen/logrus"
 	
-	e "arqsoft_proyecto/utils/errors"
+	e "api_busquedas/utils/errors"
 )
 
 var Db *gorm.DB

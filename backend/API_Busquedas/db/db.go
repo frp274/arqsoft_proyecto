@@ -1,12 +1,12 @@
 package db
 
 import (
-	actividadClient "arqsoft_proyecto/clients/actividades"
-	inscripcionClient "arqsoft_proyecto/clients/inscripciones"
-	usuarioClient "arqsoft_proyecto/clients/usuarios"
+	actividadClient "api_busquedas/clients/actividades"
+	inscripcionClient "api_busquedas/clients/inscripciones"
+	usuarioClient "api_busquedas/clients/usuarios"
 	_"os"
 
-	model "arqsoft_proyecto/model"
+	model "api_busquedas/model"
 	"fmt"
 
 	"gorm.io/driver/mysql"

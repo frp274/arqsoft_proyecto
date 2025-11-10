@@ -1,8 +1,8 @@
 package usuario
 
 import (
-	"arqsoft_proyecto/dto"
-	usuariosService "arqsoft_proyecto/services"
+	"api_busquedas/dto"
+	usuariosService "api_busquedas/services"
 	"log"
 	"net/http"
 
