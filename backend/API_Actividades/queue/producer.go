@@ -21,9 +21,9 @@ const (
 
 // ActividadEvent es el mensaje que se envía a RabbitMQ
 type ActividadEvent struct {
-	Type         EventType `json:"type"`
-	ActividadID  string    `json:"actividad_id"`
-	Timestamp    time.Time `json:"timestamp"`
+	Type        EventType `json:"type"`
+	ActividadID string    `json:"actividad_id"`
+	Timestamp   time.Time `json:"timestamp"`
 }
 
 // RabbitMQProducer gestiona la conexión y publicación de mensajes

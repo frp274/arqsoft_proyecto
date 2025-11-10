@@ -2,8 +2,8 @@ package services
 
 import (
 	"api_actividades/dto"
-	actividadRepositories "api_actividades/repositories/actividades"
 	"api_actividades/queue"
+	actividadRepositories "api_actividades/repositories/actividades"
 
 	"api_actividades/model"
 	e "api_actividades/utils/errors"
@@ -30,7 +30,7 @@ func GetActividadById(id string) (dto.ActividadDto, e.ApiError) {
 		}
 
 		actividad, err = actividadRepositories.GetActividadById(objectID)
-		
+
 		// 1. Validar si hubo un error general en la DB
 		if err != nil {
 			// 2. Validar si el error fue específicamente 'documento no encontrado'
@@ -46,7 +46,6 @@ func GetActividadById(id string) (dto.ActividadDto, e.ApiError) {
 		actividadCache := actividadRepositories.InsertActividadCache(actividad)
 		log.Infof("Actividad insertada en la cache local: %v", actividadCache)
 	}
-
 
 	actividadDto.Id = id //objectID.Hex()
 	log.Debugf("Nombre de la actividad: %v", actividad.Nombre)
@@ -72,6 +71,7 @@ func GetActividadById(id string) (dto.ActividadDto, e.ApiError) {
 	log.Infof("Actividad DTO to return: %+v", actividadDto)
 	return actividadDto, nil
 }
+
 /*
 func GetActividadesByNombre(nombre string) (dto.ActividadesDto, e.ApiError) {
 	// Llamar a la API_Busquedas, para encontrar las actividades que coincidan con el nombre ===================================================================================
@@ -169,10 +169,10 @@ func InsertActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 
 	for _, horarioDto := range actividadDto.Horario {
 		horario := model.Horario{
-			Dia:         horarioDto.Dia,
-			HoraInicio:  horarioDto.HoraInicio,
-			HoraFin:     horarioDto.HoraFin,
-			Cupo:        horarioDto.Cupo,
+			Dia:        horarioDto.Dia,
+			HoraInicio: horarioDto.HoraInicio,
+			HoraFin:    horarioDto.HoraFin,
+			Cupo:       horarioDto.Cupo,
 		}
 		actividad.Horarios = append(actividad.Horarios, horario)
 	}
@@ -188,7 +188,7 @@ func InsertActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 	// Preguntar al profe si conviene en vez de retornar,			==================================================================================================
 	// simplemente cuando devuelva el error en la funcion general, 	==================================================================================================
 	// mostrar el error que hubo									==================================================================================================
-	
+
 	log.Infof("Actividad insertada en la cache local: %v", actividadCache)
 
 	actividadDto.Id = actividadInsertada.Id.Hex()
@@ -199,9 +199,8 @@ func InsertActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 		// No retornamos error porque la actividad ya fue creada exitosamente
 	}
 
-	return actividadDto, nil  // Mandar aca el error de la cache en caso de que haya?? ==============================^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+	return actividadDto, nil // Mandar aca el error de la cache en caso de que haya?? ==============================^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 }
-
 
 func DeleteActividad(id string) e.ApiError {
 	//Falta eliminar en Solr y en la cache local===============================================================================================================================
@@ -229,7 +228,6 @@ func DeleteActividad(id string) e.ApiError {
 
 	return nil
 }
-
 
 func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiError) {
 	//Falta actualizar en Solr ===============================================================================================================================
@@ -276,9 +274,9 @@ func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 		return dto.ActividadDto{}, e.NewInternalServerApiError("Error al actualizar la actividad", err)
 	}
 
-	//Actualizar en la cache local 
+	//Actualizar en la cache local
 	actividadCache := actividadRepositories.InsertActividadCache(actividadActual)
-	
+
 	log.Infof("Actividad actualizada en la cache local: %v", actividadCache)
 
 	// 6. Armar respuesta DTO
@@ -305,4 +303,3 @@ func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 
 	return actividadActualizada, nil
 }
-

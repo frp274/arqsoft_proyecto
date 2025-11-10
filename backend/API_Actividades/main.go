@@ -1,12 +1,13 @@
 package main
 
 import (
-	"api_actividades/repositories/actividades"
 	"api_actividades/queue"
+	repository "api_actividades/repositories/actividades"
 	"context"
-	log "github.com/sirupsen/logrus"
 	"os"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	"api_actividades/app"
 	db "api_actividades/db" // Importar como 'db' para facilitar el uso
@@ -16,8 +17,8 @@ func main() {
 	// --- 1. CONFIGURACIÓN DE LA CONEXIÓN ---
 	// La URI debe leerse de una variable de entorno para Docker
 	cfg := db.MongoConfig{
-		URI:        os.Getenv("MONGO_URI"),          // mongodb://mongouser:mongopass@mongodb:27017
-		Database:   os.Getenv("MONGO_DB_NAME"),       // actividades_db
+		URI:        os.Getenv("MONGO_URI"),     // mongodb://mongouser:mongopass@mongodb:27017
+		Database:   os.Getenv("MONGO_DB_NAME"), // actividades_db
 		TimeoutSec: 10,
 	}
 
@@ -75,7 +76,7 @@ func main() {
 			log.Println("Database connection closed gracefully.")
 		}
 	}()
-	
+
 	// --- 5. CORRER MIGRACIONES / SEED ---
 	// Correr el setup de la colección y el seed.
 	migrationCtx, migrationCancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -89,8 +90,8 @@ func main() {
 	// Aquí debes pasar la instancia 'database' al resto de tu aplicación
 	// (clients/repositories) para que puedan usarla.
 	repository.Db = database
-	
-    // **PENDIENTE**: Necesitas una forma de inyectar 'database' al resto de la aplicación.
+
+	// **PENDIENTE**: Necesitas una forma de inyectar 'database' al resto de la aplicación.
 	// Por ahora, solo iniciamos las rutas.
 	app.StartRoute()
 }
