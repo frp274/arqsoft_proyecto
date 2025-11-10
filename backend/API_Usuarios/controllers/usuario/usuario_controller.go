@@ -4,6 +4,7 @@ import (
 	"api_usuarios/dto"
 	usuariosService "api_usuarios/services"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -12,14 +13,14 @@ import (
 func Login(c *gin.Context) {
 	var request dto.LoginRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	usuarioId, token, es_admin, err := usuariosService.Login(request.Username, request.Password)
 	if err != nil {
 		log.Errorf("Login failed for user %s: %v", request.Username, err)
-		c.JSON(http.StatusUnauthorized, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -29,4 +30,43 @@ func Login(c *gin.Context) {
 		Token:    token,
 		Es_admin: es_admin,
 	})
+}
+
+func GetUsuarioById(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		log.Warnf("Invalid user ID format: %s", idParam)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	usuarioDto, err := usuariosService.GetUsuarioById(id)
+	if err != nil {
+		log.Errorf("Error getting user %d: %v", id, err)
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	log.Infof("User %d retrieved successfully", id)
+	c.JSON(http.StatusOK, usuarioDto)
+}
+
+func CreateUsuario(c *gin.Context) {
+	var request dto.CreateUsuarioRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		log.Warnf("Invalid request body: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	usuarioDto, err := usuariosService.CreateUsuario(request)
+	if err != nil {
+		log.Errorf("Error creating user %s: %v", request.UserName, err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	log.Infof("User created successfully: %s (ID: %d)", usuarioDto.UserName, usuarioDto.Id)
+	c.JSON(http.StatusCreated, usuarioDto)
 }
