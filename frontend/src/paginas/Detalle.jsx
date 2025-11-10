@@ -75,7 +75,7 @@ function Detalle() {
   const [mensaje, setMensaje] = useState('');
 
   useEffect(() => {
-    axios.get(`http://localhost:8080/actividad/${id}`)
+    axios.get(`${process.env.REACT_APP_API_BUSQUEDAS_URL}/actividad/${id}`)
       .then((res) => setActividad(res.data))
       .catch((err) => console.error(err));
   }, [id]);
@@ -97,21 +97,27 @@ function Detalle() {
     const Id = parseInt(id, 10);
     const horarioidint = parseInt(horarioId, 10);
     const usuarioidint = parseInt(usuarioId, 10);
-    axios.post('http://localhost:8080/inscripcion', {
-      actividad_id: Id,
-      horario_id: horarioidint,
-      usuario_id: usuarioidint
+    
+    // Por ahora usamos el endpoint de calcular disponibilidad como "acción"
+    axios.post(`${process.env.REACT_APP_API_ACTIVIDADES_URL}/actividad/${id}/calcular-disponibilidad`, {
+      horario_ids: [horarioidint]
     }, {
-      headers: { Authorization: `Bearer ${getCookie("token")}`, "Content-Type": "application/json"
-                  
-    }
+      headers: { 
+        Authorization: `Bearer ${getCookie("token")}`, 
+        "Content-Type": "application/json"
+      }
     })
-      .then(() => {
-        setMensaje('¡Inscripción exitosa!');
-        setTimeout(() => window.location.reload(), 2000);  // Recarga la página después de 2 segundos
+      .then((res) => {
+        const disponibilidad = res.data.disponibilidad;
+        if (disponibilidad && disponibilidad.length > 0 && disponibilidad[0].disponible) {
+          setMensaje('¡Disponibilidad confirmada! Cupos disponibles: ' + disponibilidad[0].cupos_disponibles);
+        } else {
+          setMensaje('No hay cupos disponibles para este horario.');
+        }
+        setTimeout(() => window.location.reload(), 2000);
       })
       .catch((err) => {
-        setMensaje("Ya estas incripto a esta actividad.");
+        setMensaje("Error al verificar disponibilidad.");
         console.error(err);
       });
   };

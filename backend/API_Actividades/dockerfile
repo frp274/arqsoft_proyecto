@@ -1,8 +1,8 @@
 # ----------------------------------------------------
 # STAGE 1: BUILDER (Compilación)
 # ----------------------------------------------------
-# Usa una imagen base con Go (versión 1.25.3-alpine para ser ligera)
-FROM golang:1.25.3-alpine AS builder
+# Usa una imagen base con Go (versión 1.24.1-alpine para ser ligera)
+FROM golang:1.24.1-alpine AS builder
 
 # Establece el directorio de trabajo
 WORKDIR /app

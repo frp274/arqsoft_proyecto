@@ -1,0 +1,194 @@
+version: '3.8'
+
+services:
+  # ============================================
+  # API_USUARIOS - Autenticación y Gestión de Usuarios
+  # ============================================
+  mysql_usuarios:
+    image: mysql:8.0
+    container_name: mysql_usuarios
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: usuarios_db
+      MYSQL_USER: usuariosuser
+      MYSQL_PASSWORD: usuariospass
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql_usuarios_data:/var/lib/mysql
+      - ./backend/API_Usuarios/db/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - arqsoft_network
+
+  api_usuarios:
+    build:
+      context: ./backend/API_Usuarios
+      dockerfile: Dockerfile
+    container_name: api_usuarios
+    ports:
+      - "8082:8082"
+    environment:
+      - MYSQL_HOST=mysql_usuarios
+      - MYSQL_PORT=3306
+      - MYSQL_USER=usuariosuser
+      - MYSQL_PASSWORD=usuariospass
+      - MYSQL_DATABASE=usuarios_db
+    depends_on:
+      mysql_usuarios:
+        condition: service_healthy
+    networks:
+      - arqsoft_network
+
+  # ============================================
+  # API_ACTIVIDADES - CRUD de Actividades
+  # ============================================
+  mongodb_actividades:
+    image: mongo:latest
+    container_name: mongodb_actividades
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongouser
+      MONGO_INITDB_ROOT_PASSWORD: mongopass
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_actividades_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.runCommand({ping: 1})", "--quiet"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - arqsoft_network
+
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - arqsoft_network
+
+  api_actividades:
+    build:
+      context: ./backend/API_Actividades
+      dockerfile: Dockerfile
+    container_name: api_actividades
+    ports:
+      - "8081:8080"
+    environment:
+      - MONGO_URI=mongodb://mongouser:mongopass@mongodb_actividades:27017
+      - MONGO_DB_NAME=actividades_db
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - RABBITMQ_QUEUE=actividades_events
+      - RABBITMQ_EXCHANGE=actividades_exchange
+      - USUARIOS_API_URL=http://api_usuarios:8082
+    depends_on:
+      mongodb_actividades:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      api_usuarios:
+        condition: service_started
+    networks:
+      - arqsoft_network
+
+  # ============================================
+  # API_BUSQUEDAS - Motor de Búsqueda con Solr
+  # ============================================
+  solr:
+    image: solr:9.3
+    container_name: solr
+    ports:
+      - "8983:8983"
+    volumes:
+      - solr_data:/var/solr
+      - ./backend/API_Busquedas/solr/conf:/opt/solr-conf
+    command: >
+      bash -c "
+      solr-precreate actividades /opt/solr-conf &&
+      solr-foreground
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8983/solr/admin/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - arqsoft_network
+
+  memcached:
+    image: memcached:1.6-alpine
+    container_name: memcached
+    ports:
+      - "11211:11211"
+    command: memcached -m 64
+    networks:
+      - arqsoft_network
+
+  api_busquedas:
+    build:
+      context: ./backend/API_Busquedas
+      dockerfile: Dockerfile
+    container_name: api_busquedas
+    ports:
+      - "8083:8083"
+    environment:
+      - SOLR_URL=http://solr:8983/solr/actividades
+      - MEMCACHED_HOST=memcached:11211
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - RABBITMQ_QUEUE=actividades_events
+      - ACTIVIDADES_API_URL=http://api_actividades:8080
+    depends_on:
+      solr:
+        condition: service_healthy
+      memcached:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      api_actividades:
+        condition: service_started
+    networks:
+      - arqsoft_network
+
+  # ============================================
+  # FRONTEND - React App
+  # ============================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - api_usuarios
+      - api_actividades
+      - api_busquedas
+    networks:
+      - arqsoft_network
+
+networks:
+  arqsoft_network:
+    driver: bridge
+
+volumes:
+  mysql_usuarios_data:
+  mongodb_actividades_data:
+  rabbitmq_data:
+  solr_data:

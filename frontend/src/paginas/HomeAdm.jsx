@@ -125,7 +125,7 @@ function HomeAdm() {
     };
 
     try {
-      const response = await fetch('http://localhost:8080/actividad', {
+      const response = await fetch('${process.env.REACT_APP_API_ACTIVIDADES_URL}/actividad', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(nuevaActividad)
@@ -301,7 +301,7 @@ export default HomeAdm;
 //     };
 
 //     try {
-//       const response = await fetch('http://localhost:8080/actividad', {
+//       const response = await fetch('${process.env.REACT_APP_API_ACTIVIDADES_URL}/actividad', {
 //         method: 'POST',
 //         headers: { 'Content-Type': 'application/json' },
 //         body: JSON.stringify(nuevaActividad)

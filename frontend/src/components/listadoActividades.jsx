@@ -9,7 +9,7 @@ function ListadoActividades({ filtro }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('http://localhost:8080/actividad')
+    fetch('${process.env.REACT_APP_API_ACTIVIDADES_URL}/actividad')
       .then(response => response.json())
       .then(data => setActividades(data))
       .catch(error => console.error('Error:', error));
@@ -60,7 +60,7 @@ function ListadoActividades() {
 
 
   useEffect(() => {
-    fetch('http://localhost:8080/actividad')
+    fetch('${process.env.REACT_APP_API_ACTIVIDADES_URL}/actividad')
       .then(response => response.json())
       .then(data => setActividades(data))
       .catch(error => console.error('Error:', error));
@@ -114,7 +114,7 @@ function ListadoActividades({ filtro }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('http://localhost:8080/actividad')
+    fetch('${process.env.REACT_APP_API_ACTIVIDADES_URL}/actividad')
       .then(response => response.json())
       .then(data => setActividades(data))
       .catch(error => console.error('Error:', error));
@@ -176,7 +176,7 @@ function ListadoActividades({ filtro }) {
   useEffect(() => {
     const fetchActividades = async () => {
       try {
-        const res = await fetch(`http://localhost:8080/actividad?nombre=${filtro}`);
+        const res = await fetch(`${process.env.REACT_APP_API_BUSQUEDAS_URL}/search/actividades?nombre=${filtro}`);
         const data = await res.json();
         setActividades(data);
       } catch (error) {
@@ -209,7 +209,7 @@ function ListadoActividades({ filtro }) {
   useEffect(() => {
     const fetchActividades = async () => {
       try {
-        const res = await fetch(`http://localhost:8080/actividad?nombre=${filtro}`);
+        const res = await fetch(`${process.env.REACT_APP_API_BUSQUEDAS_URL}/search/actividades?nombre=${filtro}`);
         const data = await res.json();
         setActividades(data);
       } catch (error) {
@@ -274,7 +274,7 @@ function ListadoActividades({ filtro, refrescar, esAdmin }) {
 
   const fetchActividades = async () => {
     try {
-      const res = await fetch(`http://localhost:8080/actividad?nombre=${filtro}`);
+      const res = await fetch(`${process.env.REACT_APP_API_BUSQUEDAS_URL}/search/actividades?nombre=${filtro}`);
       if (!res.ok) throw new Error("Error en la respuesta del servidor");
       const data = await res.json();
       setActividades(data);
@@ -292,7 +292,7 @@ function ListadoActividades({ filtro, refrescar, esAdmin }) {
     if (!window.confirm("¿Estás seguro de que deseas eliminar esta actividad?")) return;
 
     try {
-      const res = await fetch(`http://localhost:8080/actividad/${id}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_ACTIVIDADES_URL}/actividad/${id}`, {
         method: 'DELETE'
       });
 
@@ -371,7 +371,7 @@ function ListadoActividades({ filtro, refrescar, esAdmin }) {
 
   const fetchActividades = async () => {
     try {
-      const res = await fetch(`http://localhost:8080/actividad?nombre=${filtro}`);
+      const res = await fetch(`${process.env.REACT_APP_API_BUSQUEDAS_URL}/search/actividades?nombre=${filtro}`);
       if (!res.ok) throw new Error("Error en la respuesta del servidor");
       const data = await res.json();
       setActividades(data);
@@ -389,7 +389,7 @@ function ListadoActividades({ filtro, refrescar, esAdmin }) {
     if (!window.confirm("¿Estás seguro de que deseas eliminar esta actividad?")) return;
 
     try {
-      const res = await fetch(`http://localhost:8080/actividad/${id}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_ACTIVIDADES_URL}/actividad/${id}`, {
         method: 'DELETE'
       });
 
@@ -422,7 +422,7 @@ function ListadoActividades({ filtro, refrescar, esAdmin }) {
 
   const handleGuardarEdicion = async (id) => {
     try {
-      const res = await fetch(`http://localhost:8080/actividad/${id}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_ACTIVIDADES_URL}/actividad/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -531,7 +531,7 @@ function ListadoActividades({ filtro, refrescar, esAdmin }) {
 
   const fetchActividades = async () => {
     try {
-      const res = await fetch(`http://localhost:8080/actividad?nombre=${filtro}`);
+      const res = await fetch(`${process.env.REACT_APP_API_BUSQUEDAS_URL}/search/actividades?nombre=${filtro}`);
       if (!res.ok) throw new Error("Error en la respuesta del servidor");
       const data = await res.json();
       setActividades(data);
@@ -549,7 +549,7 @@ function ListadoActividades({ filtro, refrescar, esAdmin }) {
     if (!window.confirm("¿Estás seguro de que deseas eliminar esta actividad?")) return;
 
     try {
-      const res = await fetch(`http://localhost:8080/actividad/${id}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_ACTIVIDADES_URL}/actividad/${id}`, {
         method: 'DELETE'
       });
 
@@ -593,7 +593,7 @@ function ListadoActividades({ filtro, refrescar, esAdmin }) {
 
   const handleGuardarEdicion = async (id) => {
     try {
-      const res = await fetch(`http://localhost:8080/actividad/${id}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_ACTIVIDADES_URL}/actividad/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
