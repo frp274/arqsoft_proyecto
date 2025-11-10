@@ -33,11 +33,11 @@ services:
     ports:
       - "8082:8082"
     environment:
-      - MYSQL_HOST=mysql_usuarios
-      - MYSQL_PORT=3306
-      - MYSQL_USER=usuariosuser
-      - MYSQL_PASSWORD=usuariospass
-      - MYSQL_DATABASE=usuarios_db
+      - DB_HOST=mysql_usuarios
+      - DB_PORT=3306
+      - DB_USER=usuariosuser
+      - DB_PASSWORD=usuariospass
+      - DB_NAME=usuarios_db
     depends_on:
       mysql_usuarios:
         condition: service_healthy
@@ -125,7 +125,7 @@ services:
       solr-foreground
       "
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8983/solr/admin/ping"]
+      test: ["CMD", "curl", "-f", "http://localhost:8983/solr/actividades/admin/ping"]
       interval: 10s
       timeout: 5s
       retries: 5
