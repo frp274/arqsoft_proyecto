@@ -13,15 +13,15 @@ func mapUrls() {
 
 	// Gestión de usuarios
 	// GET /usuario/:id - Requiere autenticación y ser owner o admin
-	router.GET("/usuario/:id", 
-		middlewares.AuthMiddleware(), 
-		middlewares.RequireOwnerOrAdmin(), 
+	router.GET("/usuario/:id",
+		middlewares.AuthMiddleware(),
+		middlewares.RequireOwnerOrAdmin(),
 		usuarioController.GetUsuarioById)
-	
+
 	// POST /usuario - Solo admins pueden crear usuarios
-	router.POST("/usuario", 
-		middlewares.AuthMiddleware(), 
-		middlewares.RequireAdmin(), 
+	router.POST("/usuario",
+		middlewares.AuthMiddleware(),
+		middlewares.RequireAdmin(),
 		usuarioController.CreateUsuario)
 
 	// Endpoints futuros (comentados por ahora)

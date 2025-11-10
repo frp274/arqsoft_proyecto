@@ -46,7 +46,7 @@ func GetUsuarioById(id int) (model.Usuario, error) {
 
 func CreateUsuario(usuario model.Usuario) (model.Usuario, error) {
 	log.Debugf("Creating new user: %s", usuario.UserName)
-	
+
 	txn := Db.Create(&usuario)
 	if txn.Error != nil {
 		log.Errorf("Error creating user %s: %v", usuario.UserName, txn.Error)

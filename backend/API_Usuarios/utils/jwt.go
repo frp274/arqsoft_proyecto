@@ -22,17 +22,16 @@ func GenerateJWT(userId int, es_admin bool) (string, error) {
 	expirationTime := time.Now().Add(jwtDuracion)
 
 	claims := CustomClaims{
-	RegisteredClaims: jwt.RegisteredClaims{
-		ExpiresAt: jwt.NewNumericDate(expirationTime),
-		IssuedAt:  jwt.NewNumericDate(time.Now()),
-		NotBefore: jwt.NewNumericDate(time.Now()),
-		Issuer:    "backend",
-		Subject:   "auth",
-		ID:        fmt.Sprintf("%d", userId),
-	},
-	Es_admin: es_admin, // esto ya es un bool, no necesitas Sprintf
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expirationTime),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			NotBefore: jwt.NewNumericDate(time.Now()),
+			Issuer:    "backend",
+			Subject:   "auth",
+			ID:        fmt.Sprintf("%d", userId),
+		},
+		Es_admin: es_admin, // esto ya es un bool, no necesitas Sprintf
 	}
-
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
@@ -68,4 +67,3 @@ func ValidateJWT(tokenString string) (*CustomClaims, error) {
 
 	return claims, nil
 }
-

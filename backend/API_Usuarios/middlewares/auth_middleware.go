@@ -43,7 +43,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		// Guardar claims en el contexto para uso posterior
 		c.Set("userId", claims.ID)
 		c.Set("es_admin", claims.Es_admin)
-		
+
 		log.Debugf("User authenticated: ID=%s, Admin=%t", claims.ID, claims.Es_admin)
 		c.Next()
 	}
@@ -76,7 +76,7 @@ func RequireOwnerOrAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Obtener ID del recurso desde la URL
 		resourceId := c.Param("id")
-		
+
 		// Obtener datos del usuario autenticado del contexto
 		userId, userExists := c.Get("userId")
 		esAdmin, adminExists := c.Get("es_admin")
