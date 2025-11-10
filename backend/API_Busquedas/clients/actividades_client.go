@@ -28,7 +28,7 @@ type Actividad struct {
 }
 
 var (
-	httpClient      *http.Client
+	httpClient        *http.Client
 	apiActividadesURL string
 )
 
@@ -36,7 +36,7 @@ func init() {
 	httpClient = &http.Client{
 		Timeout: 10 * time.Second,
 	}
-	
+
 	apiHost := getEnv("API_ACTIVIDADES_HOST", "api_actividades")
 	apiPort := getEnv("API_ACTIVIDADES_PORT", "8081")
 	apiActividadesURL = fmt.Sprintf("http://%s:%s", apiHost, apiPort)
@@ -45,7 +45,7 @@ func init() {
 // GetActividadFromAPI fetches an actividad by ID from API_Actividades
 func GetActividadFromAPI(id string) (*Actividad, error) {
 	url := fmt.Sprintf("%s/actividad/%s", apiActividadesURL, id)
-	
+
 	log.Debugf("Fetching actividad from API: %s", url)
 
 	resp, err := httpClient.Get(url)

@@ -16,7 +16,7 @@ import (
 )
 
 type ActividadEvent struct {
-	Operation  string `json:"operation"` // create, update, delete
+	Operation   string `json:"operation"` // create, update, delete
 	ActividadID string `json:"actividad_id"`
 	Timestamp   string `json:"timestamp"`
 }
@@ -34,7 +34,7 @@ func StartConsumer() error {
 	log.Infof("Connecting to RabbitMQ at %s", rabbitURL)
 
 	var err error
-	
+
 	// Retry connection with exponential backoff
 	for i := 0; i < 5; i++ {
 		conn, err = amqp.Dial(rabbitURL)

@@ -3,6 +3,7 @@ package services
 import (
 	"api_actividades/dto"
 	actividadRepositories "api_actividades/repositories/actividades"
+	"api_actividades/queue"
 
 	"api_actividades/model"
 	e "api_actividades/utils/errors"
@@ -192,6 +193,12 @@ func InsertActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 
 	actividadDto.Id = actividadInsertada.Id.Hex()
 
+	// Publicar evento CREATE en RabbitMQ
+	if err := queue.PublishEvent(queue.EventCreate, actividadDto.Id); err != nil {
+		log.Errorf("Error al publicar evento CREATE en RabbitMQ: %v", err)
+		// No retornamos error porque la actividad ya fue creada exitosamente
+	}
+
 	return actividadDto, nil  // Mandar aca el error de la cache en caso de que haya?? ==============================^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 }
 
@@ -213,6 +220,13 @@ func DeleteActividad(id string) e.ApiError {
 	if er != nil {
 		return e.NewInternalServerApiError("No se pudo eliminar la actividad de la cache local", er)
 	}
+
+	// Publicar evento DELETE en RabbitMQ
+	if err := queue.PublishEvent(queue.EventDelete, id); err != nil {
+		log.Errorf("Error al publicar evento DELETE en RabbitMQ: %v", err)
+		// No retornamos error porque la actividad ya fue eliminada exitosamente
+	}
+
 	return nil
 }
 
@@ -281,6 +295,12 @@ func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 			HoraFin:    h.HoraFin,
 			Cupo:       h.Cupo,
 		})
+	}
+
+	// Publicar evento UPDATE en RabbitMQ
+	if err := queue.PublishEvent(queue.EventUpdate, actividadActualizada.Id); err != nil {
+		log.Errorf("Error al publicar evento UPDATE en RabbitMQ: %v", err)
+		// No retornamos error porque la actividad ya fue actualizada exitosamente
 	}
 
 	return actividadActualizada, nil

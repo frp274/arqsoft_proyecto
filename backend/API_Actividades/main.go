@@ -2,6 +2,7 @@ package main
 
 import (
 	"api_actividades/repositories/actividades"
+	"api_actividades/queue"
 	"context"
 	log "github.com/sirupsen/logrus"
 	"os"
@@ -38,9 +39,34 @@ func main() {
 	})
 	log.Info("INFO: Successfully connected to Local Cache.")
 
-	// --- 3. CIERRE DE LA CONEXIÓN ---
-	// Usar defer para asegurar que la conexión se cierre al finalizar main()
+	// --- 3. INICIALIZAR RABBITMQ PRODUCER ---
+	rabbitURL := os.Getenv("RABBITMQ_URL")
+	if rabbitURL == "" {
+		rabbitURL = "amqp://guest:guest@localhost:5672/" // Default para desarrollo local
+	}
+	queueName := os.Getenv("RABBITMQ_QUEUE")
+	if queueName == "" {
+		queueName = "actividades_events"
+	}
+	exchangeName := os.Getenv("RABBITMQ_EXCHANGE")
+	if exchangeName == "" {
+		exchangeName = "actividades_exchange"
+	}
+
+	if err := queue.InitProducer(rabbitURL, queueName, exchangeName); err != nil {
+		log.Fatalf("FATAL: Failed to initialize RabbitMQ producer: %v", err)
+	}
+	log.Info("INFO: RabbitMQ producer initialized successfully.")
+
+	// --- 4. CIERRE DE CONEXIONES ---
+	// Usar defer para asegurar que las conexiones se cierren al finalizar main()
 	defer func() {
+		// Cerrar RabbitMQ
+		if err := queue.Close(); err != nil {
+			log.Printf("WARNING: Failed to close RabbitMQ connection: %v", err)
+		}
+
+		// Cerrar MongoDB
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		if err = client.Disconnect(ctx); err != nil {
@@ -50,7 +76,7 @@ func main() {
 		}
 	}()
 	
-	// --- 4. CORRER MIGRACIONES / SEED ---
+	// --- 5. CORRER MIGRACIONES / SEED ---
 	// Correr el setup de la colección y el seed.
 	migrationCtx, migrationCancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer migrationCancel()
@@ -59,7 +85,7 @@ func main() {
 	}
 	log.Info("INFO: Database migrations/seed completed successfully.")
 
-	// --- 5. INICIAR EL ROUTER Y LA API ---
+	// --- 6. INICIAR EL ROUTER Y LA API ---
 	// Aquí debes pasar la instancia 'database' al resto de tu aplicación
 	// (clients/repositories) para que puedan usarla.
 	repository.Db = database

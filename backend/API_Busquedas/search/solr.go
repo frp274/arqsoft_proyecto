@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	SolrClient    *solr.SolrInterface
-	SolrCore      = "actividades"
+	SolrClient *solr.SolrInterface
+	SolrCore   = "actividades"
 )
 
 // InitSolr initializes the connection to Solr
@@ -32,7 +32,7 @@ func InitSolr() error {
 	query := solr.NewQuery()
 	query.Q("*:*")
 	query.Rows(0)
-	
+
 	searchObj := si.Search(query)
 	if _, err := searchObj.Result(nil); err != nil {
 		return fmt.Errorf("failed to connect to Solr: %w", err)

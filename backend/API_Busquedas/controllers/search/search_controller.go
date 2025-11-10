@@ -17,7 +17,7 @@ import (
 // SearchActividades handles paginated search with filters
 func SearchActividades(c *gin.Context) {
 	var params model.SearchParams
-	
+
 	// Set defaults
 	params.Page = 1
 	params.PageSize = 10
@@ -42,7 +42,7 @@ func SearchActividades(c *gin.Context) {
 	}
 
 	// Generate cache key
-	cacheKey := fmt.Sprintf("search:%s:p%d:s%d:sort%s:%s", 
+	cacheKey := fmt.Sprintf("search:%s:p%d:s%d:sort%s:%s",
 		params.Query, params.Page, params.PageSize, params.Sort, params.Order)
 
 	// Try cache first
@@ -85,7 +85,7 @@ func SearchActividades(c *gin.Context) {
 			Profesor:    getString(doc, "profesor"),
 			Horarios:    getString(doc, "horarios"),
 		}
-		
+
 		if tags, ok := doc["tags"].([]interface{}); ok {
 			for _, tag := range tags {
 				if str, ok := tag.(string); ok {
@@ -93,7 +93,7 @@ func SearchActividades(c *gin.Context) {
 				}
 			}
 		}
-		
+
 		actividades = append(actividades, actividad)
 	}
 
@@ -167,7 +167,7 @@ func HealthCheck(c *gin.Context) {
 	query := solr.NewQuery()
 	query.Q("*:*")
 	query.Rows(0)
-	
+
 	si := search.SolrClient
 	searchObj := si.Search(query)
 	if _, err := searchObj.Result(nil); err != nil {
