@@ -1,29 +1,32 @@
 package services
 
 import (
-	usuarioClient "arqsoft_proyecto/clients/usuarios"
-	"arqsoft_proyecto/utils"
+	usuarioClient "api_usuarios/clients/usuarios"
+	"api_usuarios/utils"
 	"fmt"
-	"log"
+
+	log "github.com/sirupsen/logrus"
 )
 
-
-func Login(username string, password string) (int, string, bool, error){
+func Login(username string, password string) (int, string, bool, error) {
 	usuario, err := usuarioClient.GetUsuarioByUsername(username)
 
-	if err !=  nil{
-		log.Print("service if 1")
+	if err != nil {
+		log.Warnf("User not found: %s", username)
 		return 0, "", false, fmt.Errorf("error getting user: %w", err)
 	}
 
-	if utils.HashSHA256(password) != usuario.PasswordHash{
-		log.Print("service if 2")
-		return 0, "", false, fmt.Errorf("invalid Password")
+	if utils.HashSHA256(password) != usuario.PasswordHash {
+		log.Warnf("Invalid password attempt for user: %s", username)
+		return 0, "", false, fmt.Errorf("invalid password")
 	}
+
 	token, err := utils.GenerateJWT(usuario.Id, usuario.Es_admin)
 	if err != nil {
-		log.Print("service if 3")
+		log.Errorf("Failed to generate JWT for user %s: %v", username, err)
 		return 0, "", false, fmt.Errorf("error generating token: %w", err)
 	}
+
+	log.Infof("Login successful for user: %s (ID: %d)", username, usuario.Id)
 	return usuario.Id, token, usuario.Es_admin, nil
 }

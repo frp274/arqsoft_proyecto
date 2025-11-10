@@ -1,24 +1,20 @@
 package app
 
 import (
-	actividadController "arqsoft_proyecto/controllers/actividad"
-	inscripcionController "arqsoft_proyecto/controllers/inscripcion"
-	usuarioController "arqsoft_proyecto/controllers/usuario"
+	usuarioController "api_usuarios/controllers/usuario"
 
 	log "github.com/sirupsen/logrus"
 )
 
 func mapUrls() {
-	router.GET("/actividad/:id", actividadController.GetActividadById)
-	router.POST("/actividad", actividadController.InsertActividad)
-	router.GET("/actividad", actividadController.GetAllActividades)
-	router.DELETE("/actividad/:id", actividadController.DeleteActividad)
-	router.PUT("/actividad/:id", actividadController.UpdateActividad)
-
-	router.POST("/inscripcion", inscripcionController.InscripcionActividad)
-	router.GET("/inscripcion/:id", inscripcionController.GetInscripcionesByUsuarioId)
-
+	// Autenticación
 	router.POST("/login", usuarioController.Login)
-	log.Info("Finishing mappings configurations")
 
+	// Gestión de usuarios (endpoints a implementar)
+	// router.GET("/usuario/:id", usuarioController.GetUsuarioById)
+	// router.POST("/usuario", usuarioController.CreateUsuario)
+	// router.PUT("/usuario/:id", usuarioController.UpdateUsuario)
+	// router.DELETE("/usuario/:id", usuarioController.DeleteUsuario)
+
+	log.Info("API_Usuarios: Finishing mappings configurations")
 }

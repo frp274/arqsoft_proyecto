@@ -1,11 +1,11 @@
 package model
 
 type Usuario struct {
-	Id       int    	`gorm:"primaryKey"` //`json:""` sirve para que al correr el programa no aparezca en mayusculas, y si direct queremos ponerlo con mayus pasa a ser un atributo privado
-	Nombre_apellido     string 	`gorm:"not null"`
-	UserName string 		`gorm:"column:Username"`
-	Es_admin bool   	`gorm:"not null"`
-	PasswordHash string 	`gorm:"not null"`
+	Id              int    `gorm:"primaryKey"`
+	Nombre_apellido string `gorm:"type:varchar(255);not null"`
+	UserName        string `gorm:"column:Username;type:varchar(100);not null;unique"`
+	Es_admin        bool   `gorm:"not null;default:false"`
+	PasswordHash    string `gorm:"type:varchar(64);not null"`
 }
 
 type Usuarios []Usuario

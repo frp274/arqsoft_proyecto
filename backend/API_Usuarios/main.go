@@ -1,21 +1,26 @@
-package main_usuarios
+package main
 
 import (
-	"arqsoft_proyecto/app"
-	actividad "arqsoft_proyecto/clients/actividades"
-	"arqsoft_proyecto/db"
+	"api_usuarios/app"
+	usuarioClient "api_usuarios/clients/usuarios"
+	"api_usuarios/db"
+
+	log "github.com/sirupsen/logrus"
 )
 
-
 func main() {
+	log.Info("Starting API_Usuarios microservice...")
+
 	// Initialize the database connection
 	database := db.InitConnection()
-	actividad.Db = database
+
+	// Initialize usuario client with database
+	usuarioClient.Db = database
+
+	// Start the HTTP server
 	app.StartRoute()
 
-	// Perform any necessary operations with the database
-	// For example, you can create a new user or perform queries
-
-	// dbClose the database connection when done
+	// Close the database connection when done
 	defer db.Close(database)
+	log.Info("API_Usuarios shutdown complete")
 }
