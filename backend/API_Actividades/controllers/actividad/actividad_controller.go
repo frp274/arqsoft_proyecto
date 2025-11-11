@@ -54,7 +54,14 @@ func InsertActividad(c *gin.Context) {
 		return
 	}
 
-	actividadDto, er := service.InsertActividad(actividadDto)
+	// Extraer token del header Authorization
+	token := ""
+	authHeader := c.GetHeader("Authorization")
+	if len(authHeader) > 7 && authHeader[:7] == "Bearer " {
+		token = authHeader[7:]
+	}
+
+	actividadDto, er := service.InsertActividad(actividadDto, token)
 	// Error del Insert
 	if er != nil {
 		c.JSON(er.Status(), er)
@@ -92,7 +99,14 @@ func UpdateActividad(c *gin.Context) {
 
 	actividadDto.Id = id
 
-	actividadActualizada, updateErr := service.UpdateActividad(actividadDto)
+	// Extraer token del header Authorization
+	token := ""
+	authHeader := c.GetHeader("Authorization")
+	if len(authHeader) > 7 && authHeader[:7] == "Bearer " {
+		token = authHeader[7:]
+	}
+
+	actividadActualizada, updateErr := service.UpdateActividad(actividadDto, token)
 	if updateErr != nil {
 		c.JSON(updateErr.Status(), updateErr)
 		return

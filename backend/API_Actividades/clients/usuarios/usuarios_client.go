@@ -36,20 +36,20 @@ func init() {
 }
 
 // ValidateUser verifica que un usuario existe en API_Usuarios
-func ValidateUser(userId int) error {
+func ValidateUser(userId int, token string) error {
 	url := fmt.Sprintf("%s/usuario/%d", usuariosAPIURL, userId)
 
 	log.Debugf("Validating user %d against %s", userId, url)
 
-	// Nota: En producción, aquí deberías incluir un token de servicio
-	// para autenticación entre microservicios
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return fmt.Errorf("error creating request: %w", err)
 	}
 
-	// TODO: Agregar token de servicio para autenticación entre microservicios
-	// req.Header.Set("Authorization", "Bearer "+serviceToken)
+	// Pasar el token del usuario para autenticación entre microservicios
+	if token != "" {
+		req.Header.Set("Authorization", "Bearer "+token)
+	}
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
