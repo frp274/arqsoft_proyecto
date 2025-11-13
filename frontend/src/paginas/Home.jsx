@@ -17,7 +17,24 @@ function Home() {
       
 
       <hr/>
-      <h1 className="Titulo">    G O O D   G Y M    </h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 20px' }}>
+        <h1 className="Titulo">    G O O D   G Y M    </h1>
+        <button 
+          onClick={() => navigate("/MisInscripciones")}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#4CAF50',
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            fontSize: '1rem',
+            fontWeight: 'bold'
+          }}
+        >
+          📋 Mis Inscripciones
+        </button>
+      </div>
       <div className="foto">
         <Foto/>
 
