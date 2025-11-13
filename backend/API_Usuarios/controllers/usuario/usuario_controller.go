@@ -26,9 +26,9 @@ func Login(c *gin.Context) {
 
 	log.Infof("User %s logged in successfully (id: %d, admin: %t)", request.Username, usuarioId, es_admin)
 	c.JSON(http.StatusOK, dto.LoginResponse{
-		Id:       usuarioId,
-		Token:    token,
-		Es_admin: es_admin,
+		Id:      usuarioId,
+		Token:   token,
+		EsAdmin: es_admin,
 	})
 }
 
@@ -62,11 +62,11 @@ func CreateUsuario(c *gin.Context) {
 
 	usuarioDto, err := usuariosService.CreateUsuario(request)
 	if err != nil {
-		log.Errorf("Error creating user %s: %v", request.UserName, err)
+		log.Errorf("Error creating user %s: %v", request.Username, err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	log.Infof("User created successfully: %s (ID: %d)", usuarioDto.UserName, usuarioDto.Id)
+	log.Infof("User created successfully: %s (ID: %d)", usuarioDto.Username, usuarioDto.Id)
 	c.JSON(http.StatusCreated, usuarioDto)
 }
