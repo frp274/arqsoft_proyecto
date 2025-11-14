@@ -105,3 +105,45 @@ func CreateUsuario(usuarioDto dto.CreateUsuarioRequest) (dto.UsuarioDto, error) 
 	log.Infof("User created: %s (ID: %d)", usuarioCreado.Username, usuarioCreado.Id)
 	return responseDto, nil
 }
+
+func UpdateUsuario (usuarioDto dto.UsuarioDto)(dto.UsuarioDto, error){
+
+	// 1. Validar que primero exista el usuario a actualizar
+	usuarioActual, err := usuarioClient.GetUsuarioById(usuarioDto.Id)
+	if err != nil {
+		log.Print("Error al obtener el usuario: ", err)
+		return dto.UsuarioDto{}, fmt.Errorf("Usuario no encontrado")
+	}
+
+	// 2. Actualizar campos basicos
+	if usuarioDto.Nombre != "" {
+		usuarioActual.Nombre = usuarioDto.Nombre
+	}
+	if usuarioDto.Apellido != "" {
+		usuarioActual.Apellido = usuarioDto.Apellido
+	}
+	if usuarioDto.Email != "" {
+		usuarioActual.Email = usuarioDto.Email
+	}
+	if usuarioDto.Username != "" {
+		usuarioActual.Username = usuarioDto.Username
+	}
+
+	// Y la password? si la quiero cambiar??
+	
+	// 3. Guardar cambios en la base de datos
+	usuarioActual, err = usuarioClient.UpdateUsuario(usuarioActual)
+	if err != nil {
+		log.Print("Error al actualizar el usuario: ", err)
+		return dto.UsuarioDto{}, fmt.Errorf("Error al actualizar el usuario", err)
+	}
+
+	var usuarioActualizado dto.UsuarioDto
+	usuarioActualizado.Id = usuarioActual.Id
+	usuarioActualizado.Nombre = usuarioActual.Nombre
+	usuarioActualizado.Apellido = usuarioActual.Apellido
+	usuarioActualizado.Email = usuarioActual.Email
+	usuarioActualizado.Username = usuarioActual.Username
+
+	return usuarioActualizado, nil
+}

@@ -50,7 +50,10 @@ func mapUrls() {
 		inscripcionController.DeleteInscripcion)
 
 	// Endpoints futuros (comentados por ahora)
-	// router.PUT("/usuario/:id", middlewares.AuthMiddleware(), middlewares.RequireOwnerOrAdmin(), usuarioController.UpdateUsuario)
+	//router.PUT("/usuario/:id",
+	//	middlewares.AuthMiddleware(),
+	//	middlewares.RequireOwnerOrAdmin(),
+	//	usuarioController.Update)
 	// router.DELETE("/usuario/:id", middlewares.AuthMiddleware(), middlewares.RequireAdmin(), usuarioController.DeleteUsuario)
 
 	log.Info("API_Usuarios: Finishing mappings configurations")
