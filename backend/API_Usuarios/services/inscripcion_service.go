@@ -1,46 +1,51 @@
 package services
 
 import (
+	"api_usuarios/clients/actividades"
 	inscripcionesClient "api_usuarios/clients/inscripciones"
 	"api_usuarios/dto"
 	"api_usuarios/model"
 	"api_usuarios/utils/errors"
 	
+
 	log "github.com/sirupsen/logrus"
 )
 
 // CreateInscripcion crea una nueva inscripción
 func CreateInscripcion(inscripcionDto dto.InscripcionDto) (dto.InscripcionDto, errors.ApiError) {
-	log.Infof("Creando inscripción - Usuario: %d, Actividad: %d, Horario: %d", 
-		inscripcionDto.UsuarioId, inscripcionDto.ActividadId, inscripcionDto.HorarioId)
-	
+	log.Infof("Creando inscripción - Usuario: %d, Actividad: %d", inscripcionDto.UsuarioId, inscripcionDto.ActividadId)
+
 	// Validar datos
-	if inscripcionDto.UsuarioId <= 0 {
+	if inscripcionDto.UsuarioId == 0 {
 		return dto.InscripcionDto{}, errors.NewBadRequestApiError("ID de usuario inválido")
 	}
-	if inscripcionDto.ActividadId <= 0 {
+	if inscripcionDto.ActividadId == 0 {
 		return dto.InscripcionDto{}, errors.NewBadRequestApiError("ID de actividad inválido")
 	}
-	if inscripcionDto.HorarioId < 0 {
-		return dto.InscripcionDto{}, errors.NewBadRequestApiError("ID de horario inválido")
+
+	// Validar existencia de actividad
+	actividad, err := actividades.GetActividadById(inscripcionDto.ActividadId)
+	if err != nil {
+		return dto.InscripcionDto{}, errors.NewBadRequestApiError("Actividad no encontrada en la base de datos")
 	}
-	
+	if actividad.Id == 0 {
+		return dto.InscripcionDto{}, errors.NewBadRequestApiError("Actividad no encontrada")
+	}
 	// Convertir DTO a Model
 	inscripcion := model.Inscripcion{
 		UsuarioId:   inscripcionDto.UsuarioId,
 		ActividadId: inscripcionDto.ActividadId,
-		HorarioId:   inscripcionDto.HorarioId,
 	}
-	
+
 	// Crear inscripción en BD
-	inscripcion, err := inscripcionesClient.InsertInscripcion(inscripcion)
+	inscripcion, err = inscripcionesClient.InsertInscripcion(inscripcion)
 	if err != nil {
-		return dto.InscripcionDto{}, err
+		return dto.InscripcionDto{}, errors.NewBadRequestApiError("No se pudo insertar la Inscripcion")
 	}
-	
+
 	// Convertir Model a DTO
 	inscripcionDto.Id = inscripcion.Id
-	
+
 	log.Infof("Inscripción creada exitosamente con ID: %d", inscripcionDto.Id)
 	return inscripcionDto, nil
 }
@@ -48,17 +53,17 @@ func CreateInscripcion(inscripcionDto dto.InscripcionDto) (dto.InscripcionDto, e
 // GetInscripcionesByUsuarioId obtiene todas las inscripciones de un usuario
 func GetInscripcionesByUsuarioId(usuarioId int) (dto.InscripcionesDto, errors.ApiError) {
 	log.Infof("Obteniendo inscripciones del usuario: %d", usuarioId)
-	
+
 	if usuarioId <= 0 {
 		return nil, errors.NewBadRequestApiError("ID de usuario inválido")
 	}
-	
+
 	// Obtener inscripciones de BD
 	inscripciones, err := inscripcionesClient.GetInscripcionesByUsuarioId(usuarioId)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Convertir Models a DTOs
 	var inscripcionesDto dto.InscripcionesDto
 	for _, inscripcion := range inscripciones {
@@ -66,11 +71,10 @@ func GetInscripcionesByUsuarioId(usuarioId int) (dto.InscripcionesDto, errors.Ap
 			Id:          inscripcion.Id,
 			UsuarioId:   inscripcion.UsuarioId,
 			ActividadId: inscripcion.ActividadId,
-			HorarioId:   inscripcion.HorarioId,
 		}
 		inscripcionesDto = append(inscripcionesDto, inscripcionDto)
 	}
-	
+
 	log.Infof("Se encontraron %d inscripciones para el usuario %d", len(inscripcionesDto), usuarioId)
 	return inscripcionesDto, nil
 }
@@ -78,16 +82,16 @@ func GetInscripcionesByUsuarioId(usuarioId int) (dto.InscripcionesDto, errors.Ap
 // DeleteInscripcion elimina una inscripción
 func DeleteInscripcion(inscripcionId int) errors.ApiError {
 	log.Infof("Eliminando inscripción: %d", inscripcionId)
-	
+
 	if inscripcionId <= 0 {
 		return errors.NewBadRequestApiError("ID de inscripción inválido")
 	}
-	
+
 	err := inscripcionesClient.DeleteInscripcion(inscripcionId)
 	if err != nil {
 		return err
 	}
-	
+
 	log.Infof("Inscripción %d eliminada exitosamente", inscripcionId)
 	return nil
 }

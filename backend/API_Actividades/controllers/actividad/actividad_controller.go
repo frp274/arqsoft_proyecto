@@ -129,3 +129,15 @@ func CalcularDisponibilidad(c *gin.Context) {
 	c.JSON(http.StatusOK, resultado)
 }
 
+func BorrarCupo (c *gin.Context) {
+	log.Debug("Borrando cupo para actividad: " + c.Param("id"))
+	id := c.Param("id")
+
+	err := service.BorrarCupo(id)
+	if err != nil {
+		c.JSON(err.Status(), err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Cupo borrado correctamente"})
+}

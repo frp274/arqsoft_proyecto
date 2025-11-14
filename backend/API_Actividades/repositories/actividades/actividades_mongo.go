@@ -88,3 +88,16 @@ func UpdateActividad(a model.Actividad) (model.Actividad, error) {
     }
     return a, nil
 }
+
+func BorrarCupo(id primitive.ObjectID) error {
+	filter := bson.M{"_id": id}
+	update := bson.M{"$inc": bson.M{"cupos": -1}}
+	res, err := Db.Collection("actividades").UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		return err
+	}
+	if res.MatchedCount == 0 {
+		return fmt.Errorf("actividad not found")
+	}
+	return nil
+}

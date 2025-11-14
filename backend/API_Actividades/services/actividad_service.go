@@ -499,3 +499,27 @@ func calcularDisponibilidadHorario(index int, horario model.Horario, resultsChan
 	// Enviar resultado por el channel
 	resultsChan <- result
 }
+
+
+func BorrarCupo(id string) e.ApiError {
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Errorf("Error converting id to mongo ID: %v", err)
+		return e.NewBadRequestApiError("Invalid ID format")
+	}
+
+	err = actividadRepositories.BorrarCupo(objectID)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return e.NewNotFoundApiError("actividad not found")
+		}
+		return e.NewInternalServerApiError("Error retrieving actividad", err)
+	}
+	// Borrar en cache local
+	er := actividadRepositories.DeleteActividadCache(id)
+	if er != nil {
+		return e.NewInternalServerApiError("No se pudo eliminar la actividad de la cache local", er)
+	}
+
+	return nil
+}

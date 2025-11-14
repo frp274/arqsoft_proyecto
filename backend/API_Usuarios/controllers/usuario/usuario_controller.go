@@ -2,7 +2,7 @@ package usuario
 
 import (
 	"api_usuarios/dto"
-	usuariosService "api_usuarios/services"
+	"api_usuarios/services"
 	"net/http"
 	"strconv"
 
@@ -17,7 +17,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	usuarioId, token, es_admin, err := usuariosService.Login(request.Username, request.Password)
+	usuarioId, token, es_admin, err := services.Login(request.Username, request.Password)
 	if err != nil {
 		log.Errorf("Login failed for user %s: %v", request.Username, err)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
@@ -41,7 +41,7 @@ func GetUsuarioById(c *gin.Context) {
 		return
 	}
 
-	usuarioDto, err := usuariosService.GetUsuarioById(id)
+	usuarioDto, err := services.GetUsuarioById(id)
 	if err != nil {
 		log.Errorf("Error getting user %d: %v", id, err)
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
@@ -72,7 +72,7 @@ func CreateUsuario(c *gin.Context) {
 		log.Infof("Admin user creating new admin: %s", request.Username)
 	}
 
-	usuarioDto, err := usuariosService.CreateUsuario(request)
+	usuarioDto, err := services.CreateUsuario(request)
 	if err != nil {
 		log.Errorf("Error creating user %s: %v", request.Username, err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

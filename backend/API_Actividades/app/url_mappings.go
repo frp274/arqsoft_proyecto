@@ -15,7 +15,7 @@ func mapUrls() {
 
 	// Endpoint de acción con procesamiento concurrente
 	router.POST("/actividad/:id/calcular-disponibilidad", actividadController.CalcularDisponibilidad)
-
+	router.POST("/actividad/:id/borar-cupo", actividadController.BorrarCupo)
 	// Endpoints futuros (comentados)
 	//router.GET("/actividad", actividadController.GetActividadesByNombre)
 	//router.POST("/inscripcion", inscripcionController.InscripcionActividad)

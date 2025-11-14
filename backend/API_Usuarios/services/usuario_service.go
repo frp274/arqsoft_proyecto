@@ -135,7 +135,7 @@ func UpdateUsuario (usuarioDto dto.UsuarioDto)(dto.UsuarioDto, error){
 	usuarioActual, err = usuarioClient.UpdateUsuario(usuarioActual)
 	if err != nil {
 		log.Print("Error al actualizar el usuario: ", err)
-		return dto.UsuarioDto{}, fmt.Errorf("Error al actualizar el usuario", err)
+		return dto.UsuarioDto{}, fmt.Errorf("error al actualizar el usuario, %v", err.Error())
 	}
 
 	var usuarioActualizado dto.UsuarioDto

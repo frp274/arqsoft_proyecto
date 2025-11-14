@@ -21,8 +21,8 @@ func CreateInscripcion(c *gin.Context) {
 		return
 	}
 	
-	log.Infof("Solicitud de inscripción - Usuario: %d, Actividad: %d, Horario: %d", 
-		inscripcionDto.UsuarioId, inscripcionDto.ActividadId, inscripcionDto.HorarioId)
+	log.Infof("Solicitud de inscripción - Usuario: %d, Actividad: %d", 
+		inscripcionDto.UsuarioId, inscripcionDto.ActividadId)
 	
 	// Crear inscripción
 	inscripcionDto, err := services.CreateInscripcion(inscripcionDto)
