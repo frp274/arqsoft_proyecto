@@ -181,6 +181,20 @@ function Login() {
         
           <button className="ingresar" type="submit">Ingresar</button>
           {error && <p className="login-error">{error}</p>}
+
+          <p style={{ marginTop: "15px", fontSize: "0.9rem" }}>
+            ¿No tienes cuenta?{" "}
+            <span
+              onClick={() => navigate("/Registro")}
+              style={{
+                color: "#4CAF50",
+                cursor: "pointer",
+                textDecoration: "underline"
+              }}
+            >
+              Regístrate aquí
+            </span>
+          </p>
         </div>
       </form>
     </div>

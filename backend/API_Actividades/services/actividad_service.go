@@ -211,7 +211,7 @@ func GetAllActividades() (dto.ActividadesDto, e.ApiError) {
 	return actividadesDto, nil // asumimos que no hay error por ahora
 }
 */
-func InsertActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiError) {
+func InsertActividad(actividadDto dto.ActividadDto, token string) (dto.ActividadDto, e.ApiError) {
 	var actividad model.Actividad
 
 	err := ValidarActividadConcurrently(actividadDto)
@@ -237,7 +237,7 @@ func InsertActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 
 	// VALIDAR EXISTENCIA DEL OWNER CONTRA API_USUARIOS
 	log.Infof("Validating owner user %d against API_Usuarios", actividadDto.OwnerId)
-	if err := usuarios.ValidateUser(actividadDto.OwnerId); err != nil {
+	if err := usuarios.ValidateUser(actividadDto.OwnerId, token); err != nil {
 		log.Errorf("Owner validation failed for user %d: %v", actividadDto.OwnerId, err)
 		return dto.ActividadDto{}, e.NewBadRequestApiError(fmt.Sprintf("Invalid owner_id: %v", err))
 	}
@@ -309,7 +309,7 @@ func DeleteActividad(id string) e.ApiError {
 	return nil
 }
 
-func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiError) {
+func UpdateActividad(actividadDto dto.ActividadDto, token string) (dto.ActividadDto, e.ApiError) {
 	//Falta actualizar en Solr ===============================================================================================================================
 	objetID, err := primitive.ObjectIDFromHex(actividadDto.Id)
 	if err != nil {
@@ -327,7 +327,7 @@ func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 	// 1.5 VALIDAR OWNER SI SE PROPORCIONA (para cambio de propietario)
 	if actividadDto.OwnerId != 0 && actividadDto.OwnerId != actividadActual.OwnerId {
 		log.Infof("Validating new owner user %d against API_Usuarios", actividadDto.OwnerId)
-		if err := usuarios.ValidateUser(actividadDto.OwnerId); err != nil {
+		if err := usuarios.ValidateUser(actividadDto.OwnerId, token); err != nil {
 			log.Errorf("Owner validation failed for user %d: %v", actividadDto.OwnerId, err)
 			return dto.ActividadDto{}, e.NewBadRequestApiError(fmt.Sprintf("Invalid owner_id: %v", err))
 		}

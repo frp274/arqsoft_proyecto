@@ -14,7 +14,7 @@ func GetUsuarioByUsername(username string) (model.Usuario, error) {
 	var usuario model.Usuario
 
 	log.Debugf("Searching for user: %s", username)
-	txn := Db.First(&usuario, "Username = ?", username)
+	txn := Db.First(&usuario, "username = ?", username)
 
 	if txn.Error != nil {
 		if txn.Error == gorm.ErrRecordNotFound {
@@ -40,19 +40,19 @@ func GetUsuarioById(id int) (model.Usuario, error) {
 		return model.Usuario{}, fmt.Errorf("error getting user: %w", txn.Error)
 	}
 
-	log.Debugf("User found: %s (ID: %d)", usuario.UserName, usuario.Id)
+	log.Debugf("User found: %s (ID: %d)", usuario.Username, usuario.Id)
 	return usuario, nil
 }
 
 func CreateUsuario(usuario model.Usuario) (model.Usuario, error) {
-	log.Debugf("Creating new user: %s", usuario.UserName)
+	log.Debugf("Creating new user: %s", usuario.Username)
 
 	txn := Db.Create(&usuario)
 	if txn.Error != nil {
-		log.Errorf("Error creating user %s: %v", usuario.UserName, txn.Error)
+		log.Errorf("Error creating user %s: %v", usuario.Username, txn.Error)
 		return model.Usuario{}, fmt.Errorf("error creating user: %w", txn.Error)
 	}
 
-	log.Infof("User created successfully: %s (ID: %d)", usuario.UserName, usuario.Id)
+	log.Infof("User created successfully: %s (ID: %d)", usuario.Username, usuario.Id)
 	return usuario, nil
 }

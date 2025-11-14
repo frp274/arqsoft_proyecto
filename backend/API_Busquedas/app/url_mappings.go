@@ -2,6 +2,7 @@ package app
 
 import (
 	searchController "api_busquedas/controllers/search"
+	inscripcionController "api_busquedas/controllers/inscripcion"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -13,6 +14,12 @@ func mapUrls() {
 
 	// Endpoint para obtener actividad específica (con cache)
 	router.GET("/actividad/:id", searchController.GetActividadById)
+
+	// Endpoint para inscripciones por usuario
+	router.GET("/inscripciones/usuario/:id", inscripcionController.GetInscripcionesByUsuarioId)
+
+	// Endpoint para crear inscripción
+	router.POST("/inscripcion", inscripcionController.InscripcionActividad)
 
 	// Health check endpoint
 	router.GET("/health", searchController.HealthCheck)

@@ -49,11 +49,24 @@ func GetInscripcionesByUsuarioId(usuarioId int) (dto.ActividadesDto, e.ApiError)
 	}
 
 	for _, actividad := range actividades {
+		var horariosDto []dto.HorarioDto
+		for _, horario := range actividad.Horarios {
+			horarioDto := dto.HorarioDto{
+				Id:         horario.Id,
+				Dia:        horario.Dia,
+				HoraInicio: horario.HoraInicio,
+				HoraFin:    horario.HoraFin,
+				Cupo:       horario.Cupo,
+			}
+			horariosDto = append(horariosDto, horarioDto)
+		}
+
 		actividadDto := dto.ActividadDto{
 			Id:          actividad.Id,
-			Nombre:   actividad.Nombre,
+			Nombre:      actividad.Nombre,
 			Descripcion: actividad.Descripcion,
-			Profesor:   actividad.Profesor,
+			Profesor:    actividad.Profesor,
+			Horario:     horariosDto,
 		}
 		actividadesDto = append(actividadesDto, actividadDto)
 	}

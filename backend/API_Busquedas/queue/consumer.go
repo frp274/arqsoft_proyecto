@@ -16,7 +16,7 @@ import (
 )
 
 type ActividadEvent struct {
-	Operation   string `json:"operation"` // create, update, delete
+	Type        string `json:"type"` // create, update, delete (cambiar de operation a type para coincidir con productor)
 	ActividadID string `json:"actividad_id"`
 	Timestamp   string `json:"timestamp"`
 }
@@ -98,15 +98,15 @@ func processMessage(body []byte) {
 		return
 	}
 
-	log.Infof("Processing event: %s for actividad %s", event.Operation, event.ActividadID)
+	log.Infof("Processing event: %s for actividad %s", event.Type, event.ActividadID)
 
-	switch event.Operation {
+	switch event.Type {
 	case "create", "update":
 		handleCreateOrUpdate(event.ActividadID)
 	case "delete":
 		handleDelete(event.ActividadID)
 	default:
-		log.Warnf("Unknown operation: %s", event.Operation)
+		log.Warnf("Unknown operation: %s", event.Type)
 	}
 }
 

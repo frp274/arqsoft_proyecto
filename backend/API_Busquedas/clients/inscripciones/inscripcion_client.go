@@ -48,13 +48,30 @@ func UpdateInscripcion(horario model.Horario) model.Horario {
 }
 
 func GetInscripcionesByUsuarioId(usuarioId int) (model.Actividades, error) {
-	var actividades model.Actividades
-	result := Db.Preload("Horarios").Where("id = ?", usuarioId).Find(&actividades)
-	//result := Db.Where("usuario_id = ?", usuarioId).Find(&inscripciones)
+	var inscripciones model.Inscripciones
+	
+	// Obtener todas las inscripciones del usuario con sus actividades y horarios relacionados
+	result := Db.Preload("Actividad").Preload("Actividad.Horarios").Where("usuario_id = ?", usuarioId).Find(&inscripciones)
+	
 	if result.Error != nil {
+		log.Error("Error al obtener inscripciones: ", result.Error)
 		return model.Actividades{}, result.Error
 	}
-	log.Debugf("Ins: %v", actividades)
-
+	
+	// Extraer las actividades únicas de las inscripciones
+	actividadesMap := make(map[int]model.Actividad)
+	for _, insc := range inscripciones {
+		if _, exists := actividadesMap[insc.ActividadId]; !exists {
+			actividadesMap[insc.ActividadId] = insc.Actividad
+		}
+	}
+	
+	// Convertir el mapa a slice
+	var actividades model.Actividades
+	for _, actividad := range actividadesMap {
+		actividades = append(actividades, actividad)
+	}
+	
+	log.Debugf("Actividades encontradas para usuario %d: %v", usuarioId, actividades)
 	return actividades, nil
 }

@@ -56,15 +56,21 @@ function InscripcionesUsuario() {
       }
 
       try {
-        // Comentado: endpoint de inscripciones no existe en microservicios
-        // const res = await fetch(`${process.env.REACT_APP_API_BUSQUEDAS_URL}/inscripciones/usuario/${usuarioId}`);
-        // const data = await res.json();
-        // setInscripciones(data);
-
-        // Por ahora, dejamos vacío hasta implementar endpoint
-        setInscripciones([]);
+        const res = await fetch(`${process.env.REACT_APP_API_BUSQUEDAS_URL}/inscripciones/usuario/${usuarioId}`, {
+          headers: {
+            Authorization: `Bearer ${getCookie("token")}`
+          }
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          setInscripciones(Array.isArray(data) ? data : []);
+        } else {
+          setInscripciones([]);
+        }
       } catch (err) {
         console.error("Error al obtener inscripciones:", err);
+        setInscripciones([]);
       } finally {
         setLoading(false);
       }

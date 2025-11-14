@@ -23,14 +23,14 @@ func Login(username string, password string) (int, string, bool, error) {
 		return 0, "", false, fmt.Errorf("invalid password")
 	}
 
-	token, err := utils.GenerateJWT(usuario.Id, usuario.Es_admin)
+	token, err := utils.GenerateJWT(usuario.Id, usuario.EsAdmin)
 	if err != nil {
 		log.Errorf("Failed to generate JWT for user %s: %v", username, err)
 		return 0, "", false, fmt.Errorf("error generating token: %w", err)
 	}
 
 	log.Infof("Login successful for user: %s (ID: %d)", username, usuario.Id)
-	return usuario.Id, token, usuario.Es_admin, nil
+	return usuario.Id, token, usuario.EsAdmin, nil
 }
 
 func GetUsuarioById(id int) (dto.UsuarioDto, error) {
@@ -42,26 +42,34 @@ func GetUsuarioById(id int) (dto.UsuarioDto, error) {
 
 	// Mapear modelo a DTO (sin devolver el hash de contraseña)
 	usuarioDto := dto.UsuarioDto{
-		Id:              usuario.Id,
-		Nombre_apellido: usuario.Nombre_apellido,
-		UserName:        usuario.UserName,
-		Es_admin:        usuario.Es_admin,
+		Id:       usuario.Id,
+		Username: usuario.Username,
+		Email:    usuario.Email,
+		Nombre:   usuario.Nombre,
+		Apellido: usuario.Apellido,
+		EsAdmin:  usuario.EsAdmin,
 	}
 
-	log.Infof("User retrieved: %s (ID: %d)", usuario.UserName, usuario.Id)
+	log.Infof("User retrieved: %s (ID: %d)", usuario.Username, usuario.Id)
 	return usuarioDto, nil
 }
 
 func CreateUsuario(usuarioDto dto.CreateUsuarioRequest) (dto.UsuarioDto, error) {
 	// Validaciones
-	if usuarioDto.UserName == "" {
+	if usuarioDto.Username == "" {
 		return dto.UsuarioDto{}, fmt.Errorf("username is required")
+	}
+	if usuarioDto.Email == "" {
+		return dto.UsuarioDto{}, fmt.Errorf("email is required")
 	}
 	if usuarioDto.Password == "" {
 		return dto.UsuarioDto{}, fmt.Errorf("password is required")
 	}
-	if usuarioDto.Nombre_apellido == "" {
-		return dto.UsuarioDto{}, fmt.Errorf("nombre_apellido is required")
+	if usuarioDto.Nombre == "" {
+		return dto.UsuarioDto{}, fmt.Errorf("nombre is required")
+	}
+	if usuarioDto.Apellido == "" {
+		return dto.UsuarioDto{}, fmt.Errorf("apellido is required")
 	}
 
 	// Hashear la contraseña
@@ -69,10 +77,12 @@ func CreateUsuario(usuarioDto dto.CreateUsuarioRequest) (dto.UsuarioDto, error) 
 
 	// Crear modelo
 	usuario := model.Usuario{
-		Nombre_apellido: usuarioDto.Nombre_apellido,
-		UserName:        usuarioDto.UserName,
-		Es_admin:        usuarioDto.Es_admin,
-		PasswordHash:    passwordHash,
+		Username:     usuarioDto.Username,
+		Email:        usuarioDto.Email,
+		Nombre:       usuarioDto.Nombre,
+		Apellido:     usuarioDto.Apellido,
+		PasswordHash: passwordHash,
+		EsAdmin:      usuarioDto.EsAdmin,
 	}
 
 	// Guardar en la base de datos
@@ -84,12 +94,14 @@ func CreateUsuario(usuarioDto dto.CreateUsuarioRequest) (dto.UsuarioDto, error) 
 
 	// Mapear a DTO
 	responseDto := dto.UsuarioDto{
-		Id:              usuarioCreado.Id,
-		Nombre_apellido: usuarioCreado.Nombre_apellido,
-		UserName:        usuarioCreado.UserName,
-		Es_admin:        usuarioCreado.Es_admin,
+		Id:       usuarioCreado.Id,
+		Username: usuarioCreado.Username,
+		Email:    usuarioCreado.Email,
+		Nombre:   usuarioCreado.Nombre,
+		Apellido: usuarioCreado.Apellido,
+		EsAdmin:  usuarioCreado.EsAdmin,
 	}
 
-	log.Infof("User created: %s (ID: %d)", usuarioCreado.UserName, usuarioCreado.Id)
+	log.Infof("User created: %s (ID: %d)", usuarioCreado.Username, usuarioCreado.Id)
 	return responseDto, nil
 }
