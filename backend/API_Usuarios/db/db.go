@@ -47,6 +47,9 @@ func InitConnection() *gorm.DB {
 	usuarioClient.Db = db
 	inscripcionesClient.Db = db
 
+	// Seed inicial de usuarios si la base está vacía
+	seedInitialData(db)
+
 	return db
 }
 
@@ -56,6 +59,68 @@ func getEnv(key, defaultValue string) string {
 		return defaultValue
 	}
 	return value
+}
+
+func seedInitialData(db *gorm.DB) {
+	// Verificar si ya existen usuarios
+	var count int64
+	db.Model(&model.Usuario{}).Count(&count)
+
+	if count > 0 {
+		log.Info("Database already has users, skipping seed data")
+		return
+	}
+
+	log.Info("Seeding initial user data...")
+
+	// Hash SHA256 de las passwords
+	// admin -> 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+	// password123 -> ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f
+
+	usuarios := []model.Usuario{
+		{
+			Username:     "admin",
+			Email:        "admin@gym.com",
+			Nombre:       "Admin",
+			Apellido:     "Sistema",
+			PasswordHash: "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
+			EsAdmin:      true,
+		},
+		{
+			Username:     "juan_gomez",
+			Email:        "juan.gomez@email.com",
+			Nombre:       "Juan",
+			Apellido:     "Gomez",
+			PasswordHash: "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
+			EsAdmin:      false,
+		},
+		{
+			Username:     "maria_lopez",
+			Email:        "maria.lopez@email.com",
+			Nombre:       "Maria",
+			Apellido:     "Lopez",
+			PasswordHash: "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
+			EsAdmin:      false,
+		},
+		{
+			Username:     "carlos_diaz",
+			Email:        "carlos.diaz@email.com",
+			Nombre:       "Carlos",
+			Apellido:     "Diaz",
+			PasswordHash: "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
+			EsAdmin:      false,
+		},
+	}
+
+	for _, usuario := range usuarios {
+		if err := db.Create(&usuario).Error; err != nil {
+			log.Errorf("Failed to seed user %s: %v", usuario.Username, err)
+		} else {
+			log.Infof("✅ Seeded user: %s", usuario.Username)
+		}
+	}
+
+	log.Info("Initial user data seeded successfully")
 }
 
 func Close(db *gorm.DB) {
