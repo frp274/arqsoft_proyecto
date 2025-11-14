@@ -60,6 +60,18 @@ func CreateUsuario(c *gin.Context) {
 		return
 	}
 
+	// Verificar si se intenta crear un admin
+	if request.EsAdmin {
+		// Verificar si el usuario que hace la petición es admin autenticado
+		esAdmin, exists := c.Get("es_admin")
+		if !exists || !esAdmin.(bool) {
+			log.Warnf("Unauthorized attempt to create admin user by %s", request.Username)
+			c.JSON(http.StatusForbidden, gin.H{"error": "Solo administradores pueden crear nuevos administradores"})
+			return
+		}
+		log.Infof("Admin user creating new admin: %s", request.Username)
+	}
+
 	usuarioDto, err := usuariosService.CreateUsuario(request)
 	if err != nil {
 		log.Errorf("Error creating user %s: %v", request.Username, err)

@@ -1,0 +1,77 @@
+# Binarios compilados de Go
+backend/API_Actividades/api_actividades
+backend/API_Usuarios/api_usuarios
+backend/API_Busquedas/api_busquedas
+backend_viejo/main
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Dependencias de Go
+backend/API_Actividades/vendor/
+backend/API_Usuarios/vendor/
+backend/API_Busquedas/vendor/
+backend_viejo/vendor/
+
+# Node modules y build del frontend
+frontend/node_modules/
+frontend/build/
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# IDEs y editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Archivos temporales de sistema
+Thumbs.db
+Desktop.ini
+
+# Variables de entorno (mantener .env.example)
+.env
+!frontend/.env.example
+
+# Archivos de test
+*.test
+coverage/
+.nyc_output/
+
+# Archivos de Docker (volúmenes locales)
+.docker/
+volumes/
+
+# Git internos
+FETCH_HEAD
+
+# Archivos de configuración local
+*.local
+
+# Cachés
+.cache/
+.npm/
+.eslintcache
+
+# Archivos de backup
+*.bak
+*.backup
+*~
+
+# Archivos de sistema Mac
+.AppleDouble
+.LSOverride

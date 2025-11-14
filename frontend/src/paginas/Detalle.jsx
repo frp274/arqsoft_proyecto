@@ -122,7 +122,12 @@ function Detalle() {
       });
   };
 
-  if (!actividad) return <p>Cargando actividad...</p>;
+  if (!actividad) return (
+    <div className="cargando">
+      <div className="spinner"></div>
+      <p>✨ Cargando actividad...</p>
+    </div>
+  );
 
   const horarios = actividad.horarios || actividad.Horarios || [];
 

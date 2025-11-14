@@ -56,8 +56,8 @@ func SearchActividades(c *gin.Context) {
 	// Build Solr query
 	query := solr.NewQuery()
 	query.Q(params.Query)
-	query.Rows((params.Page - 1) * params.PageSize)
-	query.Start(params.PageSize)
+	query.Start((params.Page - 1) * params.PageSize)  // Offset: desde dónde empezar
+	query.Rows(params.PageSize)                       // Cantidad de resultados
 
 	// Add sorting
 	if params.Sort != "" {
