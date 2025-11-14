@@ -35,6 +35,26 @@ func GetActividadById(objectID primitive.ObjectID) (model.Actividad, error) {
 	
 	return actividad, nil
 }
+
+func GetAllActividades() (model.Actividades, error) {
+	var actividades model.Actividades
+
+	cursor, err := Db.Collection("actividades").Find(context.TODO(), bson.M{})
+	if err != nil {
+		log.Errorf("Error finding all actividades: %v", err)
+		return nil, err
+	}
+	defer cursor.Close(context.TODO())
+
+	if err = cursor.All(context.TODO(), &actividades); err != nil {
+		log.Errorf("Error decoding actividades: %v", err)
+		return nil, err
+	}
+
+	log.Infof("Found %d actividades in DB", len(actividades))
+	return actividades, nil
+}
+
 /*
 func GetActividadesByNombre(nombre string) (model.Actividades, error) {
 

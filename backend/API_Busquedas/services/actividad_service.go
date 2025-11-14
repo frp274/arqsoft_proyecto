@@ -1,15 +1,12 @@
 package services
 
-import (
-	actividadCliente "api_busquedas/clients/actividades"
-	"api_busquedas/dto"
-	"api_busquedas/model"
-	e "api_busquedas/utils/errors"
+// All functions in this file are DEPRECATED and use the old MySQL model with int IDs
+// New system uses MongoDB with string IDs via HTTP endpoints and Solr search
+// Search functionality is now handled by search/search_service.go
 
-	log "github.com/sirupsen/logrus"
-)
-
-func GetActividadById(id int) (dto.ActividadDto, e.ApiError) {
+// DEPRECATED: This function uses the old MySQL model with int IDs
+// New system uses MongoDB with string IDs via HTTP endpoints
+/*func GetActividadById(id int) (dto.ActividadDto, e.ApiError) {
 	var actividad model.Actividad = actividadCliente.GetActividadById(id)
 	var actividadDto dto.ActividadDto
 
@@ -36,9 +33,11 @@ func GetActividadById(id int) (dto.ActividadDto, e.ApiError) {
 	}
 
 	return actividadDto, nil
-}
+}*/
 
-func GetAllActividades() (dto.ActividadesDto, e.ApiError) {
+// DEPRECATED: This function uses the old MySQL model with int IDs
+// New system uses MongoDB with string IDs via HTTP endpoints and Solr search
+/*func GetAllActividades() (dto.ActividadesDto, e.ApiError) {
 	var actividades model.Actividades
 	var actividadesDto dto.ActividadesDto
 
@@ -71,9 +70,10 @@ func GetAllActividades() (dto.ActividadesDto, e.ApiError) {
 	}
 
 	return actividadesDto, nil // asumimos que no hay error por ahora
-}
+}*/
 
-func InsertActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiError) {
+// DEPRECATED: This function uses the old MySQL model with int IDs
+/*func InsertActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiError) {
 	var actividad model.Actividad
 
 	actividad.Nombre = actividadDto.Nombre
@@ -97,9 +97,10 @@ func InsertActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 	actividadDto.Id = actividad.Id
 
 	return actividadDto, nil
-}
+}*/
 
-func GetActividadesByNombre(nombre string) (dto.ActividadesDto, e.ApiError) {
+// DEPRECATED: These functions use the old MySQL model with int IDs
+/*func GetActividadesByNombre(nombre string) (dto.ActividadesDto, e.ApiError) {
 	actividades, err := actividadCliente.GetActividadesFiltradas(nombre)
 	if err != nil {
 		log.Error(err.Error())
@@ -138,7 +139,7 @@ func DeleteActividad(id int) e.ApiError {
 		return e.NewInternalServerApiError("No se pudo eliminar la actividad", err)
 	}
 	return nil
-}
+}*/
 
 /*func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiError) {
 
@@ -197,7 +198,8 @@ func DeleteActividad(id int) e.ApiError {
 	return actividadActualizada, nil
 }*/
 
-func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiError) {
+// DEPRECATED: UpdateActividad also uses old MySQL model
+/*func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiError) {
 	// 1. Validar existencia de la actividad
 	actividadActual := actividadCliente.GetActividadById(actividadDto.Id)
 	if actividadActual.Id == 0 {
@@ -255,4 +257,4 @@ func UpdateActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiErro
 	}
 
 	return actividadActualizada, nil
-}
+}*/

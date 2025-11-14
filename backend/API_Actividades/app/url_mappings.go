@@ -8,6 +8,7 @@ import (
 
 func mapUrls() {
 	// Operaciones CRUD de actividades
+	router.GET("/actividades", actividadController.GetAllActividades)
 	router.GET("/actividad/:id", actividadController.GetActividadById)
 	router.POST("/actividad", actividadController.InsertActividad)
 	router.PUT("/actividad/:id", actividadController.UpdateActividad)

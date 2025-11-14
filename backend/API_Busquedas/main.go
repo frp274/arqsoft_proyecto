@@ -24,6 +24,13 @@ func main() {
 	}
 	log.Info("Solr connection initialized")
 
+	// Sync initial data from MongoDB (via API_Actividades) to Solr
+	go func() {
+		if err := search.SyncFromActividades(); err != nil {
+			log.Errorf("Initial sync failed: %v", err)
+		}
+	}()
+
 	// Initialize cache layers (local + distributed)
 	cache.InitCache()
 	log.Info("Cache layers initialized")

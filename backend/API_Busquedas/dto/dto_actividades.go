@@ -1,7 +1,7 @@
 package dto
 
 type ActividadDto struct {
-	Id          int    		`json:"id"`
+	Id          string    	`json:"id"`
 	Nombre        string 	`json:"nombre"`
 	Descripcion string 		`json:"descripcion"`
 	Profesor   string 		`json:"profesor"`

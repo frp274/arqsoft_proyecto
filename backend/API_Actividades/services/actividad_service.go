@@ -175,7 +175,7 @@ func GetActividadesByNombre(nombre string) (dto.ActividadesDto, e.ApiError) {
 	return actividadesDto, nil
 }
 */
-/*
+
 func GetAllActividades() (dto.ActividadesDto, e.ApiError) {
 	var actividades model.Actividades
 	var actividadesDto dto.ActividadesDto
@@ -190,14 +190,13 @@ func GetAllActividades() (dto.ActividadesDto, e.ApiError) {
 	// Mapear modelo → DTO
 	for _, actividad := range actividades {
 		actividadDto := dto.ActividadDto{
-			Id:          actividad.Id,
+			Id:          actividad.Id.Hex(),
 			Nombre:      actividad.Nombre,
 			Descripcion: actividad.Descripcion,
 			Profesor:    actividad.Profesor,
 		}
 		for _, horario := range actividad.Horarios {
 			horarioDto := dto.HorarioDto{
-				Id:         horario.Id,
 				Dia:        horario.Dia,
 				HoraInicio: horario.HoraInicio,
 				HoraFin:    horario.HoraFin,
@@ -210,7 +209,7 @@ func GetAllActividades() (dto.ActividadesDto, e.ApiError) {
 
 	return actividadesDto, nil // asumimos que no hay error por ahora
 }
-*/
+
 func InsertActividad(actividadDto dto.ActividadDto, token string) (dto.ActividadDto, e.ApiError) {
 	var actividad model.Actividad
 

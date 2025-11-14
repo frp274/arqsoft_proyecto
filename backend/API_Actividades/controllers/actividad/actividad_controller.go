@@ -25,6 +25,18 @@ func GetActividadById(c *gin.Context) {
 	c.JSON(http.StatusOK, actividadDto)
 }
 
+func GetAllActividades(c *gin.Context) {
+	log.Debug("Getting all activities")
+
+	actividadesDto, err := service.GetAllActividades()
+
+	if err != nil {
+		c.JSON(err.Status(), err)
+		return
+	}
+	c.JSON(http.StatusOK, actividadesDto)
+}
+
 
 /*
 func GetActividadesByNombre(c *gin.Context) {
