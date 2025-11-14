@@ -6,9 +6,9 @@ import (
 	usuarioClient "api_busquedas/clients/usuarios"
 	_"os"
 
-	model "api_busquedas/model"
 	"fmt"
 
+	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -38,7 +38,13 @@ func InitConnection() *gorm.DB {
 		panic("failed to connect database")
 	}
 
-	db.AutoMigrate(&model.Actividad{}, &model.Usuario{}, &model.Inscripcion{})
+	// API_Busquedas NO crea tablas, solo consulta
+	// Las tablas están en:
+	// - MongoDB (actividades) - API_Actividades
+	// - MySQL (usuario, inscripcion) - API_Usuarios
+	log.Info("API_Busquedas: DB connection established (read-only access)")
+	
+	// Solo inicializar clientes para consultas READ-ONLY
 	actividadClient.Db = db
 	inscripcionClient.Db = db
 	usuarioClient.Db = db

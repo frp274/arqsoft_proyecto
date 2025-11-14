@@ -94,24 +94,146 @@ func ensureActividadesCollection(ctx context.Context, db *mongo.Database) error 
 		return err
 	}
 
-	// 3) Seed opcional (idempotente)
-	_, err = db.Collection(col).UpdateOne(
-		ctx,
-		bson.M{"nombre": "Funcional"},
-		bson.M{"$setOnInsert": bson.M{
-			"profesor":    "Carlos Perez",
-			"descripcion": "Entrenamiento funcional",
+	// 3) Seed inicial con todas las actividades (idempotente)
+	if err := seedActividades(ctx, db, col); err != nil {
+		return err
+	}
+	
+	return nil
+}
+
+func seedActividades(ctx context.Context, db *mongo.Database, col string) error {
+	// Verificar si ya existen actividades
+	count, err := db.Collection(col).CountDocuments(ctx, bson.M{})
+	if err != nil {
+		return err
+	}
+	
+	if count > 0 {
+		log.Info("Database already has activities, skipping seed data")
+		return nil
+	}
+	
+	log.Info("Seeding initial activity data...")
+	
+	actividades := []interface{}{
+		bson.M{
+			"nombre":      "Yoga Integral",
+			"descripcion": "Clases de yoga para todos los niveles. Mejora tu flexibilidad, fuerza y equilibrio mental.",
+			"profesor":    "Laura Martinez",
+			"tags":        bson.A{"yoga", "relajacion", "flexibilidad"},
 			"horarios": bson.A{
-				bson.M{"dia": "lunes", "horaInicio": "07:30", "horaFin": "08:30", "cupo": 20},
-				bson.M{"dia": "martes", "horaInicio": "07:30", "horaFin": "08:30", "cupo": 20},
-				bson.M{"dia": "jueves", "horaInicio": "07:30", "horaFin": "08:30", "cupo": 20},
+				bson.M{"dia": "Lunes", "horaInicio": "08:00", "horaFin": "09:00", "cupo": 15},
+				bson.M{"dia": "Miércoles", "horaInicio": "08:00", "horaFin": "09:00", "cupo": 15},
+				bson.M{"dia": "Viernes", "horaInicio": "18:00", "horaFin": "19:00", "cupo": 15},
 			},
-			//"createdAt":         time.Now(),
-			//"updatedAt":         time.Now(),
-		}},
-		options.Update().SetUpsert(true),
-	)
-	return err
+		},
+		bson.M{
+			"nombre":      "CrossFit Avanzado",
+			"descripcion": "Entrenamiento de alta intensidad combinando levantamiento de pesas, gimnasia y cardio.",
+			"profesor":    "Roberto Sanchez",
+			"tags":        bson.A{"crossfit", "fuerza", "intensidad"},
+			"horarios": bson.A{
+				bson.M{"dia": "Lunes", "horaInicio": "19:00", "horaFin": "20:00", "cupo": 20},
+				bson.M{"dia": "Miércoles", "horaInicio": "19:00", "horaFin": "20:00", "cupo": 20},
+				bson.M{"dia": "Viernes", "horaInicio": "19:00", "horaFin": "20:00", "cupo": 20},
+			},
+		},
+		bson.M{
+			"nombre":      "Spinning Indoor",
+			"descripcion": "Entrenamiento cardiovascular sobre bicicleta estática con música motivadora.",
+			"profesor":    "Ana Rodriguez",
+			"tags":        bson.A{"spinning", "cardio", "resistencia"},
+			"horarios": bson.A{
+				bson.M{"dia": "Martes", "horaInicio": "07:00", "horaFin": "08:00", "cupo": 25},
+				bson.M{"dia": "Jueves", "horaInicio": "07:00", "horaFin": "08:00", "cupo": 25},
+				bson.M{"dia": "Sábado", "horaInicio": "09:00", "horaFin": "10:00", "cupo": 25},
+			},
+		},
+		bson.M{
+			"nombre":      "Pilates Mat",
+			"descripcion": "Método de ejercicio que enfatiza el equilibrio, la postura y la respiración para fortalecer el core.",
+			"profesor":    "Sofia Fernandez",
+			"tags":        bson.A{"pilates", "core", "postura"},
+			"horarios": bson.A{
+				bson.M{"dia": "Martes", "horaInicio": "10:00", "horaFin": "11:00", "cupo": 12},
+				bson.M{"dia": "Jueves", "horaInicio": "10:00", "horaFin": "11:00", "cupo": 12},
+			},
+		},
+		bson.M{
+			"nombre":      "Entrenamiento Funcional",
+			"descripcion": "Ejercicios que imitan movimientos cotidianos para mejorar la funcionalidad y prevenir lesiones.",
+			"profesor":    "Diego Torres",
+			"tags":        bson.A{"funcional", "movimiento", "prevencion"},
+			"horarios": bson.A{
+				bson.M{"dia": "Lunes", "horaInicio": "18:00", "horaFin": "19:00", "cupo": 18},
+				bson.M{"dia": "Miércoles", "horaInicio": "18:00", "horaFin": "19:00", "cupo": 18},
+				bson.M{"dia": "Viernes", "horaInicio": "07:00", "horaFin": "08:00", "cupo": 18},
+			},
+		},
+		bson.M{
+			"nombre":      "Zumba Fitness",
+			"descripcion": "Baile fitness con ritmos latinos que combina cardio y tonificación muscular.",
+			"profesor":    "Valentina Castro",
+			"tags":        bson.A{"zumba", "baile", "diversion"},
+			"horarios": bson.A{
+				bson.M{"dia": "Martes", "horaInicio": "19:00", "horaFin": "20:00", "cupo": 30},
+				bson.M{"dia": "Jueves", "horaInicio": "19:00", "horaFin": "20:00", "cupo": 30},
+				bson.M{"dia": "Sábado", "horaInicio": "10:00", "horaFin": "11:00", "cupo": 30},
+			},
+		},
+		bson.M{
+			"nombre":      "Boxeo Fitness",
+			"descripcion": "Entrenamiento de boxeo para mejorar resistencia cardiovascular, coordinación y fuerza.",
+			"profesor":    "Martin Ruiz",
+			"tags":        bson.A{"boxeo", "fuerza", "coordinacion"},
+			"horarios": bson.A{
+				bson.M{"dia": "Lunes", "horaInicio": "20:00", "horaFin": "21:00", "cupo": 16},
+				bson.M{"dia": "Miércoles", "horaInicio": "20:00", "horaFin": "21:00", "cupo": 16},
+				bson.M{"dia": "Viernes", "horaInicio": "20:00", "horaFin": "21:00", "cupo": 16},
+			},
+		},
+		bson.M{
+			"nombre":      "Natación Intermedia",
+			"descripcion": "Clases de natación para mejorar técnica y resistencia en los diferentes estilos.",
+			"profesor":    "Paula Medina",
+			"tags":        bson.A{"natacion", "tecnica", "resistencia"},
+			"horarios": bson.A{
+				bson.M{"dia": "Martes", "horaInicio": "06:00", "horaFin": "07:00", "cupo": 10},
+				bson.M{"dia": "Jueves", "horaInicio": "06:00", "horaFin": "07:00", "cupo": 10},
+				bson.M{"dia": "Sábado", "horaInicio": "08:00", "horaFin": "09:00", "cupo": 10},
+			},
+		},
+		bson.M{
+			"nombre":      "Stretching y Flexibilidad",
+			"descripcion": "Clases enfocadas en mejorar la flexibilidad, reducir tensión muscular y prevenir lesiones.",
+			"profesor":    "Lucia Vargas",
+			"tags":        bson.A{"stretching", "flexibilidad", "recuperacion"},
+			"horarios": bson.A{
+				bson.M{"dia": "Lunes", "horaInicio": "12:00", "horaFin": "13:00", "cupo": 20},
+				bson.M{"dia": "Miércoles", "horaInicio": "12:00", "horaFin": "13:00", "cupo": 20},
+				bson.M{"dia": "Viernes", "horaInicio": "12:00", "horaFin": "13:00", "cupo": 20},
+			},
+		},
+		bson.M{
+			"nombre":      "GAP (Glúteos-Abdomen-Piernas)",
+			"descripcion": "Entrenamiento localizado para tonificar y fortalecer el tren inferior y abdomen.",
+			"profesor":    "Carolina Paz",
+			"tags":        bson.A{"gap", "tonificacion", "fuerza"},
+			"horarios": bson.A{
+				bson.M{"dia": "Martes", "horaInicio": "18:00", "horaFin": "19:00", "cupo": 25},
+				bson.M{"dia": "Jueves", "horaInicio": "18:00", "horaFin": "19:00", "cupo": 25},
+			},
+		},
+	}
+	
+	result, err := db.Collection(col).InsertMany(ctx, actividades)
+	if err != nil {
+		return err
+	}
+	
+	log.Infof("✅ Seeded %d activities successfully", len(result.InsertedIDs))
+	return nil
 }
 
 func collectionExists(ctx context.Context, db *mongo.Database, name string) (bool, error) {
