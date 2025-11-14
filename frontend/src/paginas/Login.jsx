@@ -96,7 +96,33 @@
 
 // // export default Login;
 
-import React, { useState } from "react";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*import React, { useState } from "react";
 import "./Login.css";
 import { useNavigate } from "react-router-dom";
 
@@ -119,8 +145,8 @@ function Login() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          Username: usuario,
-          Password: contrasenia,
+          username: usuario,
+          password: contrasenia,
         }),
       });
       // const data = await response.json();
@@ -197,6 +223,160 @@ function Login() {
           </p>
         </div>
       </form>
+    </div>
+  );
+}
+
+export default Login;
+*/
+
+import React, { useState } from "react";
+import "./Login.css";
+import { useNavigate } from "react-router-dom";
+
+function Login() {
+  const [usuario, setUsuario] = useState("");
+  const [contrasenia, setContrasenia] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  const handleLogin = async (event) => {
+    event.preventDefault();
+
+    if (!usuario || !contrasenia) {
+      setError("Debe completar ambos campos.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_USUARIOS_URL}/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: usuario,
+            password: contrasenia,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("RESPUESTA DEL LOGIN:", data);
+
+        // limpiar token anterior y setear el nuevo
+        document.cookie =
+          "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+        document.cookie = `token=${data.token}; path=/; SameSite=Strict; Secure`;
+
+        // redirigir según rol
+        if (data.es_admin === true) {
+          navigate("/Admin");
+        } else {
+          navigate("/Home");
+        }
+      } else {
+        setError("Usuario o contraseña incorrectos.");
+      }
+    } catch (error) {
+      console.error("Error al conectar con el servidor:", error);
+      setError("Error al conectar con el servidor.");
+    }
+  };
+
+  const irARegistro = () => navigate("/Registro");
+
+  return (
+    <div className="login-page">
+      <div className="login-shell">
+        {/* Panel izquierdo: info / branding */}
+        <div className="login-info-panel">
+          <div className="login-logo-pill">
+            <span className="login-logo-dot" />
+            <span>GOOD GYM · RETRO FUTURE</span>
+          </div>
+
+          <h1 className="login-title">Bienvenido a GOOD GYM</h1>
+
+          <p className="login-subtitle">
+            Iniciá sesión para explorar actividades, gestionar tus
+            inscripciones y entrenar con estilo retro-futurista.
+          </p>
+
+          <div className="login-chips">
+            <span className="login-chip">Rutinas dinámicas</span>
+            <span className="login-chip">Modo administrador</span>
+            <span className="login-chip">Inscripciones online</span>
+          </div>
+
+          <p className="login-small-text">
+            ¿Todavía no tenés cuenta?
+            <button
+              type="button"
+              className="login-link-button"
+              onClick={irARegistro}
+            >
+              Crear cuenta
+            </button>
+          </p>
+        </div>
+
+        {/* Panel derecho: formulario de login */}
+        <div className="login-form-wrapper">
+          <form className="login-form" onSubmit={handleLogin}>
+            <h2 className="login-form-title">Iniciar sesión</h2>
+            <p className="login-form-subtitle">
+              Ingresá tus credenciales para continuar.
+            </p>
+
+            <div className="login-field-group">
+              <label className="login-label" htmlFor="usuario">
+                Usuario
+              </label>
+              <input
+                id="usuario"
+                className="login-input"
+                type="text"
+                placeholder="Tu nombre de usuario"
+                value={usuario}
+                onChange={(e) => setUsuario(e.target.value)}
+              />
+            </div>
+
+            <div className="login-field-group">
+              <label className="login-label" htmlFor="contrasenia">
+                Contraseña
+              </label>
+              <input
+                id="contrasenia"
+                className="login-input"
+                type="password"
+                placeholder="••••••••"
+                value={contrasenia}
+                onChange={(e) => setContrasenia(e.target.value)}
+              />
+            </div>
+
+            {error && <p className="login-error">{error}</p>}
+
+            <button className="login-submit" type="submit">
+              Ingresar
+            </button>
+
+            <p className="login-bottom-text">
+              ¿No tienes cuenta?
+              <button
+                type="button"
+                className="login-link-inline"
+                onClick={irARegistro}
+              >
+                Regístrate aquí
+              </button>
+            </p>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }
