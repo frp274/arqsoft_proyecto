@@ -19,6 +19,64 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+func ValidarActividadConcurrently(a dto.ActividadDto) error {
+	var wg sync.WaitGroup
+	errChan := make(chan error, 3) // una por cada validación
+
+	// VALIDACIÓN 1: Nombre
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if a.Nombre == "" {
+			errChan <- errors.New("el nombre de la actividad no puede estar vacío")
+		}
+	}()
+
+	// VALIDACIÓN 2: Horarios
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if len(a.Horario) == 0 {
+			errChan <- errors.New("la actividad debe tener al menos un horario")
+		}
+	}()
+
+	// VALIDACIÓN 3: Profesor
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if a.Profesor == "" {
+			errChan <- errors.New("el nombre del profesor no puede estar vacío")
+		}
+	}()
+
+	// VALIDACIÓN 4: Owner ID
+	//wg.Add(1)
+	//go func() {
+	//	defer wg.Done()
+	//	if a.OwnerId == 0 {
+	//		errChan <- errors.New("owner_id es requerido")
+	//	}
+	//}()
+
+	// Esperar a que todas terminen y cerrar canal
+	go func() {
+		wg.Wait()
+		close(errChan)
+	}()
+
+	// Retornar el primer error encontrado
+	for err := range errChan {
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+
+
 func GetActividadById(id string) (dto.ActividadDto, e.ApiError) {
 	var actividadDto dto.ActividadDto
 	//Aplicar Busqueda en la cache =====================================================================================================================================
@@ -156,22 +214,26 @@ func GetAllActividades() (dto.ActividadesDto, e.ApiError) {
 func InsertActividad(actividadDto dto.ActividadDto) (dto.ActividadDto, e.ApiError) {
 	var actividad model.Actividad
 
-	if actividadDto.Nombre == "" {
-		log.Error("El nombre de la actividad no puede estar vacío")
-		return dto.ActividadDto{}, e.NewBadRequestApiError("El nombre de la actividad no puede estar vacío")
+	err := ValidarActividadConcurrently(actividadDto)
+	if err != nil {
+		return dto.ActividadDto{}, e.NewBadRequestApiError(err.Error())
 	}
-	if len(actividadDto.Horario) == 0 {
-		log.Error("La actividad debe tener al menos un horario")
-		return dto.ActividadDto{}, e.NewBadRequestApiError("La actividad debe tener al menos un horario")
-	}
-	if actividadDto.Profesor == "" {
-		log.Error("El nombre del profesor no puede estar vacío")
-		return dto.ActividadDto{}, e.NewBadRequestApiError("El nombre del profesor no puede estar vacío")
-	}
-	if actividadDto.OwnerId == 0 {
-		log.Error("El owner_id es requerido")
-		return dto.ActividadDto{}, e.NewBadRequestApiError("owner_id is required")
-	}
+	//if actividadDto.Nombre == "" {
+	//	log.Error("El nombre de la actividad no puede estar vacío")
+	//	return dto.ActividadDto{}, e.NewBadRequestApiError("El nombre de la actividad no puede estar vacío")
+	//}
+	//if len(actividadDto.Horario) == 0 {
+	//	log.Error("La actividad debe tener al menos un horario")
+	//	return dto.ActividadDto{}, e.NewBadRequestApiError("La actividad debe tener al menos un horario")
+	//}
+	//if actividadDto.Profesor == "" {
+	//	log.Error("El nombre del profesor no puede estar vacío")
+	//	return dto.ActividadDto{}, e.NewBadRequestApiError("El nombre del profesor no puede estar vacío")
+	//}
+	//if actividadDto.OwnerId == 0 {
+	//	log.Error("El owner_id es requerido")
+	//	return dto.ActividadDto{}, e.NewBadRequestApiError("owner_id is required")
+	//}
 
 	// VALIDAR EXISTENCIA DEL OWNER CONTRA API_USUARIOS
 	log.Infof("Validating owner user %d against API_Usuarios", actividadDto.OwnerId)
