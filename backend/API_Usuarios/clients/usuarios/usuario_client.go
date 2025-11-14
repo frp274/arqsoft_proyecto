@@ -56,3 +56,18 @@ func CreateUsuario(usuario model.Usuario) (model.Usuario, error) {
 	log.Infof("User created successfully: %s (ID: %d)", usuario.Username, usuario.Id)
 	return usuario, nil
 }
+
+func UpdateUsuario(usuario model.Usuario) (model.Usuario, error){
+	log.Debugf("Updating user (ID: %d)", usuario.Id)
+
+	// Use Save to update the whole struct (or use Model(&Usuario{}).Updates(...) for partial)
+    txn := Db.Save(&usuario)
+    if txn.Error != nil {
+        log.Errorf("Error updating user %s: %v", usuario.Username, txn.Error)
+        return model.Usuario{}, fmt.Errorf("error updating user: %w", txn.Error)
+    }
+
+    log.Infof("User updated successfully: %s (ID: %d)", usuario.Username, usuario.Id)
+
+	return usuario, nil
+}
