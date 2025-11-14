@@ -155,6 +155,8 @@ services:
       - RABBITMQ_QUEUE=actividades_events
       - ACTIVIDADES_API_URL=http://api_actividades:8080
     depends_on:
+      mysql_usuarios:
+        condition: service_healthy
       solr:
         condition: service_healthy
       memcached:

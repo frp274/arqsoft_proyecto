@@ -1,6 +1,7 @@
 package app
 
 import (
+	inscripcionController "api_usuarios/controllers/inscripcion"
 	usuarioController "api_usuarios/controllers/usuario"
 	"api_usuarios/middlewares"
 
@@ -27,6 +28,26 @@ func mapUrls() {
 		middlewares.AuthMiddleware(),
 		middlewares.RequireAdmin(),
 		usuarioController.CreateUsuario)
+
+	// ============================================
+	// INSCRIPCIONES - Gestión de inscripciones a actividades
+	// ============================================
+	
+	// POST /inscripcion - Crear nueva inscripción (requiere autenticación)
+	router.POST("/inscripcion",
+		middlewares.AuthMiddleware(),
+		inscripcionController.CreateInscripcion)
+	
+	// GET /inscripciones/usuario/:id - Obtener inscripciones de un usuario
+	router.GET("/inscripciones/usuario/:id",
+		middlewares.AuthMiddleware(),
+		middlewares.RequireOwnerOrAdmin(),
+		inscripcionController.GetInscripcionesByUsuarioId)
+	
+	// DELETE /inscripcion/:id - Eliminar inscripción
+	router.DELETE("/inscripcion/:id",
+		middlewares.AuthMiddleware(),
+		inscripcionController.DeleteInscripcion)
 
 	// Endpoints futuros (comentados por ahora)
 	// router.PUT("/usuario/:id", middlewares.AuthMiddleware(), middlewares.RequireOwnerOrAdmin(), usuarioController.UpdateUsuario)

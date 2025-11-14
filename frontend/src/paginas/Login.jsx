@@ -231,8 +231,13 @@ export default Login;
 */
 
 import React, { useState } from "react";
-import "./Login.css";
 import { useNavigate } from "react-router-dom";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Badge } from "../components/ui/badge";
+import { Dumbbell, ArrowRight, Sparkles, Users, Calendar } from "lucide-react";
 
 function Login() {
   const [usuario, setUsuario] = useState("");
@@ -288,94 +293,128 @@ function Login() {
   const irARegistro = () => navigate("/Registro");
 
   return (
-    <div className="login-page">
-      <div className="login-shell">
-        {/* Panel izquierdo: info / branding */}
-        <div className="login-info-panel">
-          <div className="login-logo-pill">
-            <span className="login-logo-dot" />
-            <span>GOOD GYM · RETRO FUTURE</span>
+    <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-primary/10 flex items-center justify-center p-4">
+      <div className="w-full max-w-6xl grid md:grid-cols-2 gap-8 items-center">
+        
+        {/* Panel izquierdo: branding */}
+        <div className="hidden md:block space-y-8">
+          <div className="flex items-center gap-3">
+            <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center">
+              <Dumbbell className="h-6 w-6 text-primary-foreground" />
+            </div>
+            <div>
+              <h1 className="font-mono text-2xl font-bold uppercase tracking-tighter">
+                GOOD GYM
+              </h1>
+              <Badge variant="secondary" className="mt-1">
+                <Sparkles className="h-3 w-3 mr-1" />
+                Fitness Platform
+              </Badge>
+            </div>
           </div>
 
-          <h1 className="login-title">Bienvenido a GOOD GYM</h1>
-
-          <p className="login-subtitle">
-            Iniciá sesión para explorar actividades, gestionar tus
-            inscripciones y entrenar con estilo retro-futurista.
-          </p>
-
-          <div className="login-chips">
-            <span className="login-chip">Rutinas dinámicas</span>
-            <span className="login-chip">Modo administrador</span>
-            <span className="login-chip">Inscripciones online</span>
-          </div>
-
-          <p className="login-small-text">
-            ¿Todavía no tenés cuenta?
-            <button
-              type="button"
-              className="login-link-button"
-              onClick={irARegistro}
-            >
-              Crear cuenta
-            </button>
-          </p>
-        </div>
-
-        {/* Panel derecho: formulario de login */}
-        <div className="login-form-wrapper">
-          <form className="login-form" onSubmit={handleLogin}>
-            <h2 className="login-form-title">Iniciar sesión</h2>
-            <p className="login-form-subtitle">
-              Ingresá tus credenciales para continuar.
+          <div className="space-y-4">
+            <h2 className="font-mono text-4xl font-bold uppercase tracking-tighter leading-tight">
+              Transform Your<br />Fitness Journey
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-md">
+              Iniciá sesión para explorar actividades, gestionar tus inscripciones 
+              y alcanzar tus objetivos fitness.
             </p>
+          </div>
 
-            <div className="login-field-group">
-              <label className="login-label" htmlFor="usuario">
-                Usuario
-              </label>
-              <input
-                id="usuario"
-                className="login-input"
-                type="text"
-                placeholder="Tu nombre de usuario"
-                value={usuario}
-                onChange={(e) => setUsuario(e.target.value)}
-              />
-            </div>
+          <div className="flex flex-wrap gap-3">
+            <Badge variant="outline" className="gap-2 py-2 px-4">
+              <Users className="h-4 w-4" />
+              Rutinas dinámicas
+            </Badge>
+            <Badge variant="outline" className="gap-2 py-2 px-4">
+              <Calendar className="h-4 w-4" />
+              Inscripciones online
+            </Badge>
+            <Badge variant="outline" className="gap-2 py-2 px-4">
+              <Sparkles className="h-4 w-4" />
+              Modo administrador
+            </Badge>
+          </div>
 
-            <div className="login-field-group">
-              <label className="login-label" htmlFor="contrasenia">
-                Contraseña
-              </label>
-              <input
-                id="contrasenia"
-                className="login-input"
-                type="password"
-                placeholder="••••••••"
-                value={contrasenia}
-                onChange={(e) => setContrasenia(e.target.value)}
-              />
-            </div>
-
-            {error && <p className="login-error">{error}</p>}
-
-            <button className="login-submit" type="submit">
-              Ingresar
-            </button>
-
-            <p className="login-bottom-text">
-              ¿No tienes cuenta?
-              <button
-                type="button"
-                className="login-link-inline"
+          <div className="pt-8">
+            <p className="text-sm text-muted-foreground">
+              ¿Todavía no tenés cuenta?{" "}
+              <Button 
+                variant="link" 
+                className="p-0 h-auto font-semibold"
                 onClick={irARegistro}
               >
-                Regístrate aquí
-              </button>
+                Crear cuenta
+                <ArrowRight className="ml-1 h-4 w-4" />
+              </Button>
             </p>
-          </form>
+          </div>
         </div>
+
+        {/* Panel derecho: formulario */}
+        <Card className="w-full shadow-lg">
+          <CardHeader>
+            <CardTitle className="font-mono text-2xl uppercase tracking-tight">
+              Iniciar sesión
+            </CardTitle>
+            <CardDescription>
+              Ingresá tus credenciales para continuar
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="usuario">Usuario</Label>
+                <Input
+                  id="usuario"
+                  type="text"
+                  placeholder="Tu nombre de usuario"
+                  value={usuario}
+                  onChange={(e) => setUsuario(e.target.value)}
+                  className="h-11"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="contrasenia">Contraseña</Label>
+                <Input
+                  id="contrasenia"
+                  type="password"
+                  placeholder="••••••••"
+                  value={contrasenia}
+                  onChange={(e) => setContrasenia(e.target.value)}
+                  className="h-11"
+                />
+              </div>
+
+              {error && (
+                <div className="text-sm text-destructive bg-destructive/10 border border-destructive/30 rounded-md p-3">
+                  {error}
+                </div>
+              )}
+
+              <Button type="submit" className="w-full h-11 font-semibold" size="lg">
+                Ingresar
+              </Button>
+
+              <div className="md:hidden text-center pt-4">
+                <p className="text-sm text-muted-foreground">
+                  ¿No tienes cuenta?{" "}
+                  <Button 
+                    variant="link" 
+                    className="p-0 h-auto"
+                    onClick={irARegistro}
+                    type="button"
+                  >
+                    Regístrate aquí
+                  </Button>
+                </p>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

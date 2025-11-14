@@ -89,18 +89,28 @@ function Detalle() {
       return;
     }
 
-    const cupo = actividad.cupo || actividad.Cupo;
-    if (cupo === 0) {
-      setMensaje("No hay cupos disponibles para esta actividad.");
+    // Validar que el horario tenga cupos disponibles
+    const horarioSeleccionado = horarios.find(h => h.id === horarioId);
+    if (!horarioSeleccionado || horarioSeleccionado.cupo <= 0) {
+      setMensaje("No hay cupos disponibles para este horario.");
       return;
     }
-    const Id = parseInt(id, 10);
+    
+    const actividadidint = parseInt(id, 10);
     const horarioidint = parseInt(horarioId, 10);
     const usuarioidint = parseInt(usuarioId, 10);
     
-    // Por ahora usamos el endpoint de calcular disponibilidad como "acción"
-    axios.post(`${process.env.REACT_APP_API_ACTIVIDADES_URL}/actividad/${id}/calcular-disponibilidad`, {
-      horario_ids: [horarioidint]
+    console.log('Enviando inscripción:', { 
+      usuario_id: usuarioidint, 
+      actividad_id: actividadidint, 
+      horario_id: horarioidint 
+    });
+
+    // Llamar al endpoint de inscripción en API_Usuarios
+    axios.post(`${process.env.REACT_APP_API_USUARIOS_URL}/inscripcion`, {
+      usuario_id: usuarioidint,
+      actividad_id: actividadidint,
+      horario_id: horarioidint
     }, {
       headers: { 
         Authorization: `Bearer ${getCookie("token")}`, 
@@ -108,17 +118,20 @@ function Detalle() {
       }
     })
       .then((res) => {
-        const disponibilidad = res.data.disponibilidad;
-        if (disponibilidad && disponibilidad.length > 0 && disponibilidad[0].disponible) {
-          setMensaje('¡Disponibilidad confirmada! Cupos disponibles: ' + disponibilidad[0].cupos_disponibles);
-        } else {
-          setMensaje('No hay cupos disponibles para este horario.');
-        }
-        setTimeout(() => window.location.reload(), 2000);
+        console.log('Respuesta de inscripción:', res.data);
+        setMensaje('¡Felicitaciones! Te inscribiste correctamente a la actividad.');
+        
+        // Recargar los datos de la actividad para actualizar los cupos
+        setTimeout(() => {
+          axios.get(`${process.env.REACT_APP_API_BUSQUEDAS_URL}/actividad/${id}`)
+            .then((response) => setActividad(response.data))
+            .catch((err) => console.error('Error al recargar:', err));
+        }, 1500);
       })
       .catch((err) => {
-        setMensaje("Error al verificar disponibilidad.");
-        console.error(err);
+        console.error('Error al inscribirse:', err);
+        const mensajeError = err.response?.data?.message || 'Error al inscribirse. Intenta nuevamente.';
+        setMensaje(mensajeError);
       });
   };
 

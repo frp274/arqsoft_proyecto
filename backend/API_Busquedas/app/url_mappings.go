@@ -15,11 +15,9 @@ func mapUrls() {
 	// Endpoint para obtener actividad específica (con cache)
 	router.GET("/actividad/:id", searchController.GetActividadById)
 
-	// Endpoint para inscripciones por usuario
+	// Endpoint para obtener inscripciones por usuario (solo consulta)
+	// NOTA: La creación de inscripciones está en API_Usuarios
 	router.GET("/inscripciones/usuario/:id", inscripcionController.GetInscripcionesByUsuarioId)
-
-	// Endpoint para crear inscripción
-	router.POST("/inscripcion", inscripcionController.InscripcionActividad)
 
 	// Health check endpoint
 	router.GET("/health", searchController.HealthCheck)

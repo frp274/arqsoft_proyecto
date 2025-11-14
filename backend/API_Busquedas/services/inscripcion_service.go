@@ -1,7 +1,6 @@
 package services
 
 import (
-	actividadCliente "api_busquedas/clients/actividades"
 	inscripcionCliente "api_busquedas/clients/inscripciones"
 	"api_busquedas/dto"
 	"api_busquedas/model"
@@ -17,59 +16,41 @@ func InscripcionActividad(inscripcionDto dto.InscripcionDto) (dto.InscripcionDto
 	inscripcion.ActividadId = inscripcionDto.ActividadId
 	inscripcion.HorarioId = inscripcionDto.HorarioId
 
+	// Crear la inscripción en PostgreSQL
 	inscripcion, err := inscripcionCliente.InscripcionActividad(inscripcion)
 	if err != nil {
 		return dto.InscripcionDto{}, e.NewBadRequestApiError("ya estas inscripto a la actividad")
 	}
 	inscripcionDto.Id = inscripcion.Id
-	actividad := actividadCliente.GetActividadById(inscripcionDto.ActividadId)
-	horario, errror := inscripcionCliente.GetCupoByHorarioId(inscripcion.HorarioId)
-	if errror != nil {
-		return dto.InscripcionDto{}, e.NewBadRequestApiError("no se encontro el horario")
-	}
-	if actividad.Id == 0 {
-		// Manejá error
-	} else if horario.Cupo > 0 {
-		horario.Cupo -= 1
-		inscripcionCliente.UpdateInscripcion(horario)
-	}
+
+	// NOTA: Los horarios están en MongoDB (API_Actividades), no en PostgreSQL
+	// Por ahora solo creamos la inscripción, el decremento del cupo se manejará en API_Actividades
+	log.Info("Inscripción creada exitosamente:", inscripcionDto.Id)
 
 	return inscripcionDto, nil
 
 }
 
-func GetInscripcionesByUsuarioId(usuarioId int) (dto.ActividadesDto, e.ApiError) {
-	var actividadesDto dto.ActividadesDto
-
-	actividades, er := inscripcionCliente.GetInscripcionesByUsuarioId(usuarioId)
+func GetInscripcionesByUsuarioId(usuarioId int) (dto.InscripcionesDto, e.ApiError) {
+	// Obtener inscripciones del usuario (solo IDs)
+	inscripciones, er := inscripcionCliente.GetInscripcionesByUsuarioId(usuarioId)
 
 	if er != nil {
 		log.Error(er.Error())
-		return dto.ActividadesDto{}, e.NewBadRequestApiError("no se encontro el usuario id")
+		return dto.InscripcionesDto{}, e.NewBadRequestApiError("no se encontraron inscripciones para el usuario")
 	}
 
-	for _, actividad := range actividades {
-		var horariosDto []dto.HorarioDto
-		for _, horario := range actividad.Horarios {
-			horarioDto := dto.HorarioDto{
-				Id:         horario.Id,
-				Dia:        horario.Dia,
-				HoraInicio: horario.HoraInicio,
-				HoraFin:    horario.HoraFin,
-				Cupo:       horario.Cupo,
-			}
-			horariosDto = append(horariosDto, horarioDto)
+	// Convertir a DTO
+	var inscripcionesDto dto.InscripcionesDto
+	for _, insc := range inscripciones {
+		inscripcionDto := dto.InscripcionDto{
+			Id:          insc.Id,
+			UsuarioId:   insc.UsuarioId,
+			ActividadId: insc.ActividadId,
+			HorarioId:   insc.HorarioId,
 		}
-
-		actividadDto := dto.ActividadDto{
-			Id:          actividad.Id,
-			Nombre:      actividad.Nombre,
-			Descripcion: actividad.Descripcion,
-			Profesor:    actividad.Profesor,
-			Horario:     horariosDto,
-		}
-		actividadesDto = append(actividadesDto, actividadDto)
+		inscripcionesDto = append(inscripcionesDto, inscripcionDto)
 	}
 
-	return actividadesDto, nil
+	return inscripcionesDto, nil
 }

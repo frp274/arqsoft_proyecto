@@ -1,6 +1,7 @@
 package db
 
 import (
+	inscripcionesClient "api_usuarios/clients/inscripciones"
 	usuarioClient "api_usuarios/clients/usuarios"
 	model "api_usuarios/model"
 	"os"
@@ -35,15 +36,16 @@ func InitConnection() *gorm.DB {
 
 	log.Info("Database connection established successfully")
 
-	// Solo migrar la tabla de usuarios
-	if err := db.AutoMigrate(&model.Usuario{}); err != nil {
+	// Migrar tablas de usuarios e inscripciones
+	if err := db.AutoMigrate(&model.Usuario{}, &model.Inscripcion{}); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
 
-	log.Info("Database migration completed")
+	log.Info("Database migration completed (Usuario, Inscripcion)")
 
-	// Inicializar el cliente de usuarios
+	// Inicializar los clientes
 	usuarioClient.Db = db
+	inscripcionesClient.Db = db
 
 	return db
 }

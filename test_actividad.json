@@ -1,0 +1,14 @@
+{
+  "nombre": "Yoga Integral Test",
+  "descripcion": "Clases de yoga para todos los niveles",
+  "profesor": "Laura Martinez",
+  "owner_id": 1,
+  "horario": [
+    {
+      "dia": "Lunes",
+      "horaInicio": "08:00",
+      "horaFin": "09:00",
+      "cupo": 15
+    }
+  ]
+}

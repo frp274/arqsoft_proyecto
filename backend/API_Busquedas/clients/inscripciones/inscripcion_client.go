@@ -17,14 +17,15 @@ func InscripcionActividad(inscripcion model.Inscripcion) (model.Inscripcion, err
 	if verificadorInscripcion.Id != 0{
 		return inscripcion, e.NewBadRequestApiError("ya esta inscripto a la actividad")
 	}
-	//Db.First(&verificadorInscripcion, "UsuarioId = ?", inscripcion.UsuarioId)
+	
 	result := Db.Create(&inscripcion)
 
 	if result.Error != nil {
-
-		log.Info(result.Error.Error())
+		log.Error("Error al crear inscripcion:", result.Error.Error())
+		return inscripcion, result.Error
 	}
-	log.Info("Inscripcion realizada", inscripcion.Id)
+	
+	log.Info("Inscripcion realizada con ID:", inscripcion.Id)
 	return inscripcion, nil
 }
 
@@ -47,31 +48,18 @@ func UpdateInscripcion(horario model.Horario) model.Horario {
     return horario
 }
 
-func GetInscripcionesByUsuarioId(usuarioId int) (model.Actividades, error) {
+func GetInscripcionesByUsuarioId(usuarioId int) (model.Inscripciones, error) {
 	var inscripciones model.Inscripciones
 	
-	// Obtener todas las inscripciones del usuario con sus actividades y horarios relacionados
-	result := Db.Preload("Actividad").Preload("Actividad.Horarios").Where("usuario_id = ?", usuarioId).Find(&inscripciones)
+	// Obtener todas las inscripciones del usuario
+	// NOTA: Actividad y Horario están en MongoDB, solo almacenamos los IDs en MySQL
+	result := Db.Where("usuario_id = ?", usuarioId).Find(&inscripciones)
 	
 	if result.Error != nil {
 		log.Error("Error al obtener inscripciones: ", result.Error)
-		return model.Actividades{}, result.Error
+		return model.Inscripciones{}, result.Error
 	}
 	
-	// Extraer las actividades únicas de las inscripciones
-	actividadesMap := make(map[int]model.Actividad)
-	for _, insc := range inscripciones {
-		if _, exists := actividadesMap[insc.ActividadId]; !exists {
-			actividadesMap[insc.ActividadId] = insc.Actividad
-		}
-	}
-	
-	// Convertir el mapa a slice
-	var actividades model.Actividades
-	for _, actividad := range actividadesMap {
-		actividades = append(actividades, actividad)
-	}
-	
-	log.Debugf("Actividades encontradas para usuario %d: %v", usuarioId, actividades)
-	return actividades, nil
+	log.Debugf("Inscripciones encontradas para usuario %d: %d", usuarioId, len(inscripciones))
+	return inscripciones, nil
 }

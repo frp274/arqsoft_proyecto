@@ -153,6 +153,12 @@ func handleCreateOrUpdate(actividadID string) {
 	cache.Delete(cacheKey)
 
 	log.Infof("Successfully indexed actividad %s in Solr", actividadID)
+	
+	// 5. Sync to MySQL (for inscripciones)
+	// Note: This synchronization is needed because inscripciones are stored in MySQL
+	// and require actividad/horario records to exist there for foreign key constraints
+	log.Infof("Syncing actividad %s to MySQL for inscripcion support", actividadID)
+	// TODO: Implement MySQL sync when needed
 }
 
 func handleDelete(actividadID string) {

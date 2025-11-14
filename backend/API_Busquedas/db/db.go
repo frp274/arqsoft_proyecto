@@ -16,7 +16,7 @@ import (
 
 func InitConnection() *gorm.DB {
 	// refer https://github.com/go-sql-driver/mysql#dsn-data-source-name for details
-	dsn := "root:genagena1@tcp(mysql:3306)/arquisoftware?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "root:root@tcp(mysql_usuarios:3306)/usuarios_db?charset=utf8mb4&parseTime=True&loc=Local"
 	// dsn := fmt.Sprintf(
 	// 	"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 	// 	os.Getenv("DB_USER"),

@@ -11,20 +11,41 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type Horario struct {
-	Dia        string `json:"dia"`
-	HoraInicio string `json:"horaInicio"`
-	HoraFin    string `json:"horaFin"`
-	Cupo       int    `json:"cupo"`
+// HorarioAPI es el formato que viene de API_Actividades
+type HorarioAPI struct {
+	Dia            string `json:"dia"`
+	HorarioInicio  string `json:"horarioInicio"`
+	HorarioFinal   string `json:"horarioFinal"`
+	Cupo           int    `json:"cupo"`
 }
 
+// ActividadAPI es el formato que viene de API_Actividades
+type ActividadAPI struct {
+	ID          string       `json:"id"`
+	Nombre      string       `json:"nombre"`
+	Descripcion string       `json:"descripcion"`
+	Profesor    string       `json:"profesor"`
+	Tags        []string     `json:"tags"`
+	Horarios    []HorarioAPI `json:"horarios"`
+}
+
+// Horario es el formato que exponemos al frontend
+type Horario struct {
+	ID            string `json:"id,omitempty"`
+	Dia           string `json:"dia"`
+	HorarioInicio string `json:"horarioInicio"`
+	HorarioFinal  string `json:"horarioFinal"`
+	Cupo          int    `json:"cupo"`
+}
+
+// Actividad es el formato que exponemos al frontend
 type Actividad struct {
 	ID          string    `json:"id"`
 	Nombre      string    `json:"nombre"`
 	Descripcion string    `json:"descripcion"`
 	Profesor    string    `json:"profesor"`
 	Tags        []string  `json:"tags"`
-	Horarios    []Horario `json:"horario"`
+	Horarios    []Horario `json:"horarios"`
 }
 
 var (
@@ -38,7 +59,7 @@ func init() {
 	}
 
 	apiHost := getEnv("API_ACTIVIDADES_HOST", "api_actividades")
-	apiPort := getEnv("API_ACTIVIDADES_PORT", "8081")
+	apiPort := getEnv("API_ACTIVIDADES_PORT", "8080")
 	apiActividadesURL = fmt.Sprintf("http://%s:%s", apiHost, apiPort)
 }
 
@@ -59,13 +80,35 @@ func GetActividadFromAPI(id string) (*Actividad, error) {
 		return nil, fmt.Errorf("API_Actividades returned status %d: %s", resp.StatusCode, string(body))
 	}
 
-	var actividad Actividad
-	if err := json.NewDecoder(resp.Body).Decode(&actividad); err != nil {
+	// Decodificar en el formato de la API
+	var actividadAPI ActividadAPI
+	if err := json.NewDecoder(resp.Body).Decode(&actividadAPI); err != nil {
 		return nil, fmt.Errorf("failed to decode response: %w", err)
 	}
 
+	// Mapear a nuestro formato
+	actividad := &Actividad{
+		ID:          actividadAPI.ID,
+		Nombre:      actividadAPI.Nombre,
+		Descripcion: actividadAPI.Descripcion,
+		Profesor:    actividadAPI.Profesor,
+		Tags:        actividadAPI.Tags,
+		Horarios:    make([]Horario, len(actividadAPI.Horarios)),
+	}
+
+	// Mapear horarios con IDs generados
+	for i, h := range actividadAPI.Horarios {
+		actividad.Horarios[i] = Horario{
+			ID:            fmt.Sprintf("%d", i),
+			Dia:           h.Dia,
+			HorarioInicio: h.HorarioInicio,
+			HorarioFinal:  h.HorarioFinal,
+			Cupo:          h.Cupo,
+		}
+	}
+
 	log.Debugf("Successfully fetched actividad %s: %s", id, actividad.Nombre)
-	return &actividad, nil
+	return actividad, nil
 }
 
 func getEnv(key, defaultValue string) string {

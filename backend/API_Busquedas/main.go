@@ -3,6 +3,7 @@ package main
 import (
 	"api_busquedas/app"
 	"api_busquedas/cache"
+	"api_busquedas/db"
 	"api_busquedas/queue"
 	"api_busquedas/search"
 
@@ -11,6 +12,11 @@ import (
 
 func main() {
 	log.Info("Starting API_Busquedas microservice...")
+
+	// Initialize MySQL database connection
+	database := db.InitConnection()
+	defer db.Close(database)
+	log.Info("MySQL database connected and tables migrated")
 
 	// Initialize Solr connection
 	if err := search.InitSolr(); err != nil {
