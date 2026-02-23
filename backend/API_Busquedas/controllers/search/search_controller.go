@@ -1,6 +1,7 @@
 package search
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -11,7 +12,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
-	"github.com/vanng822/go-solr/solr"
 )
 
 // SearchActividades handles paginated search with filters
@@ -41,50 +41,54 @@ func SearchActividades(c *gin.Context) {
 		params.Order = "asc"
 	}
 
+	// Apply fuzzy search if query is not matching all and doesn't already have modifiers
+	processedQuery := params.Query
+	if processedQuery != "*:*" && len(processedQuery) > 3 {
+		// simple approach: add ~1 for words longer than 3 chars to allow 1 typo
+		processedQuery = fmt.Sprintf("%s~1", processedQuery)
+	}
+
 	// Generate cache key
 	cacheKey := fmt.Sprintf("search:%s:p%d:s%d:sort%s:%s",
-		params.Query, params.Page, params.PageSize, params.Sort, params.Order)
+		processedQuery, params.Page, params.PageSize, params.Sort, params.Order)
 
 	// Try cache first
 	var result model.ActividadSearchResult
 	if cache.GetJSON(cacheKey, &result) {
-		log.Infof("Returning cached search results for: %s", params.Query)
+		log.Infof("Returning cached search results for: %s", processedQuery)
 		c.JSON(http.StatusOK, result)
 		return
 	}
 
-	// Build Solr query
-	query := solr.NewQuery()
-	query.Q(params.Query)
-	query.Start((params.Page - 1) * params.PageSize)  // Offset: desde dónde empezar
-	query.Rows(params.PageSize)                       // Cantidad de resultados
-
 	// Add sorting
+	sortField := ""
 	if params.Sort != "" {
-		sortField := params.Sort + " " + params.Order
-		query.Sort(sortField)
+		sortField = params.Sort + " " + params.Order
 	}
 
 	// Execute search
-	si := search.SolrClient
-	searchObj := si.Search(query)
-	response, err := searchObj.Result(nil)
+	resultObj, err := search.SolrClient.Search(processedQuery, sortField, (params.Page-1)*params.PageSize, params.PageSize)
 	if err != nil {
 		log.Errorf("Solr search failed: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Search failed"})
 		return
 	}
 
-	// Parse results
 	var actividades []model.ActividadSolr
-	for _, doc := range response.Results.Docs {
+	for _, doc := range resultObj.Response.Docs {
 		actividad := model.ActividadSolr{
 			ID:          getString(doc, "id"),
 			Nombre:      getString(doc, "nombre"),
 			Descripcion: getString(doc, "descripcion"),
 			Profesor:    getString(doc, "profesor"),
-			Horarios:    getString(doc, "horarios"),
 		}
+
+		horariosStr := getString(doc, "horarios")
+		var horariosArr []map[string]interface{}
+		if horariosStr != "" {
+			json.Unmarshal([]byte(horariosStr), &horariosArr)
+		}
+		actividad.Horarios = horariosArr
 
 		if tags, ok := doc["tags"].([]interface{}); ok {
 			for _, tag := range tags {
@@ -98,7 +102,7 @@ func SearchActividades(c *gin.Context) {
 	}
 
 	// Build result
-	totalResults := int64(response.Results.NumFound)
+	totalResults := int64(resultObj.Response.NumFound)
 	totalPages := int(totalResults) / params.PageSize
 	if int(totalResults)%params.PageSize > 0 {
 		totalPages++
@@ -117,7 +121,7 @@ func SearchActividades(c *gin.Context) {
 		log.Warnf("Failed to cache search results: %v", err)
 	}
 
-	log.Infof("Search completed: %d results for query '%s'", len(actividades), params.Query)
+	log.Infof("Search completed: %d results for query '%s'", len(actividades), processedQuery)
 	c.JSON(http.StatusOK, result)
 }
 
@@ -164,13 +168,8 @@ func HealthCheck(c *gin.Context) {
 	}
 
 	// Test Solr connection
-	query := solr.NewQuery()
-	query.Q("*:*")
-	query.Rows(0)
-
-	si := search.SolrClient
-	searchObj := si.Search(query)
-	if _, err := searchObj.Result(nil); err != nil {
+	_, err := search.SolrClient.Search("*:*", "", 0, 0)
+	if err != nil {
 		health["solr"] = "disconnected"
 		health["status"] = "degraded"
 	}

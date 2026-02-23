@@ -12,7 +12,6 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
-	"github.com/vanng822/go-solr/solr"
 )
 
 type ActividadEvent struct {
@@ -119,11 +118,12 @@ func handleCreateOrUpdate(actividadID string) {
 	}
 
 	// 2. Index in Solr
-	doc := solr.Document{
+	doc := map[string]interface{}{
 		"id":          actividadID,
 		"nombre":      actividad.Nombre,
 		"descripcion": actividad.Descripcion,
 		"profesor":    actividad.Profesor,
+		"imagen_url":  actividad.ImagenURL,
 		"tags":        actividad.Tags,
 	}
 
@@ -133,27 +133,18 @@ func handleCreateOrUpdate(actividadID string) {
 		doc["horarios"] = string(horariosJSON)
 	}
 
-	updateResp, err := search.SolrClient.Update(doc, nil)
+	err = search.SolrClient.Update(doc)
 	if err != nil {
 		log.Errorf("Failed to index actividad %s in Solr: %v", actividadID, err)
 		return
 	}
-	log.Debugf("Update response: %v", updateResp)
-
-	// 3. Commit to Solr
-	commitResp, err := search.SolrClient.Commit()
-	if err != nil {
-		log.Errorf("Failed to commit to Solr: %v", err)
-		return
-	}
-	log.Debugf("Commit response: %v", commitResp)
 
 	// 4. Invalidate cache
 	cacheKey := fmt.Sprintf("actividad:%s", actividadID)
 	cache.Delete(cacheKey)
 
 	log.Infof("Successfully indexed actividad %s in Solr", actividadID)
-	
+
 	// 5. Sync to MySQL (for inscripciones)
 	// Note: This synchronization is needed because inscripciones are stored in MySQL
 	// and require actividad/horario records to exist there for foreign key constraints
@@ -163,20 +154,11 @@ func handleCreateOrUpdate(actividadID string) {
 
 func handleDelete(actividadID string) {
 	// 1. Delete from Solr
-	deleteResp, err := search.SolrClient.Delete(solr.M{"id": actividadID}, nil)
+	err := search.SolrClient.Delete(actividadID)
 	if err != nil {
 		log.Errorf("Failed to delete actividad %s from Solr: %v", actividadID, err)
 		return
 	}
-	log.Debugf("Delete response: %v", deleteResp)
-
-	// 2. Commit to Solr
-	commitResp, err := search.SolrClient.Commit()
-	if err != nil {
-		log.Errorf("Failed to commit to Solr: %v", err)
-		return
-	}
-	log.Debugf("Commit response: %v", commitResp)
 
 	// 3. Invalidate cache
 	cacheKey := fmt.Sprintf("actividad:%s", actividadID)

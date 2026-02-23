@@ -56,7 +56,7 @@
 //         <button type="submit">Ingresar</button>
 //         {error && <div className="error">{error}</div>}
 //       </form>
- 
+
 //     </div>
 //   );
 // };
@@ -78,10 +78,10 @@
 
 // //   return (
 // //     <div className="login">
-      
+
 // //       <h2 className="titulo">GOOD GYM</h2>
 // //       <p>Bienvenido. Ingrese su usuario para acceder : </p>
-      
+
 
 // //       <hr/>
 // //       <p/>
@@ -295,7 +295,7 @@ function Login() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-primary/10 flex items-center justify-center p-4">
       <div className="w-full max-w-6xl grid md:grid-cols-2 gap-8 items-center">
-        
+
         {/* Panel izquierdo: branding */}
         <div className="hidden md:block space-y-8">
           <div className="flex items-center gap-3">
@@ -318,7 +318,7 @@ function Login() {
               Transform Your<br />Fitness Journey
             </h2>
             <p className="text-lg text-muted-foreground max-w-md">
-              Iniciá sesión para explorar actividades, gestionar tus inscripciones 
+              Iniciá sesión para explorar actividades, gestionar tus inscripciones
               y alcanzar tus objetivos fitness.
             </p>
           </div>
@@ -341,8 +341,8 @@ function Login() {
           <div className="pt-8">
             <p className="text-sm text-muted-foreground">
               ¿Todavía no tenés cuenta?{" "}
-              <Button 
-                variant="link" 
+              <Button
+                variant="link"
                 className="p-0 h-auto font-semibold"
                 onClick={irARegistro}
               >
@@ -354,57 +354,59 @@ function Login() {
         </div>
 
         {/* Panel derecho: formulario */}
-        <Card className="w-full shadow-lg">
+        <Card className="w-full shadow-[0_0_50px_-12px_hsl(var(--primary)/0.15)] border-primary/20 bg-card/60 backdrop-blur-xl transition-all duration-300 hover:shadow-[0_0_50px_-12px_hsl(var(--primary)/0.25)] hover:border-primary/40">
           <CardHeader>
-            <CardTitle className="font-mono text-2xl uppercase tracking-tight">
+            <CardTitle className="font-mono text-3xl uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white to-white/60">
               Iniciar sesión
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-muted-foreground/80">
               Ingresá tus credenciales para continuar
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="usuario">Usuario</Label>
+              <div className="space-y-2 group">
+                <Label htmlFor="usuario" className="text-muted-foreground transition-colors group-focus-within:text-primary">Usuario</Label>
                 <Input
                   id="usuario"
                   type="text"
                   placeholder="Tu nombre de usuario"
                   value={usuario}
                   onChange={(e) => setUsuario(e.target.value)}
-                  className="h-11"
+                  className="h-12 bg-background/50 border-input focus:border-primary/50 transition-colors"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="contrasenia">Contraseña</Label>
+              <div className="space-y-2 group">
+                <Label htmlFor="contrasenia" className="text-muted-foreground transition-colors group-focus-within:text-primary">Contraseña</Label>
                 <Input
                   id="contrasenia"
                   type="password"
                   placeholder="••••••••"
                   value={contrasenia}
                   onChange={(e) => setContrasenia(e.target.value)}
-                  className="h-11"
+                  className="h-12 bg-background/50 border-input focus:border-primary/50 transition-colors"
                 />
               </div>
 
               {error && (
-                <div className="text-sm text-destructive bg-destructive/10 border border-destructive/30 rounded-md p-3">
+                <div className="text-sm font-medium text-destructive bg-destructive/10 border border-destructive/30 rounded-md p-3 flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-destructive animate-pulse" />
                   {error}
                 </div>
               )}
 
-              <Button type="submit" className="w-full h-11 font-semibold" size="lg">
-                Ingresar
+              <Button type="submit" className="w-full h-12 font-bold text-lg uppercase tracking-wider relative overflow-hidden group shadow-[0_0_20px_-5px_hsl(var(--primary)/0.4)] hover:shadow-[0_0_30px_-5px_hsl(var(--primary)/0.6)] transition-all duration-300">
+                <span className="relative z-10">Ingresar</span>
+                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
               </Button>
 
-              <div className="md:hidden text-center pt-4">
+              <div className="md:hidden text-center pt-4 border-t border-border/50">
                 <p className="text-sm text-muted-foreground">
                   ¿No tienes cuenta?{" "}
-                  <Button 
-                    variant="link" 
-                    className="p-0 h-auto"
+                  <Button
+                    variant="link"
+                    className="p-0 h-auto text-primary hover:text-primary/80 transition-colors"
                     onClick={irARegistro}
                     type="button"
                   >

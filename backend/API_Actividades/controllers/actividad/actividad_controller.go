@@ -1,6 +1,7 @@
 package actividadController
 
 import (
+	"api_actividades/cache"
 	"api_actividades/dto"
 	service "api_actividades/services"
 
@@ -12,7 +13,7 @@ import (
 
 func GetActividadById(c *gin.Context) {
 	log.Debug("Actividad id to load: " + c.Param("id"))
-	id:= c.Param("id")
+	id := c.Param("id")
 
 	var actividadDto dto.ActividadDto
 
@@ -24,7 +25,6 @@ func GetActividadById(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, actividadDto)
 }
-
 
 /*
 func GetActividadesByNombre(c *gin.Context) {
@@ -73,7 +73,7 @@ func InsertActividad(c *gin.Context) {
 
 func DeleteActividad(c *gin.Context) {
 	log.Debug("Actividad id to delete: " + c.Param("id"))
-	id:= c.Param("id")
+	id := c.Param("id")
 
 	err := service.DeleteActividad(id)
 	if err != nil {
@@ -83,7 +83,6 @@ func DeleteActividad(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"mensaje": "Actividad eliminada correctamente"})
 }
-
 
 func UpdateActividad(c *gin.Context) {
 	log.Debug("Actividad id to update: " + c.Param("id"))
@@ -129,7 +128,7 @@ func CalcularDisponibilidad(c *gin.Context) {
 	c.JSON(http.StatusOK, resultado)
 }
 
-func BorrarCupo (c *gin.Context) {
+func BorrarCupo(c *gin.Context) {
 	log.Debug("Borrando cupo para actividad: " + c.Param("id"))
 	id := c.Param("id")
 
@@ -140,4 +139,23 @@ func BorrarCupo (c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Cupo borrado correctamente"})
+}
+
+// HealthCheck simple para validación de servicios
+func HealthCheck(c *gin.Context) {
+	stats := cache.GetStats()
+	status := "healthy"
+	if stats["memcached_enabled"] == true && stats["memcached_status"] != "connected" {
+		status = "degraded"
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": status,
+		"cache":  stats,
+	})
+}
+
+// GetCacheStats devuelve estadísticas detalladas de la caché
+func GetCacheStats(c *gin.Context) {
+	c.JSON(http.StatusOK, cache.GetStats())
 }

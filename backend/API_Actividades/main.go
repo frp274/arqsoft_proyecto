@@ -10,6 +10,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"api_actividades/app"
+	"api_actividades/cache"
 	db "api_actividades/db" // Importar como 'db' para facilitar el uso
 )
 
@@ -32,13 +33,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("FATAL: Failed to connect to MongoDB: %v", err)
 	}
-	// Inicializar la cache local
-	repository.NewCache(repository.CacheConfig{
-		MaxSize:      100000,
-		ItemsToPrune: 100,
-		Duration:     30 * time.Minute,
-	})
-	log.Info("INFO: Successfully connected to Local Cache.")
+	// Inicializar la doble capa de caché (L1 + L2)
+	cache.InitCache()
 
 	// --- 3. INICIALIZAR RABBITMQ PRODUCER ---
 	rabbitURL := os.Getenv("RABBITMQ_URL")

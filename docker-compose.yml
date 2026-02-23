@@ -98,6 +98,8 @@ services:
       - RABBITMQ_QUEUE=actividades_events
       - RABBITMQ_EXCHANGE=actividades_exchange
       - USUARIOS_API_URL=http://api_usuarios:8082
+      - MEMCACHED_HOST=memcached
+      - MEMCACHED_PORT=11211
     depends_on:
       mongodb_actividades:
         condition: service_healthy

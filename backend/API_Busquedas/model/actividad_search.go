@@ -2,14 +2,15 @@ package model
 
 // ActividadSolr representa una actividad indexada en Solr
 type ActividadSolr struct {
-	ID          string   `json:"id"`
-	Nombre      string   `json:"nombre"`
-	Descripcion string   `json:"descripcion,omitempty"`
-	Profesor    string   `json:"profesor"`
-	Tags        []string `json:"tags,omitempty"`
-	Horarios    string   `json:"horarios"` // JSON string de los horarios
-	CreatedAt   string   `json:"created_at,omitempty"`
-	UpdatedAt   string   `json:"updated_at,omitempty"`
+	ID          string                   `json:"id"`
+	Nombre      string                   `json:"nombre"`
+	Descripcion string                   `json:"descripcion,omitempty"`
+	Profesor    string                   `json:"profesor"`
+	ImagenURL   string                   `json:"imagen_url,omitempty"`
+	Tags        []string                 `json:"tags,omitempty"`
+	Horarios    []map[string]interface{} `json:"horarios"` // Se envían como array para el cliente React
+	CreatedAt   string                   `json:"created_at,omitempty"`
+	UpdatedAt   string                   `json:"updated_at,omitempty"`
 }
 
 // ActividadSearchResult representa el resultado de una búsqueda

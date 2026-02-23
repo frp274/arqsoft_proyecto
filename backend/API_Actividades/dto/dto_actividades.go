@@ -6,6 +6,7 @@ type ActividadDto struct {
 	Descripcion string       `json:"descripcion"`
 	Profesor    string       `json:"profesor"`
 	OwnerId     int          `json:"owner_id" binding:"required"`
+	ImagenURL   string       `json:"imagen_url,omitempty"`
 	Horario     []HorarioDto `json:"horarios"`
 }
 
@@ -20,18 +21,18 @@ type HorarioDto struct {
 
 // DisponibilidadResult representa el resultado del cálculo de disponibilidad
 type DisponibilidadResult struct {
-	Dia                string `json:"dia"`
-	Cupo               int    `json:"cupo"`
-	Disponibles        int    `json:"disponibles"`
-	PorcentajeOcupado  float64 `json:"porcentaje_ocupado"`
+	Dia               string  `json:"dia"`
+	Cupo              int     `json:"cupo"`
+	Disponibles       int     `json:"disponibles"`
+	PorcentajeOcupado float64 `json:"porcentaje_ocupado"`
 }
 
 // DisponibilidadResponse es la respuesta del endpoint de disponibilidad
 type DisponibilidadResponse struct {
-	ActividadId string                 `json:"actividad_id"`
-	Nombre      string                 `json:"nombre"`
-	Horarios    []DisponibilidadResult `json:"horarios"`
-	TotalCupo   int                    `json:"total_cupo"`
-	TotalOcupado int                   `json:"total_ocupado"`
-	Tiempo      string                 `json:"tiempo_calculo"`
+	ActividadId  string                 `json:"actividad_id"`
+	Nombre       string                 `json:"nombre"`
+	Horarios     []DisponibilidadResult `json:"horarios"`
+	TotalCupo    int                    `json:"total_cupo"`
+	TotalOcupado int                    `json:"total_ocupado"`
+	Tiempo       string                 `json:"tiempo_calculo"`
 }

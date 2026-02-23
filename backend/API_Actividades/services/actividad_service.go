@@ -1,6 +1,7 @@
 package services
 
 import (
+	"api_actividades/cache"
 	"api_actividades/clients/usuarios"
 	"api_actividades/dto"
 	"api_actividades/queue"
@@ -75,17 +76,15 @@ func ValidarActividadConcurrently(a dto.ActividadDto) error {
 	return nil
 }
 
-
-
 func GetActividadById(id string) (dto.ActividadDto, e.ApiError) {
-	var actividadDto dto.ActividadDto
-	//Aplicar Busqueda en la cache =====================================================================================================================================
-	actividad, er := actividadRepositories.GetActividadByIdCache(id)
-	if er != nil {
-		log.Errorf("Error retrieving actividad from cache: %v", er)
-	}
-	if actividad.Id.IsZero() {
+	var actividad model.Actividad
 
+	// 1. Intentar obtener de la DOBLE CAPA DE CACHÉ (L1 + L2)
+	cacheKey := fmt.Sprintf("actividad:%s", id)
+	if found := cache.GetJSON(cacheKey, &actividad); found {
+		log.Infof("Actividad %s encontrada en caché", id)
+	} else {
+		// 2. Si no está en caché, buscar en MongoDB
 		objectID, err := primitive.ObjectIDFromHex(id)
 		if err != nil {
 			log.Errorf("Error converting id to mongo ID: %v", err)
@@ -93,29 +92,28 @@ func GetActividadById(id string) (dto.ActividadDto, e.ApiError) {
 		}
 
 		actividad, err = actividadRepositories.GetActividadById(objectID)
-
-		// 1. Validar si hubo un error general en la DB
 		if err != nil {
-			// 2. Validar si el error fue específicamente 'documento no encontrado'
 			log.Errorf("Error retrieving actividad: %v", err)
 			if errors.Is(err, mongo.ErrNoDocuments) {
-				// Documento no encontrado
-				return actividadDto, e.NewNotFoundApiError("actividad not found")
+				return dto.ActividadDto{}, e.NewNotFoundApiError("actividad not found")
 			}
-			// Otro error de la DB
-			return actividadDto, e.NewInternalServerApiError("Error retrieving actividad", err)
+			return dto.ActividadDto{}, e.NewInternalServerApiError("Error retrieving actividad", err)
 		}
-		// Insertar en la cache local
-		actividadCache := actividadRepositories.InsertActividadCache(actividad)
-		log.Infof("Actividad insertada en la cache local: %v", actividadCache)
+
+		// 3. Guardar en la doble capa de caché (L1 + L2) para futuras consultas
+		if err := cache.SetJSON(cacheKey, actividad); err != nil {
+			log.Warnf("Error guardando actividad en caché: %v", err)
+		}
 	}
 
-	actividadDto.Id = id //objectID.Hex()
+	var actividadDto dto.ActividadDto
+	actividadDto.Id = id
 	log.Debugf("Nombre de la actividad: %v", actividad.Nombre)
 	actividadDto.Nombre = actividad.Nombre
 	actividadDto.Descripcion = actividad.Descripcion
 	actividadDto.Profesor = actividad.Profesor
 	actividadDto.OwnerId = actividad.OwnerId
+	actividadDto.ImagenURL = actividad.ImagenURL
 	//actividadDto.Cupo = actividad.Cupo
 	//if actividad.tags != nil {
 	//	actividadDto.Tags = actividad.tags
@@ -246,6 +244,7 @@ func InsertActividad(actividadDto dto.ActividadDto, token string) (dto.Actividad
 	actividad.Descripcion = actividadDto.Descripcion
 	actividad.Profesor = actividadDto.Profesor
 	actividad.OwnerId = actividadDto.OwnerId
+	actividad.ImagenURL = actividadDto.ImagenURL
 
 	for _, horarioDto := range actividadDto.Horario {
 		horario := model.Horario{
@@ -263,13 +262,11 @@ func InsertActividad(actividadDto dto.ActividadDto, token string) (dto.Actividad
 		return dto.ActividadDto{}, e.NewInternalServerApiError("Error al insertar actividad", err)
 	}
 
-	//Luego de insertar y que haya salido todo bien, falta insertarla en localcache e indexarla en soler (para busquedas)================================================================
-	actividadCache := actividadRepositories.InsertActividadCache(actividadInsertada)
-	// Preguntar al profe si conviene en vez de retornar,			==================================================================================================
-	// simplemente cuando devuelva el error en la funcion general, 	==================================================================================================
-	// mostrar el error que hubo									==================================================================================================
+	// Publicar en caché
+	cacheKey := fmt.Sprintf("actividad:%s", actividadDto.Id)
+	cache.SetJSON(cacheKey, actividadInsertada)
 
-	log.Infof("Actividad insertada en la cache local: %v", actividadCache)
+	log.Infof("Actividad %s indexada en caché L1+L2", actividadDto.Id)
 
 	actividadDto.Id = actividadInsertada.Id.Hex()
 
@@ -294,11 +291,9 @@ func DeleteActividad(id string) e.ApiError {
 	if err != nil {
 		return e.NewInternalServerApiError("No se pudo eliminar la actividad", err)
 	}
-	//Eliminar de la cache local
-	er := actividadRepositories.DeleteActividadCache(id)
-	if er != nil {
-		return e.NewInternalServerApiError("No se pudo eliminar la actividad de la cache local", er)
-	}
+	// Invalida caché L1+L2
+	cacheKey := fmt.Sprintf("actividad:%s", id)
+	cache.Delete(cacheKey)
 
 	// Publicar evento DELETE en RabbitMQ
 	if err := queue.PublishEvent(queue.EventDelete, id); err != nil {
@@ -344,6 +339,9 @@ func UpdateActividad(actividadDto dto.ActividadDto, token string) (dto.Actividad
 	if actividadDto.Profesor != "" {
 		actividadActual.Profesor = actividadDto.Profesor
 	}
+	if actividadDto.ImagenURL != "" {
+		actividadActual.ImagenURL = actividadDto.ImagenURL
+	}
 	if actividadDto.Horario != nil {
 		nuevosHorarios := make([]model.Horario, 0, len(actividadDto.Horario))
 		for _, horarioDto := range actividadDto.Horario {
@@ -364,10 +362,11 @@ func UpdateActividad(actividadDto dto.ActividadDto, token string) (dto.Actividad
 		return dto.ActividadDto{}, e.NewInternalServerApiError("Error al actualizar la actividad", err)
 	}
 
-	//Actualizar en la cache local
-	actividadCache := actividadRepositories.InsertActividadCache(actividadActual)
+	// Actualiza caché L1+L2
+	cacheKey := fmt.Sprintf("actividad:%s", actividadActual.Id.Hex())
+	cache.SetJSON(cacheKey, actividadActual)
 
-	log.Infof("Actividad actualizada en la cache local: %v", actividadCache)
+	log.Infof("Actividad %s actualizada en caché L1+L2", cacheKey)
 
 	// 6. Armar respuesta DTO
 	var actividadActualizada dto.ActividadDto
@@ -376,6 +375,7 @@ func UpdateActividad(actividadDto dto.ActividadDto, token string) (dto.Actividad
 	actividadActualizada.Descripcion = actividadActual.Descripcion
 	actividadActualizada.Profesor = actividadActual.Profesor
 	actividadActualizada.OwnerId = actividadActual.OwnerId
+	actividadActualizada.ImagenURL = actividadActual.ImagenURL
 
 	for _, h := range actividadActual.Horarios {
 		actividadActualizada.Horario = append(actividadActualizada.Horario, dto.HorarioDto{
@@ -399,7 +399,7 @@ func UpdateActividad(actividadDto dto.ActividadDto, token string) (dto.Actividad
 // Utiliza GoRoutines, Channels y WaitGroups según enunciado
 func CalcularDisponibilidad(id string) (dto.DisponibilidadResponse, e.ApiError) {
 	startTime := time.Now()
-	
+
 	// 1. Obtener la actividad
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -423,7 +423,7 @@ func CalcularDisponibilidad(id string) (dto.DisponibilidadResponse, e.ApiError) 
 
 	// Channel para recibir resultados de las GoRoutines
 	resultsChan := make(chan dto.DisponibilidadResult, numHorarios)
-	
+
 	// WaitGroup para sincronizar las GoRoutines
 	var wg sync.WaitGroup
 
@@ -493,13 +493,12 @@ func calcularDisponibilidadHorario(index int, horario model.Horario, resultsChan
 		PorcentajeOcupado: porcentajeOcupado,
 	}
 
-	log.Debugf("GoRoutine %d: Completado - %s: %d/%d disponibles (%.1f%% ocupado)", 
+	log.Debugf("GoRoutine %d: Completado - %s: %d/%d disponibles (%.1f%% ocupado)",
 		index, horario.Dia, disponibles, horario.Cupo, porcentajeOcupado)
 
 	// Enviar resultado por el channel
 	resultsChan <- result
 }
-
 
 func BorrarCupo(id string) e.ApiError {
 	objectID, err := primitive.ObjectIDFromHex(id)
@@ -515,11 +514,9 @@ func BorrarCupo(id string) e.ApiError {
 		}
 		return e.NewInternalServerApiError("Error retrieving actividad", err)
 	}
-	// Borrar en cache local
-	er := actividadRepositories.DeleteActividadCache(id)
-	if er != nil {
-		return e.NewInternalServerApiError("No se pudo eliminar la actividad de la cache local", er)
-	}
+	// Invalida caché
+	cacheKey := fmt.Sprintf("actividad:%s", id)
+	cache.Delete(cacheKey)
 
 	return nil
 }

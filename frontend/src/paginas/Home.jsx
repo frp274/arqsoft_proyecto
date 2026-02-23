@@ -34,7 +34,7 @@ function Home() {
               GOOD GYM
             </h1>
           </div>
-          <Button 
+          <Button
             onClick={() => navigate("/MisInscripciones")}
             variant="outline"
             className="gap-2"
@@ -46,26 +46,36 @@ function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative h-[60vh] overflow-hidden bg-gradient-to-br from-primary/10 via-background to-secondary/10">
-        <div className="absolute inset-0 bg-grid-white/5" />
+      <section className="relative h-[60vh] overflow-hidden bg-gradient-to-br from-background via-card to-background border-b border-border">
+        <div className="absolute inset-0 bg-grid-white/5 bg-[size:30px_30px] opacity-20" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
+
         <div className="relative container h-full flex flex-col justify-center px-4 md:px-6">
           <div className="max-w-3xl">
-            <h1 className="font-mono text-4xl md:text-6xl lg:text-7xl font-bold uppercase tracking-tighter text-balance mb-6">
+            <div className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-sm font-medium text-primary mb-6">
+              <span className="flex h-2 w-2 rounded-full bg-primary mr-2 animate-pulse"></span>
+              Descubre tu potencial
+            </div>
+            <h1 className="font-mono text-4xl md:text-6xl lg:text-7xl font-bold uppercase tracking-tighter text-balance mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white to-white/60">
               Transform Your<br />Fitness Journey
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl">
-              Descubre las mejores actividades fitness adaptadas a tu nivel y objetivos
+              Descubre las mejores actividades fitness adaptadas a tu nivel y objetivos.
+              Entrena con los mejores profesionales.
             </p>
-            <div className="flex flex-wrap gap-3">
-              <Button 
-                size="lg" 
+            <div className="flex flex-wrap gap-4">
+              <Button
+                size="lg"
+                className="h-12 px-8 font-bold tracking-wide relative overflow-hidden group shadow-[0_0_20px_-5px_hsl(var(--primary)/0.4)] hover:shadow-[0_0_30px_-5px_hsl(var(--primary)/0.6)] transition-all duration-300"
                 onClick={() => document.getElementById('search-section')?.scrollIntoView({ behavior: 'smooth' })}
               >
-                Explorar Actividades
+                <span className="relative z-10">Explorar Actividades</span>
+                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
               </Button>
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 variant="outline"
+                className="h-12 px-8 font-semibold border-border hover:bg-secondary transition-colors"
                 onClick={() => navigate("/MisInscripciones")}
               >
                 Ver Mi Agenda
@@ -85,7 +95,7 @@ function Home() {
             <div className="flex gap-2 mb-12">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input 
+                <Input
                   placeholder="Buscar por nombre, instructor o tipo de actividad..."
                   className="pl-10 h-12 bg-card"
                   value={busqueda}
@@ -99,9 +109,9 @@ function Home() {
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {categorias.map((categoria) => (
-                <Button 
+                <Button
                   key={categoria}
-                  variant="outline" 
+                  variant="outline"
                   className="h-14 text-sm font-medium hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all"
                   onClick={() => {
                     setBusqueda(categoria);

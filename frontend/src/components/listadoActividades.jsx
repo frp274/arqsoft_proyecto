@@ -14,7 +14,7 @@ function ListadoActividades({ filtro, refrescar, esAdmin }) {
 
   const fetchActividades = async () => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_BUSQUEDAS_URL}/search/actividades?nombre=${filtro || ''}`);
+      const res = await fetch(`${process.env.REACT_APP_API_BUSQUEDAS_URL}/search/actividades?q=${filtro || ''}`);
       if (!res.ok) throw new Error("Error en la respuesta del servidor");
       const data = await res.json();
       setActividades(data.actividades || []);
@@ -122,13 +122,14 @@ function ListadoActividades({ filtro, refrescar, esAdmin }) {
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {actividades && actividades.map((act) => (
-            <Card 
-              key={act.id} 
-              className="group hover:shadow-lg transition-all cursor-pointer border-border overflow-hidden"
+            <Card
+              key={act.id}
+              className="group relative overflow-hidden transition-all duration-300 cursor-pointer border-border bg-card/60 backdrop-blur-sm hover:border-primary/50 hover:shadow-[0_0_30px_-5px_hsl(var(--primary)/0.2)] hover:-translate-y-1"
               onClick={() => !editando && navigate(`/Detalle/${act.id}`)}
             >
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
               {editando === act.id ? (
-                <div onClick={(e) => e.stopPropagation()}>
+                <div onClick={(e) => e.stopPropagation()} className="relative z-10">
                   <CardHeader>
                     <Input
                       value={formData.nombre}
@@ -149,7 +150,7 @@ function ListadoActividades({ filtro, refrescar, esAdmin }) {
                       onChange={(e) => setFormData({ ...formData, profesor: e.target.value })}
                       placeholder="Profesor"
                     />
-                    
+
                     <div className="space-y-2">
                       <h4 className="font-semibold text-sm">Horarios:</h4>
                       {formData.horarios.map((h, i) => (
@@ -198,7 +199,7 @@ function ListadoActividades({ filtro, refrescar, esAdmin }) {
                     </div>
                   </CardContent>
                   <CardFooter className="flex gap-2">
-                    <Button 
+                    <Button
                       size="sm"
                       onClick={(e) => { e.stopPropagation(); handleActualizar(act.id); }}
                       className="flex-1"
@@ -206,7 +207,7 @@ function ListadoActividades({ filtro, refrescar, esAdmin }) {
                       <Save className="h-4 w-4 mr-2" />
                       Guardar
                     </Button>
-                    <Button 
+                    <Button
                       size="sm"
                       variant="outline"
                       onClick={(e) => { e.stopPropagation(); handleCancelar(); }}
@@ -237,7 +238,7 @@ function ListadoActividades({ filtro, refrescar, esAdmin }) {
                     <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
                       {act.descripcion}
                     </p>
-                    
+
                     {act.horarios && act.horarios.length > 0 && (
                       <div className="space-y-2">
                         <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
@@ -267,7 +268,7 @@ function ListadoActividades({ filtro, refrescar, esAdmin }) {
                       </div>
                     )}
                   </CardContent>
-                  
+
                   {esAdmin && (
                     <CardFooter className="flex gap-2 bg-secondary/30" onClick={(e) => e.stopPropagation()}>
                       <Button

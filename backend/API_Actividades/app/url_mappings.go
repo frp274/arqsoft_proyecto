@@ -16,11 +16,15 @@ func mapUrls() {
 	// Endpoint de acción con procesamiento concurrente
 	router.POST("/actividad/:id/calcular-disponibilidad", actividadController.CalcularDisponibilidad)
 	router.POST("/actividad/:id/borar-cupo", actividadController.BorrarCupo)
+
+	// Endpoints de Monitoreo y Salud
+	router.GET("/health", actividadController.HealthCheck)
+	router.GET("/stats", actividadController.GetCacheStats)
 	// Endpoints futuros (comentados)
 	//router.GET("/actividad", actividadController.GetActividadesByNombre)
 	//router.POST("/inscripcion", inscripcionController.InscripcionActividad)
 	//router.GET("/inscripcion/:id", inscripcionController.GetInscripcionesByUsuarioId)
 	//router.POST("/login", usuarioController.Login)
-	
+
 	log.Info("Finishing mappings configurations")
 }
