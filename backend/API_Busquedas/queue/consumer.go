@@ -142,6 +142,7 @@ func handleCreateOrUpdate(actividadID string) {
 	// 4. Invalidate cache
 	cacheKey := fmt.Sprintf("actividad:%s", actividadID)
 	cache.Delete(cacheKey)
+	cache.ClearSearchCache()
 
 	log.Infof("Successfully indexed actividad %s in Solr", actividadID)
 
@@ -163,6 +164,7 @@ func handleDelete(actividadID string) {
 	// 3. Invalidate cache
 	cacheKey := fmt.Sprintf("actividad:%s", actividadID)
 	cache.Delete(cacheKey)
+	cache.ClearSearchCache()
 
 	log.Infof("Successfully deleted actividad %s from Solr", actividadID)
 }

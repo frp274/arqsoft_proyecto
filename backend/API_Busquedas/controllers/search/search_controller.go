@@ -20,7 +20,7 @@ func SearchActividades(c *gin.Context) {
 
 	// Set defaults
 	params.Page = 1
-	params.PageSize = 10
+	params.PageSize = 1000
 
 	if err := c.ShouldBindQuery(&params); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -31,8 +31,8 @@ func SearchActividades(c *gin.Context) {
 	if params.Page < 1 {
 		params.Page = 1
 	}
-	if params.PageSize < 1 || params.PageSize > 100 {
-		params.PageSize = 10
+	if params.PageSize < 1 || params.PageSize > 1000 {
+		params.PageSize = 1000
 	}
 	if params.Query == "" {
 		params.Query = "*:*" // Match all
@@ -41,11 +41,10 @@ func SearchActividades(c *gin.Context) {
 		params.Order = "asc"
 	}
 
-	// Apply fuzzy search if query is not matching all and doesn't already have modifiers
+	// Apply combination of wildcard (partial match) and fuzzy (typo tolerance) search
 	processedQuery := params.Query
-	if processedQuery != "*:*" && len(processedQuery) > 3 {
-		// simple approach: add ~1 for words longer than 3 chars to allow 1 typo
-		processedQuery = fmt.Sprintf("%s~1", processedQuery)
+	if processedQuery != "*:*" && processedQuery != "" {
+		processedQuery = fmt.Sprintf("(*%s* OR %s~1)", processedQuery, processedQuery)
 	}
 
 	// Generate cache key

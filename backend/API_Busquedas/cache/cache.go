@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -108,6 +109,27 @@ func Delete(key string) {
 	if memcachedEnabled {
 		if err := memcachedClient.Delete(key); err != nil && err != memcache.ErrCacheMiss {
 			log.Warnf("Failed to delete from Memcached: %v", err)
+		}
+	}
+}
+
+// ClearSearchCache invalidates all search query caches
+func ClearSearchCache() {
+	// For LocalCache
+	localCache.mu.Lock()
+	for k := range localCache.items {
+		if strings.HasPrefix(k, "search:") {
+			delete(localCache.items, k)
+		}
+	}
+	localCache.mu.Unlock()
+
+	// For Memcached - flush all is the easiest way to clear patterns since memcached doesn't support wildcards natively
+	if memcachedEnabled {
+		if err := memcachedClient.FlushAll(); err != nil {
+			log.Warnf("Failed to flush Memcached: %v", err)
+		} else {
+			log.Infof("Memcached flushed successfully")
 		}
 	}
 }

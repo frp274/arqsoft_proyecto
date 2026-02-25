@@ -6,21 +6,23 @@ import (
 	"api_usuarios/dto"
 	"api_usuarios/model"
 	"api_usuarios/utils/errors"
-	
 
 	log "github.com/sirupsen/logrus"
 )
 
 // CreateInscripcion crea una nueva inscripción
 func CreateInscripcion(inscripcionDto dto.InscripcionDto) (dto.InscripcionDto, errors.ApiError) {
-	log.Infof("Creando inscripción - Usuario: %d, Actividad: %d", inscripcionDto.UsuarioId, inscripcionDto.ActividadId)
+	log.Infof("Creando inscripción - Usuario: %d, Actividad: %s, Horario: %s", inscripcionDto.UsuarioId, inscripcionDto.ActividadId, inscripcionDto.HorarioId)
 
 	// Validar datos
 	if inscripcionDto.UsuarioId == 0 {
 		return dto.InscripcionDto{}, errors.NewBadRequestApiError("ID de usuario inválido")
 	}
-	if inscripcionDto.ActividadId == 0 {
+	if inscripcionDto.ActividadId == "" {
 		return dto.InscripcionDto{}, errors.NewBadRequestApiError("ID de actividad inválido")
+	}
+	if inscripcionDto.HorarioId == "" {
+		return dto.InscripcionDto{}, errors.NewBadRequestApiError("ID de horario inválido")
 	}
 
 	// Validar existencia de actividad
@@ -28,13 +30,14 @@ func CreateInscripcion(inscripcionDto dto.InscripcionDto) (dto.InscripcionDto, e
 	if err != nil {
 		return dto.InscripcionDto{}, errors.NewBadRequestApiError("Actividad no encontrada en la base de datos")
 	}
-	if actividad.Id == 0 {
+	if actividad.Id == "" {
 		return dto.InscripcionDto{}, errors.NewBadRequestApiError("Actividad no encontrada")
 	}
 	// Convertir DTO a Model
 	inscripcion := model.Inscripcion{
 		UsuarioId:   inscripcionDto.UsuarioId,
 		ActividadId: inscripcionDto.ActividadId,
+		HorarioId:   inscripcionDto.HorarioId,
 	}
 
 	// Crear inscripción en BD
@@ -71,6 +74,7 @@ func GetInscripcionesByUsuarioId(usuarioId int) (dto.InscripcionesDto, errors.Ap
 			Id:          inscripcion.Id,
 			UsuarioId:   inscripcion.UsuarioId,
 			ActividadId: inscripcion.ActividadId,
+			HorarioId:   inscripcion.HorarioId,
 		}
 		inscripcionesDto = append(inscripcionesDto, inscripcionDto)
 	}

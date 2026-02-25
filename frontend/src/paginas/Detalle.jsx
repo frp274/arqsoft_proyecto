@@ -74,14 +74,14 @@ function Detalle() {
       return;
     }
 
-    const actividadidint = parseInt(id, 10);
-    const horarioidint = parseInt(horarioId, 10);
+    const actividadIdStr = id.toString();
+    const horarioIdStr = horarioId.toString();
     const usuarioidint = parseInt(usuarioId, 10);
 
     axios.post(`${process.env.REACT_APP_API_USUARIOS_URL}/inscripcion`, {
       usuario_id: usuarioidint,
-      actividad_id: actividadidint,
-      horario_id: horarioidint
+      actividad_id: actividadIdStr,
+      horario_id: horarioIdStr
     }, {
       headers: {
         Authorization: `Bearer ${getCookie("token")}`,
@@ -205,7 +205,7 @@ function Detalle() {
                   const inicio = h.horarioInicio || h.horarioinicio || h.HorarioInicio;
                   const fin = h.horarioFinal || h.horariofinal || h.HorarioFinal;
                   const cupos = h.cupo || h.Cupo;
-                  const hId = h.id || h.Id;
+                  const hId = h.id || h.Id || `${dia}-${inicio}`;
                   const sinCupo = cupos <= 0;
 
                   return (

@@ -14,7 +14,7 @@ function ListadoActividades({ filtro, refrescar, esAdmin }) {
 
   const fetchActividades = async () => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_BUSQUEDAS_URL}/search/actividades?q=${filtro || ''}`);
+      const res = await fetch(`${process.env.REACT_APP_API_BUSQUEDAS_URL}/search/actividades?q=${filtro || ''}&size=1000`);
       if (!res.ok) throw new Error("Error en la respuesta del servidor");
       const data = await res.json();
       setActividades(data.actividades || []);

@@ -69,10 +69,12 @@ function HomeAdm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const userInfo = getUserInfoFromToken();
     const nuevaActividad = {
       nombre,
       descripcion,
       profesor,
+      owner_id: userInfo ? parseInt(userInfo.id, 10) : 0,
       horarios: horarios.map(h => ({
         dia: h.dia,
         horarioInicio: h.horarioInicio,
@@ -84,7 +86,10 @@ function HomeAdm() {
     try {
       const response = await fetch(`${process.env.REACT_APP_API_ACTIVIDADES_URL}/actividad`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getCookie("token")}`
+        },
         body: JSON.stringify(nuevaActividad)
       });
 

@@ -1,15 +1,25 @@
 import React from 'react';
 import './buscador.css';
 
-function Buscador({ setFiltro }) {
-  const manejarCambioActividad = (e) => setFiltro(e.target.value);
+function Buscador({ setFiltro, classNameOverride }) {
+  const [valor, setValor] = React.useState('');
+
+  const manejarCambioActividad = (e) => setValor(e.target.value);
+
+  const manejarTecla = (e) => {
+    if (e.key === 'Enter') {
+      setFiltro(valor);
+    }
+  };
 
   return (
     <div className='campos'>
-      <input 
-        className='placeholder'
-        type="text" 
-        onChange={manejarCambioActividad} 
+      <input
+        className={classNameOverride || 'placeholder'}
+        type="text"
+        value={valor}
+        onChange={manejarCambioActividad}
+        onKeyDown={manejarTecla}
         placeholder="-- Buscar actividad 🔎 --"
       />
     </div>
