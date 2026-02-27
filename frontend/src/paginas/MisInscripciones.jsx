@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, CalendarDays, Clock, User, Dumbbell } from 'lucide-react';
+import { ArrowLeft, CalendarDays, Clock, User, Dumbbell, CheckCircle } from 'lucide-react';
 import { Button } from "../components/ui/button";
 
 function getCookie(name) {
@@ -48,6 +48,8 @@ function MisInscripciones() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const usuarioInfo = getUserInfoFromToken();
+  const [mensaje, setMensaje] = useState("");
+  const [eliminando, setEliminando] = useState(null);
   const usuarioId = usuarioInfo?.id;
   const esAdmin = usuarioInfo?.es_admin;
 
@@ -118,6 +120,48 @@ function MisInscripciones() {
     else navigate("/Home");
   };
 
+  const handleEliminarInscripcion = async (inscripcionId, nombreActividad) => {
+    if (!window.confirm(`¿Estás seguro de que deseas cancelar tu inscripción a ${nombreActividad}?`)) {
+      return;
+    }
+
+    setEliminando(inscripcionId);
+    setError("");
+    setMensaje("");
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_USUARIOS_URL}/inscripcion/${inscripcionId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${getCookie("token")}`
+          }
+        }
+      );
+
+      if (response.ok) {
+        setMensaje(`Inscripción a ${nombreActividad} cancelada exitosamente`);
+        // Actualizar lista de inscripciones
+        setInscripciones(inscripciones.filter(insc => insc.id !== inscripcionId));
+
+        // Limpiar mensaje después de 5 segundos
+        setTimeout(() => setMensaje(""), 5000);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || "Error al cancelar la inscripción");
+
+        // Limpiar error después de 5 segundos
+        setTimeout(() => setError(""), 5000);
+      }
+    } catch (err) {
+      setError("Error de conexión al servidor");
+      setTimeout(() => setError(""), 5000);
+    } finally {
+      setEliminando(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -161,6 +205,13 @@ function MisInscripciones() {
           <div className="bg-destructive/10 border border-destructive/50 text-destructive px-4 py-3 rounded-lg mb-8 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-destructive animate-pulse"></span>
             {error}
+          </div>
+        )}
+
+        {mensaje && (
+          <div className="bg-primary/10 border border-primary/50 text-primary px-4 py-3 rounded-lg mb-8 flex items-center gap-2">
+            <CheckCircle className="w-5 h-5" />
+            {mensaje}
           </div>
         )}
 
@@ -227,13 +278,23 @@ function MisInscripciones() {
                       )}
                     </div>
 
-                    <Button
-                      variant="outline"
-                      className="w-full border-primary/20 hover:bg-primary hover:text-primary-foreground transition-colors group-hover:border-primary/50"
-                      onClick={() => handleVerDetalle(actID)}
-                    >
-                      Ver todos los detalles
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        className="flex-1 border-primary/20 hover:bg-primary hover:text-primary-foreground transition-colors group-hover:border-primary/50"
+                        onClick={() => handleVerDetalle(actID)}
+                      >
+                        Ver detalles
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        className="flex-1 opacity-90 hover:opacity-100 transition-opacity"
+                        onClick={() => handleEliminarInscripcion(inscripcion.id, nombre)}
+                        disabled={eliminando === inscripcion.id}
+                      >
+                        {eliminando === inscripcion.id ? "Cancelando..." : "Cancelar Reserva"}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               );
