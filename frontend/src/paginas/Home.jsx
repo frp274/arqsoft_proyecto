@@ -100,7 +100,7 @@ function Home() {
                   className="pl-10 h-12 bg-card"
                   value={busqueda}
                   onChange={(e) => setBusqueda(e.target.value)}
-                  onKeyPress={handleKeyPress}
+                  onKeyDown={handleKeyPress}
                 />
               </div>
               <Button size="lg" className="h-12" onClick={handleSearch}>

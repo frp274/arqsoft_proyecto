@@ -10,6 +10,8 @@ import (
 	"api_busquedas/model"
 	"api_busquedas/search"
 
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 )
@@ -42,8 +44,9 @@ func SearchActividades(c *gin.Context) {
 	}
 
 	// Apply combination of wildcard (partial match) and fuzzy (typo tolerance) search
-	processedQuery := params.Query
+	processedQuery := strings.TrimSpace(params.Query)
 	if processedQuery != "*:*" && processedQuery != "" {
+		processedQuery = strings.ToLower(processedQuery)
 		processedQuery = fmt.Sprintf("(*%s* OR %s~1)", processedQuery, processedQuery)
 	}
 
