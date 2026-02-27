@@ -13,10 +13,10 @@ import (
 
 // HorarioAPI es el formato que viene de API_Actividades
 type HorarioAPI struct {
-	Dia            string `json:"dia"`
-	HorarioInicio  string `json:"horarioInicio"`
-	HorarioFinal   string `json:"horarioFinal"`
-	Cupo           int    `json:"cupo"`
+	Dia           string `json:"dia"`
+	HorarioInicio string `json:"horarioInicio"`
+	HorarioFinal  string `json:"horarioFinal"`
+	Cupo          int    `json:"cupo"`
 }
 
 // ActividadAPI es el formato que viene de API_Actividades
@@ -25,6 +25,7 @@ type ActividadAPI struct {
 	Nombre      string       `json:"nombre"`
 	Descripcion string       `json:"descripcion"`
 	Profesor    string       `json:"profesor"`
+	ImagenURL   string       `json:"imagen_url"`
 	Tags        []string     `json:"tags"`
 	Horarios    []HorarioAPI `json:"horarios"`
 }
@@ -44,6 +45,7 @@ type Actividad struct {
 	Nombre      string    `json:"nombre"`
 	Descripcion string    `json:"descripcion"`
 	Profesor    string    `json:"profesor"`
+	ImagenURL   string    `json:"imagen_url"`
 	Tags        []string  `json:"tags"`
 	Horarios    []Horario `json:"horarios"`
 }
@@ -92,6 +94,7 @@ func GetActividadFromAPI(id string) (*Actividad, error) {
 		Nombre:      actividadAPI.Nombre,
 		Descripcion: actividadAPI.Descripcion,
 		Profesor:    actividadAPI.Profesor,
+		ImagenURL:   actividadAPI.ImagenURL,
 		Tags:        actividadAPI.Tags,
 		Horarios:    make([]Horario, len(actividadAPI.Horarios)),
 	}
