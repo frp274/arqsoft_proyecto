@@ -131,8 +131,14 @@ func CalcularDisponibilidad(c *gin.Context) {
 func BorrarCupo(c *gin.Context) {
 	log.Debug("Borrando cupo para actividad: " + c.Param("id"))
 	id := c.Param("id")
+	horarioId := c.Query("horario_id")
 
-	err := service.BorrarCupo(id)
+	if horarioId == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "horario_id is required"})
+		return
+	}
+
+	err := service.BorrarCupo(id, horarioId)
 	if err != nil {
 		c.JSON(err.Status(), err)
 		return

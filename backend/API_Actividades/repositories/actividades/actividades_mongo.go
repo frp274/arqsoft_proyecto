@@ -1,10 +1,12 @@
 package repository
 
 import (
+	model "api_actividades/model"
 	"context"
 	"fmt"
-	model "api_actividades/model"
+
 	log "github.com/sirupsen/logrus"
+
 	//"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -32,16 +34,16 @@ func GetActividadById(objectID primitive.ObjectID) (model.Actividad, error) {
 	}
 
 	log.Infof("Actividad encontrada en BD: %v", actividad)
-	
+
 	return actividad, nil
 }
+
 /*
 func GetActividadesByNombre(nombre string) (model.Actividades, error) {
 
 
 }
 */
-
 
 func InsertActividad(actividad model.Actividad) (model.Actividad, error) {
 	result := Db.Collection("actividades").FindOne(context.TODO(), bson.M{"nombre": actividad.Nombre})
@@ -59,7 +61,6 @@ func InsertActividad(actividad model.Actividad) (model.Actividad, error) {
 	return actividad, nil
 }
 
-
 func DeleteActividad(id primitive.ObjectID) error {
 	result, err := Db.Collection("actividades").DeleteOne(context.TODO(), bson.M{"_id": id})
 	if err != nil {
@@ -76,28 +77,32 @@ func DeleteActividad(id primitive.ObjectID) error {
 }
 
 func UpdateActividad(a model.Actividad) (model.Actividad, error) {
-    filter := bson.M{"_id": a.Id}
-    opts := options.Replace().SetUpsert(false)
+	filter := bson.M{"_id": a.Id}
+	opts := options.Replace().SetUpsert(false)
 
-    res, err := Db.Collection("actividades").ReplaceOne(context.TODO(), filter, a, opts)
-    if err != nil {
-        return model.Actividad{}, err
-    }
-    if res.MatchedCount == 0 {
-        return model.Actividad{}, fmt.Errorf("actividad not found")
-    }
-    return a, nil
+	res, err := Db.Collection("actividades").ReplaceOne(context.TODO(), filter, a, opts)
+	if err != nil {
+		return model.Actividad{}, err
+	}
+	if res.MatchedCount == 0 {
+		return model.Actividad{}, fmt.Errorf("actividad not found")
+	}
+	return a, nil
 }
 
-func BorrarCupo(id primitive.ObjectID) error {
-	filter := bson.M{"_id": id}
-	update := bson.M{"$inc": bson.M{"cupos": -1}}
+func BorrarCupo(id primitive.ObjectID, dia string, horaInicio string) error {
+	filter := bson.M{
+		"_id":                 id,
+		"horarios.dia":        dia,
+		"horarios.horaInicio": horaInicio,
+	}
+	update := bson.M{"$inc": bson.M{"horarios.$.cupo": -1}}
 	res, err := Db.Collection("actividades").UpdateOne(context.TODO(), filter, update)
 	if err != nil {
 		return err
 	}
 	if res.MatchedCount == 0 {
-		return fmt.Errorf("actividad not found")
+		return fmt.Errorf("actividad or horario not found")
 	}
 	return nil
 }

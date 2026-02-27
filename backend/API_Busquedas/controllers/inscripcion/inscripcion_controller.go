@@ -5,6 +5,7 @@ import (
 	service "api_busquedas/services"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -33,8 +34,21 @@ func InscripcionActividad(c *gin.Context) {
 }
 
 func GetInscripcionesByUsuarioId(c *gin.Context) {
-	log.Debug("Usuario id to load: " + c.Param("id"))
-	id, _ := strconv.Atoi(c.Param("id"))
+	idParam := c.Param("id")
+	log.Debug("Usuario id to load: " + idParam)
+
+	// Manejar formato defensivo (ej: "1:1" -> "1")
+	if strings.Contains(idParam, ":") {
+		idParam = strings.Split(idParam, ":")[0]
+		log.Warnf("ID de usuario con formato inválido detectado, usando: %s", idParam)
+	}
+
+	id, atoiErr := strconv.Atoi(idParam)
+	if atoiErr != nil {
+		log.Errorf("Error al convertir ID '%s': %v", idParam, atoiErr)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID de usuario inválido"})
+		return
+	}
 
 	actividadesDto, err := service.GetInscripcionesByUsuarioId(id)
 

@@ -26,7 +26,7 @@ func init() {
 	// Leer URL de API_Usuarios desde variable de entorno
 	usuariosAPIURL = os.Getenv("USUARIOS_API_URL")
 	if usuariosAPIURL == "" {
-		usuariosAPIURL = "http://localhost:8082" // Default para desarrollo
+		usuariosAPIURL = "http://api_usuarios:8082" // Default for Docker network
 	}
 
 	// Cliente HTTP con timeout

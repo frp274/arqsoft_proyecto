@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 function getCookie(name) {
   const nameEQ = `${name}=`;
   const ca = document.cookie.split(';');
-  
+
   for (let i = 0; i < ca.length; i++) {
     let c = ca[i].trim();
     if (c.indexOf(nameEQ) === 0) {
@@ -30,8 +30,12 @@ function getUserInfoFromToken() {
     const payload = JSON.parse(atob(parts[1]));
     console.log("Payload del token:", payload);
 
+    let id = payload.jti || null;
+    if (id && typeof id === 'string' && id.includes(':')) {
+      id = id.split(':')[0];
+    }
     return {
-      id: payload.jti || null,
+      id: id,
       es_admin: payload.es_admin || false  // o 'Es_admin' si tu backend lo envía así
     };
   } catch (e) {
@@ -61,7 +65,7 @@ function InscripcionesUsuario() {
             Authorization: `Bearer ${getCookie("token")}`
           }
         });
-        
+
         if (res.ok) {
           const data = await res.json();
           setInscripciones(Array.isArray(data) ? data : []);

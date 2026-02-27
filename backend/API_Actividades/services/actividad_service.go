@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"strings"
 	"sync"
 	"time"
 
@@ -500,19 +501,28 @@ func calcularDisponibilidadHorario(index int, horario model.Horario, resultsChan
 	resultsChan <- result
 }
 
-func BorrarCupo(id string) e.ApiError {
+func BorrarCupo(id string, horarioId string) e.ApiError {
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		log.Errorf("Error converting id to mongo ID: %v", err)
 		return e.NewBadRequestApiError("Invalid ID format")
 	}
 
-	err = actividadRepositories.BorrarCupo(objectID)
+	// horarioId format is expected to be "Dia-HoraInicio" (e.g., "Lunes-08:00")
+	parts := strings.Split(horarioId, "-")
+	if len(parts) < 2 {
+		log.Errorf("Invalid horarioId format: %s", horarioId)
+		return e.NewBadRequestApiError("Invalid horarioId format")
+	}
+	dia := parts[0]
+	horaInicio := parts[1]
+
+	err = actividadRepositories.BorrarCupo(objectID, dia, horaInicio)
 	if err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return e.NewNotFoundApiError("actividad not found")
+		if strings.Contains(err.Error(), "not found") {
+			return e.NewNotFoundApiError("actividad or horario not found")
 		}
-		return e.NewInternalServerApiError("Error retrieving actividad", err)
+		return e.NewInternalServerApiError("Error updating cupo", err)
 	}
 	// Invalida caché
 	cacheKey := fmt.Sprintf("actividad:%s", id)

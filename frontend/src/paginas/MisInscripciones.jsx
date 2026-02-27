@@ -29,8 +29,12 @@ function getUserInfoFromToken() {
 
   try {
     const payload = JSON.parse(atob(parts[1]));
+    let id = payload.jti || null;
+    if (id && typeof id === 'string' && id.includes(':')) {
+      id = id.split(':')[0];
+    }
     return {
-      id: payload.jti || null,
+      id: id,
       es_admin: payload.es_admin || false
     };
   } catch (e) {

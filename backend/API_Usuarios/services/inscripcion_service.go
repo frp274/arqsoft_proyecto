@@ -26,8 +26,9 @@ func CreateInscripcion(inscripcionDto dto.InscripcionDto) (dto.InscripcionDto, e
 	}
 
 	// Validar existencia de actividad
-	actividad, err := actividades.GetActividadById(inscripcionDto.ActividadId)
+	actividad, err := actividades.GetActividadById(inscripcionDto.ActividadId, inscripcionDto.HorarioId)
 	if err != nil {
+		log.Errorf("Error getting actividad %s: %v", inscripcionDto.ActividadId, err)
 		return dto.InscripcionDto{}, errors.NewBadRequestApiError("Actividad no encontrada en la base de datos")
 	}
 	if actividad.Id == "" {
@@ -41,9 +42,9 @@ func CreateInscripcion(inscripcionDto dto.InscripcionDto) (dto.InscripcionDto, e
 	}
 
 	// Crear inscripción en BD
-	inscripcion, err = inscripcionesClient.InsertInscripcion(inscripcion)
-	if err != nil {
-		return dto.InscripcionDto{}, errors.NewBadRequestApiError("No se pudo insertar la Inscripcion")
+	inscripcion, apiErr := inscripcionesClient.InsertInscripcion(inscripcion)
+	if apiErr != nil {
+		return dto.InscripcionDto{}, apiErr
 	}
 
 	// Convertir Model a DTO
