@@ -1,12 +1,13 @@
 package dto
 
 type InscripcionDto struct {
-	Id         		int   	`json:"id"`
-	UsuarioId     	int    	`json:"usuario_id"`
-	ActividadId 	int    	`json:"actividad_id"`
-	HorarioId 		int		`json:"horario_id"`
-	// UsuarioNombre   string `json:"usuario_nombre"`
-	// ActividadNombre string `json:"actividad_nombre"`
+	Id          int    `json:"id"`
+	UsuarioId   int    `json:"usuario_id"`
+	ActividadId string `json:"actividad_id"`
+	HorarioId   string `json:"horario_id"`
+	Nombre      string `json:"nombre,omitempty"`
+	Descripcion string `json:"descripcion,omitempty"`
+	Profesor    string `json:"profesor,omitempty"`
 }
 
 type InscripcionesDto []InscripcionDto

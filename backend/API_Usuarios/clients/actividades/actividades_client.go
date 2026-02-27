@@ -31,19 +31,24 @@ func GetActividadById(id string, horarioId string) (dto.ActividadDto, error) {
 		return actividad, fmt.Errorf("failed to decode response: %w", err)
 	}
 
-	// Incrementally update the cupo in API_Actividades
-	url = fmt.Sprintf("%s/actividad/%s/borar-cupo?horario_id=%s", baseURL, id, horarioId)
+	return actividad, nil
+}
+
+func DecrementarCupo(id string, horarioId string) error {
+	baseURL := "http://api_actividades:8080"
+	url := fmt.Sprintf("%s/actividad/%s/borar-cupo?horario_id=%s", baseURL, id, horarioId)
 
 	respCupo, err := http.Post(url, "application/json", nil)
 	if err != nil {
 		log.Errorf("Error calling API_Actividades para borrar cupo: %v", err)
-		return actividad, fmt.Errorf("error connecting to actividades API for quota: %w", err)
+		return fmt.Errorf("error connecting to actividades API for quota: %w", err)
 	}
 	defer respCupo.Body.Close()
 
 	if respCupo.StatusCode != http.StatusOK {
 		log.Errorf("API_Actividades /borar-cupo returned status %d", respCupo.StatusCode)
+		return fmt.Errorf("API_Actividades /borar-cupo returned status %d", respCupo.StatusCode)
 	}
 
-	return actividad, nil
+	return nil
 }

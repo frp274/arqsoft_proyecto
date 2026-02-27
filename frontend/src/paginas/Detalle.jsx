@@ -99,8 +99,13 @@ function Detalle() {
       })
       .catch((err) => {
         setErrorStatus(true);
-        const mensajeError = err.response?.data?.message || 'Error al inscribirse. Intenta nuevamente.';
-        setMensaje(mensajeError);
+        const backendError = err.response?.data?.error;
+
+        if (backendError === "Ya estás inscrito en este horario") {
+          setMensaje("Ya te encuentras inscripto a esta actividad");
+        } else {
+          setMensaje(backendError || err.response?.data?.message || 'Error al inscribirse. Intenta nuevamente.');
+        }
       });
   };
 
@@ -205,7 +210,7 @@ function Detalle() {
                   const inicio = h.horarioInicio || h.horarioinicio || h.HorarioInicio;
                   const fin = h.horarioFinal || h.horariofinal || h.HorarioFinal;
                   const cupos = h.cupo || h.Cupo;
-                  const hId = h.id || h.Id || `${dia}-${inicio}`;
+                  const hId = `${dia}-${inicio}`;
                   const sinCupo = cupos <= 0;
 
                   return (

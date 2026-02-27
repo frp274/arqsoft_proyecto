@@ -76,7 +76,17 @@ function MisInscripciones() {
         } else if (response.status === 404) {
           setInscripciones([]);
         } else {
-          setError("Error al cargar las inscripciones.");
+          // Intentar parsear el error para ver si es el de "no se encontraron"
+          try {
+            const errorData = await response.json();
+            if (errorData.message?.includes("no se encontraron") || errorData.error?.includes("no se encontraron")) {
+              setInscripciones([]);
+            } else {
+              setError("Error al cargar las inscripciones.");
+            }
+          } catch (e) {
+            setError("Error al cargar las inscripciones.");
+          }
         }
       } catch (err) {
         setError("Error de conexión al servidor.");
@@ -167,12 +177,14 @@ function MisInscripciones() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {inscripciones.map((actividad) => {
-              const actID = actividad.Id || actividad.id;
-              const nombre = actividad.Nombre || actividad.nombre;
-              const descripcion = actividad.Descripcion || actividad.descripcion;
-              const profesor = actividad.Profesor || actividad.profesor;
-              const horarios = actividad.Horarios || actividad.horarios;
+            {inscripciones.map((inscripcion) => {
+              // USAR EXPLICITAMENTE actividad_id (que es el ID de MongoDB) para navegar
+              // No usar inscripcion.id porque es el ID correlativo de la base de datos de usuarios
+              const actID = inscripcion.actividad_id;
+              const nombre = inscripcion.nombre || inscripcion.Nombre;
+              const descripcion = inscripcion.descripcion || inscripcion.Descripcion;
+              const profesor = inscripcion.profesor || inscripcion.Profesor;
+              const horarios = inscripcion.horarios || inscripcion.Horarios;
 
               return (
                 <div key={actID} className="group relative bg-card/60 backdrop-blur-sm border border-border rounded-xl overflow-hidden hover:border-primary/50 hover:shadow-[0_0_30px_-5px_hsl(var(--primary)/0.15)] transition-all duration-300 flex flex-col">

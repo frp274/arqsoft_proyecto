@@ -47,6 +47,13 @@ func CreateInscripcion(inscripcionDto dto.InscripcionDto) (dto.InscripcionDto, e
 		return dto.InscripcionDto{}, apiErr
 	}
 
+	// Decrementar cupo en API_Actividades
+	if err := actividades.DecrementarCupo(inscripcionDto.ActividadId, inscripcionDto.HorarioId); err != nil {
+		log.Warnf("Error al decrementar cupo para actividad %s: %v", inscripcionDto.ActividadId, err)
+		// No retornamos error de inscripción porque la inscripción ya se guardó.
+		// Podríamos considerar rollback, pero por ahora logueamos el aviso.
+	}
+
 	// Convertir Model a DTO
 	inscripcionDto.Id = inscripcion.Id
 
