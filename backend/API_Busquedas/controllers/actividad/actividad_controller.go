@@ -5,7 +5,6 @@ import (
 	service "api_busquedas/services"
 
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -13,7 +12,7 @@ import (
 
 func GetActividadById(c *gin.Context) {
 	log.Debug("Actividad id to load: " + c.Param("id"))
-	id, _ := strconv.Atoi(c.Param("id"))
+	id := c.Param("id")
 
 	var actividadDto dto.ActividadDto
 
@@ -86,7 +85,7 @@ func InsertActividad(c *gin.Context) {
 
 func DeleteActividad(c *gin.Context) {
 	log.Debug("Actividad id to delete: " + c.Param("id"))
-	id, _ := strconv.Atoi(c.Param("id"))
+	id := c.Param("id")
 
 	err := service.DeleteActividad(id)
 	if err != nil {
@@ -128,16 +127,10 @@ func DeleteActividad(c *gin.Context) {
 
 func UpdateActividad(c *gin.Context) {
 	log.Debug("Actividad id to update: " + c.Param("id"))
-	id, err := strconv.Atoi(c.Param("id"))
-
-	if err != nil {
-		log.Error("ID inválido: ", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
-		return
-	}
+	id := c.Param("id")
 
 	var actividadDto dto.ActividadDto
-	err = c.BindJSON(&actividadDto)
+	err := c.BindJSON(&actividadDto)
 	if err != nil {
 		log.Error("Error al parsear el cuerpo JSON: ", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido"})

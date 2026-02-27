@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"api_actividades/model"
+	"api_actividades/utils"
 	e "api_actividades/utils/errors"
 
 	log "github.com/sirupsen/logrus"
@@ -318,6 +319,22 @@ func UpdateActividad(actividadDto dto.ActividadDto, token string) (dto.Actividad
 	if err != nil {
 		log.Print("Error al obtener la actividad: ", err)
 		return dto.ActividadDto{}, e.NewNotFoundApiError("Actividad no encontrada")
+	}
+
+	// 1.2 VALIDACIÓN DE SEGURIDAD (JWT)
+	claims, err := utils.ParseJWT(token)
+	if err != nil {
+		log.Errorf("Security check failed: Invalid token: %v", err)
+		return dto.ActividadDto{}, e.NewUnauthorizedApiError("Sesión inválida o expirada")
+	}
+
+	userIdStr := claims.Subject
+	var currentUserId int
+	fmt.Sscanf(userIdStr, "%d", &currentUserId)
+
+	if !claims.Es_admin && currentUserId != actividadActual.OwnerId {
+		log.Warnf("Unauthorized edit attempt by user %d on activity %s (owner: %d)", currentUserId, actividadDto.Id, actividadActual.OwnerId)
+		return dto.ActividadDto{}, e.NewForbiddenApiError("No tienes permisos para editar esta actividad")
 	}
 
 	// 1.5 VALIDAR OWNER SI SE PROPORCIONA (para cambio de propietario)

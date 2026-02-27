@@ -59,6 +59,7 @@ function ListadoActividades({ filtro, refrescar, esAdmin }) {
       nombre: actividad.nombre,
       descripcion: actividad.descripcion,
       profesor: actividad.profesor,
+      owner_id: actividad.owner_id, // Asegurar que capturamos el owner_id
       horarios: actividad.horarios.map(h => ({
         dia: h.dia,
         horarioInicio: h.horarioInicio,
@@ -88,6 +89,7 @@ function ListadoActividades({ filtro, refrescar, esAdmin }) {
           nombre: formData.nombre,
           descripcion: formData.descripcion,
           profesor: formData.profesor,
+          owner_id: formData.owner_id, // Incluir owner_id
           horarios: formData.horarios.map(h => ({
             dia: h.dia,
             horarioInicio: h.horarioInicio,

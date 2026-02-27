@@ -11,7 +11,7 @@ import (
 
 var Db *gorm.DB
 
-func GetActividadById(id int) model.Actividad {
+func GetActividadById(id string) model.Actividad {
 	var actividad model.Actividad
 
 	result := Db.Preload("Horarios").Where("id = ?", id).First(&actividad)
@@ -131,7 +131,7 @@ func InsertActividad(actividad model.Actividad) model.Actividad {
 
 func UpdateActividad(actividad model.Actividad) model.Actividad {
 	result := Db.Model(&model.Actividad{}).Where("id = ?", actividad.Id).Updates(actividad) //Db.Save(&actividad)
-	for _, horario := range actividad.Horarios{ 
+	for _, horario := range actividad.Horarios {
 		result2 := Db.Model(&model.Horario{}).Where("id = ?", horario.Id).Updates(horario)
 		fmt.Println("HORARIO:", horario)
 		if result2.Error != nil {
@@ -148,7 +148,7 @@ func UpdateActividad(actividad model.Actividad) model.Actividad {
 	return actividad
 }
 
-func DeleteActividad(id int) error {
+func DeleteActividad(id string) error {
 	// 1. Borrar los horarios asociados a la actividad
 	err := Db.Where("actividad_id = ?", id).Delete(&model.Horario{}).Error
 	if err != nil {
@@ -157,23 +157,23 @@ func DeleteActividad(id int) error {
 
 	// 2. Borrar la actividad en sí
 	actividad := model.Actividad{}
-	result := Db.Delete(&actividad, id)
+	result := Db.Where("id = ?", id).Delete(&actividad)
 
 	if result.Error != nil {
 		return result.Error
 	}
 
 	if result.RowsAffected == 0 {
-		return fmt.Errorf("no se encontró actividad con ID %d", id)
+		return fmt.Errorf("no se encontró actividad con ID %s", id)
 	}
 
 	return nil
 }
 
-func DeleteHorariosByActividadID(actividadID int) error {
+func DeleteHorariosByActividadID(actividadID string) error {
 	err := Db.Where("actividad_id = ?", actividadID).Delete(&model.Horario{}).Error
 	if err != nil {
-		return fmt.Errorf("error al eliminar los horarios de la actividad %d: %w", actividadID, err)
+		return fmt.Errorf("error al eliminar los horarios de la actividad %s: %w", actividadID, err)
 	}
 	return nil
 }

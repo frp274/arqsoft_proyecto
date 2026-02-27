@@ -6,6 +6,7 @@ type ActividadSolr struct {
 	Nombre      string                   `json:"nombre"`
 	Descripcion string                   `json:"descripcion,omitempty"`
 	Profesor    string                   `json:"profesor"`
+	OwnerId     int                      `json:"owner_id"`
 	ImagenURL   string                   `json:"imagen_url,omitempty"`
 	Tags        []string                 `json:"tags,omitempty"`
 	Horarios    []map[string]interface{} `json:"horarios"` // Se envían como array para el cliente React

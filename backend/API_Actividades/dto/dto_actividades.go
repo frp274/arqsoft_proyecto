@@ -5,7 +5,7 @@ type ActividadDto struct {
 	Nombre      string       `json:"nombre"`
 	Descripcion string       `json:"descripcion"`
 	Profesor    string       `json:"profesor"`
-	OwnerId     int          `json:"owner_id" binding:"required"`
+	OwnerId     int          `json:"owner_id"`
 	ImagenURL   string       `json:"imagen_url,omitempty"`
 	Horario     []HorarioDto `json:"horarios"`
 }
