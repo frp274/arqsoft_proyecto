@@ -2,10 +2,12 @@ package initdb
 
 import (
 	"context"
-	log "github.com/sirupsen/logrus"
 	"time"
 
+	log "github.com/sirupsen/logrus"
+
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	//"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -34,23 +36,26 @@ func Connect(cfg MongoConfig) (*mongo.Client, *mongo.Database, error) {
 }
 
 // RunMigrations corre todo lo necesario para que el servicio arranque con la BD lista.
-func RunMigrations(ctx context.Context, db *mongo.Database) error {
-	if err := ensureActividadesCollection(ctx, db); err != nil {
-		return err
+// Retorna los IDs de todas las actividades existentes para que main.go pueda
+// publicar eventos CREATE en RabbitMQ y mantener Solr sincronizado desde el arranque.
+func RunMigrations(ctx context.Context, db *mongo.Database) ([]string, error) {
+	ids, err := ensureActividadesCollection(ctx, db)
+	if err != nil {
+		return nil, err
 	}
-	return nil
+	return ids, nil
 }
 
 // =============================================================================================
 // ACTIVIDADES
 // =============================================================================================
-func ensureActividadesCollection(ctx context.Context, db *mongo.Database) error {
+func ensureActividadesCollection(ctx context.Context, db *mongo.Database) ([]string, error) {
 	const col = "actividades"
 
 	// 1) Si no existe la colección, crearla con validator
 	has, err := collectionExists(ctx, db, col)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if !has {
 		validator := bson.M{
@@ -80,7 +85,7 @@ func ensureActividadesCollection(ctx context.Context, db *mongo.Database) error 
 		}
 		opts := options.CreateCollection().SetValidator(validator)
 		if err := db.CreateCollection(ctx, col, opts); err != nil {
-			return err
+			return nil, err
 		}
 	}
 
@@ -91,31 +96,38 @@ func ensureActividadesCollection(ctx context.Context, db *mongo.Database) error 
 		{Keys: bson.D{{Key: "horarios.dia", Value: 1}}},
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// 3) Seed inicial con todas las actividades (idempotente)
-	if err := seedActividades(ctx, db, col); err != nil {
-		return err
+	// Siempre retorna los IDs de TODAS las actividades (nuevas o existentes)
+	// para que main.go pueda publicar eventos CREATE en RabbitMQ al arrancar.
+	ids, err := seedActividades(ctx, db, col)
+	if err != nil {
+		return nil, err
 	}
-	
-	return nil
+
+	return ids, nil
 }
 
-func seedActividades(ctx context.Context, db *mongo.Database, col string) error {
+// seedActividades inserta el conjunto inicial de actividades si la colección está vacía.
+// SIEMPRE retorna los IDs de todas las actividades (sean nuevas o preexistentes)
+// para que el caller pueda publicar eventos CREATE en RabbitMQ → Solr queda indexado.
+func seedActividades(ctx context.Context, db *mongo.Database, col string) ([]string, error) {
 	// Verificar si ya existen actividades
 	count, err := db.Collection(col).CountDocuments(ctx, bson.M{})
 	if err != nil {
-		return err
+		return nil, err
 	}
-	
+
 	if count > 0 {
 		log.Info("Database already has activities, skipping seed data")
-		return nil
+		// Retornar los IDs existentes para re-publicar en RabbitMQ y sincronizar Solr
+		return getAllActividadIDs(ctx, db, col)
 	}
-	
+
 	log.Info("Seeding initial activity data...")
-	
+
 	actividades := []interface{}{
 		bson.M{
 			"nombre":      "Yoga Integral",
@@ -226,14 +238,40 @@ func seedActividades(ctx context.Context, db *mongo.Database, col string) error 
 			},
 		},
 	}
-	
+
 	result, err := db.Collection(col).InsertMany(ctx, actividades)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	
-	log.Infof("✅ Seeded %d activities successfully", len(result.InsertedIDs))
-	return nil
+
+	ids := make([]string, 0, len(result.InsertedIDs))
+	for _, rawID := range result.InsertedIDs {
+		if oid, ok := rawID.(primitive.ObjectID); ok {
+			ids = append(ids, oid.Hex())
+		}
+	}
+	log.Infof("✅ Seeded %d activities successfully", len(ids))
+	return ids, nil
+}
+
+// getAllActividadIDs retorna los IDs (hex) de todos los documentos de la colección.
+func getAllActividadIDs(ctx context.Context, db *mongo.Database, col string) ([]string, error) {
+	cursor, err := db.Collection(col).Find(ctx, bson.M{}, options.Find().SetProjection(bson.M{"_id": 1}))
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var ids []string
+	for cursor.Next(ctx) {
+		var doc struct {
+			ID primitive.ObjectID `bson:"_id"`
+		}
+		if err := cursor.Decode(&doc); err == nil {
+			ids = append(ids, doc.ID.Hex())
+		}
+	}
+	return ids, cursor.Err()
 }
 
 func collectionExists(ctx context.Context, db *mongo.Database, name string) (bool, error) {

@@ -26,6 +26,12 @@ foreach ($id in $actividadesIds) {
             nombre = $actividad.nombre
             descripcion = $actividad.descripcion
             profesor = $actividad.profesor
+            imagen_url = $actividad.imagen_url
+            tags = $actividad.tags
+        }
+        
+        if ($null -ne $actividad.horarios) {
+            $solrDoc.horarios = ($actividad.horarios | ConvertTo-Json -Compress)
         }
         
         $solrBody = @{

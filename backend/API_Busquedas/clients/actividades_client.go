@@ -25,7 +25,7 @@ type ActividadAPI struct {
 	Nombre      string       `json:"nombre"`
 	Descripcion string       `json:"descripcion"`
 	Profesor    string       `json:"profesor"`
-	ImagenURL   string       `json:"imagen_url,omitempty"`
+	ImagenURL   string       `json:"imagen_url"`
 	Tags        []string     `json:"tags"`
 	Horarios    []HorarioAPI `json:"horarios"`
 }
@@ -45,7 +45,7 @@ type Actividad struct {
 	Nombre      string    `json:"nombre"`
 	Descripcion string    `json:"descripcion"`
 	Profesor    string    `json:"profesor"`
-	ImagenURL   string    `json:"imagen_url,omitempty"`
+	ImagenURL   string    `json:"imagen_url"`
 	Tags        []string  `json:"tags"`
 	Horarios    []Horario `json:"horarios"`
 }
