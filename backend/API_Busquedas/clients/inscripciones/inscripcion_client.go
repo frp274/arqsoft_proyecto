@@ -30,24 +30,6 @@ func InscripcionActividad(inscripcion model.Inscripcion) (model.Inscripcion, err
 	return inscripcion, nil
 }
 
-func GetCupoByHorarioId(horarioId string) (model.Horario, error) {
-	var horario model.Horario
-	Db.Where("Id = ?", horarioId).First(&horario)
-	if horario.Id != "" {
-		return horario, nil
-	}
-
-	return horario, e.NewNotFoundApiError("no se encontro el horario")
-}
-
-func UpdateInscripcion(horario model.Horario) model.Horario {
-	result := Db.Save(&horario)
-	if result.Error != nil {
-		log.Error("")
-	}
-	return horario
-}
-
 func GetInscripcionesByUsuarioId(usuarioId int) (model.Inscripciones, error) {
 	var inscripciones model.Inscripciones
 

@@ -1,10 +1,9 @@
 package db
 
 import (
-	actividadClient "api_busquedas/clients/actividades"
 	inscripcionClient "api_busquedas/clients/inscripciones"
 	usuarioClient "api_busquedas/clients/usuarios"
-	_"os"
+	_ "os"
 
 	"fmt"
 
@@ -43,9 +42,8 @@ func InitConnection() *gorm.DB {
 	// - MongoDB (actividades) - API_Actividades
 	// - MySQL (usuario, inscripcion) - API_Usuarios
 	log.Info("API_Busquedas: DB connection established (read-only access)")
-	
+
 	// Solo inicializar clientes para consultas READ-ONLY
-	actividadClient.Db = db
 	inscripcionClient.Db = db
 	usuarioClient.Db = db
 

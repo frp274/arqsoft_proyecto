@@ -533,7 +533,7 @@ func BorrarCupo(id string, horarioId string) e.ApiError {
 	}
 	dia := parts[0]
 	horaInicio := parts[1]
-
+	log.Infof("Borrando cupo de la actividad:%s para el horario %s - %s en la BD", objectID.Hex(), dia, horaInicio)
 	err = actividadRepositories.BorrarCupo(objectID, dia, horaInicio)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
@@ -541,9 +541,15 @@ func BorrarCupo(id string, horarioId string) e.ApiError {
 		}
 		return e.NewInternalServerApiError("Error updating cupo", err)
 	}
-	// Invalida caché
-	cacheKey := fmt.Sprintf("actividad:%s", id)
+	// Invalida caché local
+	log.Infof("Borrando de cache la actividad:%s", objectID.Hex())
+	cacheKey := fmt.Sprintf("actividad:%s", objectID.Hex())
 	cache.Delete(cacheKey)
+
+	// Publicar evento UPDATE en RabbitMQ para sincronizar API_Busquedas (Solr y Cache)
+	if err := queue.PublishEvent(queue.EventUpdate, id); err != nil {
+		log.Errorf("Error al publicar evento UPDATE en RabbitMQ despues de borrar cupo: %v", err)
+	}
 
 	return nil
 }

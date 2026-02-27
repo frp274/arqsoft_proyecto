@@ -5,14 +5,12 @@ type ActividadDto struct {
 	Nombre      string       `json:"nombre"`
 	Descripcion string       `json:"descripcion"`
 	Profesor    string       `json:"profesor"`
-	OwnerId     int          `json:"owner_id"`
 	Horario     []HorarioDto `json:"horarios"`
 }
 
 type ActividadesDto []ActividadDto
 
 type HorarioDto struct {
-	Id         string `json:"id"`
 	Dia        string `json:"dia"`
 	HoraInicio string `json:"horarioInicio"`
 	HoraFin    string `json:"horarioFinal"`

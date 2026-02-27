@@ -67,7 +67,8 @@ function Detalle() {
       return;
     }
 
-    const horarioSeleccionado = horarios.find(h => (h.id || h.Id) === horarioId);
+    const horarioSeleccionado = horarios.find(h => `${h.dia || h.Dia}-${h.horarioInicio || h.horarioinicio || h.HorarioInicio}` === horarioId);
+    console.log("Horario Seleccionado:", horarioSeleccionado); // <--- Agrega esto
     if (!horarioSeleccionado || (horarioSeleccionado.cupo || horarioSeleccionado.Cupo) <= 0) {
       setErrorStatus(true);
       setMensaje("No hay cupos disponibles para este horario.");
@@ -92,7 +93,7 @@ function Detalle() {
         setErrorStatus(false);
         setMensaje('¡Felicitaciones! Te inscribiste correctamente a la actividad.');
         setTimeout(() => {
-          axios.get(`${process.env.REACT_APP_API_BUSQUEDAS_URL}/actividad/${id}`)
+          axios.get(`${process.env.REACT_APP_API_ACTIVIDADES_URL}/actividad/${id}`)
             .then((response) => setActividad(response.data))
             .catch((err) => console.error('Error al recargar:', err));
         }, 1500);

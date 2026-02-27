@@ -92,9 +92,13 @@ func UpdateActividad(a model.Actividad) (model.Actividad, error) {
 
 func BorrarCupo(id primitive.ObjectID, dia string, horaInicio string) error {
 	filter := bson.M{
-		"_id":                 id,
-		"horarios.dia":        dia,
-		"horarios.horaInicio": horaInicio,
+		"_id": id,
+		"horarios": bson.M{
+			"$elemMatch": bson.M{
+				"dia":        dia,
+				"horaInicio": horaInicio,
+			},
+		},
 	}
 	update := bson.M{"$inc": bson.M{"horarios.$.cupo": -1}}
 	res, err := Db.Collection("actividades").UpdateOne(context.TODO(), filter, update)
