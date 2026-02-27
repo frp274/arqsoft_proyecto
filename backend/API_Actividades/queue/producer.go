@@ -38,9 +38,21 @@ var producer *RabbitMQProducer
 
 // InitProducer inicializa la conexión con RabbitMQ y declara la cola
 func InitProducer(rabbitURL, queueName, exchangeName string) error {
-	conn, err := amqp.Dial(rabbitURL)
+	var conn *amqp.Connection
+	var err error
+
+	// Retry connection with exponential backoff
+	for i := 0; i < 5; i++ {
+		conn, err = amqp.Dial(rabbitURL)
+		if err == nil {
+			break
+		}
+		log.Warnf("Failed to connect to RabbitMQ (attempt %d/5): %v", i+1, err)
+		time.Sleep(time.Duration(i+1) * 2 * time.Second)
+	}
+
 	if err != nil {
-		return fmt.Errorf("failed to connect to RabbitMQ: %w", err)
+		return fmt.Errorf("failed to connect to RabbitMQ after retries: %w", err)
 	}
 
 	ch, err := conn.Channel()
